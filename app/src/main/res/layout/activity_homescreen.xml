@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#D8D8D8">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:text="ユーザー名 useruser"
+            android:textSize="20sp"
+            android:layout_marginBottom="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnProduct"
+                android:text="製品"
+                android:background="@drawable/button_bg"
+                android:textColor="#FFFFFF"
+                android:layout_width="100dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="8dp"/>
+
+            <Button
+                android:id="@+id/btnParts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/parts_box_rounded"
+                android:elevation="4dp"
+                android:text="部品"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnConstruction"
+                android:text="工事"
+                android:background="@drawable/button_bg"
+                android:textColor="#FFFFFF"
+                android:layout_width="80dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="12dp"/>
+
+            <EditText
+                android:id="@+id/etConstructionText"
+                android:hint="工事名を入力"
+                android:textSize="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnProcess"
+                android:text="工程"
+                android:background="@drawable/button_bg"
+                android:textColor="#FFFFFF"
+                android:layout_width="80dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="12dp"/>
+
+            <EditText
+                android:id="@+id/etProcessText"
+                android:hint="工程名を入力"
+                android:textSize="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="32dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnNumberReg"
+                android:text="スキャン"
+                android:background="@drawable/button_bg"
+                android:textColor="#FFFFFF"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="16dp"/>
+
+            <Button
+                android:id="@+id/btnLocation"
+                android:text="置き場確認"
+                android:background="@drawable/button_bg"
+                android:textColor="#FFFFFF"
+                android:layout_width="140dp"
+                android:layout_height="48dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:text="ver 0.0.0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</ScrollView>
