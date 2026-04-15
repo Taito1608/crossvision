@@ -41,36 +41,74 @@
 
             <RadioButton
                 android:id="@+id/rgStart"
-                android:layout_width="wrap_content"
+
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:textAlignment="center"
+                android:paddingVertical="8dp"
 
                 android:button="@null"
-                android:checked="false"
-                android:clickable="false"
+                android:background="@drawable/background_custom_radio"
+                android:textColor="@color/color_custom_radio_text"
+
                 android:text="開始" />
 
             <RadioButton
                 android:id="@+id/rbFinish"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:textAlignment="center"
+                android:paddingVertical="8dp"
+
+                android:button="@null"
+                android:background="@drawable/background_custom_radio"
+                android:textColor="@color/color_custom_radio_text"
                 android:text="完了"/>
 
             <RadioButton
                 android:id="@+id/rbStop"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:textAlignment="center"
+                android:paddingVertical="8dp"
+
+                android:button="@null"
+                android:background="@drawable/background_custom_radio"
+                android:textColor="@color/color_custom_radio_text"
                 android:text="中止"/>
 
             <RadioButton
                 android:id="@+id/rbBad"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:textAlignment="center"
+                android:paddingVertical="8dp"
+
+                android:button="@null"
+                android:background="@drawable/background_custom_radio"
+                android:textColor="@color/color_custom_radio_text"
                 android:text="不良"/>
 
             <RadioButton
                 android:id="@+id/rbCancel"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:textAlignment="center"
+                android:paddingVertical="8dp"
+
+                android:button="@null"
+                android:background="@drawable/background_custom_radio"
+                android:textColor="@color/color_custom_radio_text"
                 android:text="取消"/>
         </RadioGroup>
 
