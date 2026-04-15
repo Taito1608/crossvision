@@ -22,10 +22,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="093272ab-4967-4b3e-ae28-1fa510f3fcc1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/color/color_custom_radio_text.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,7 +103,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "kanazawa__add__progress",
+    "git-widget-placeholder": "kanazawa-add-progress-registration-screen",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/yusataito/GitHub/crossvision",
     "show.migrate.to.gradle.popup": "false"
