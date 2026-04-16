@@ -18,6 +18,17 @@ class ProgressActivity : AppCompatActivity(){
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "確認画面"
+
+        val btnRegister = findViewById<Button>(R.id.btnRegister)
+
+        btnRegister.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean{
@@ -29,13 +40,4 @@ class ProgressActivity : AppCompatActivity(){
     }
 
     val btnRegister = findViewById<Button>(R.id.btnRegister)
-
-    btnRegister.setOnClickListener {
-        val intent = Intent(this, HomeActivity::class.java)
-
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-
-        startActivity(intent)
-        finish()
-    }
 }

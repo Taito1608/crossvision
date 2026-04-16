@@ -15,6 +15,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.camera.view.PreviewView
+import androidx.camera.core.ImageAnalysis
+import java.io.File
+
 
 class CameraActivity : AppCompatActivity() {
 
@@ -22,9 +25,14 @@ class CameraActivity : AppCompatActivity() {
 
     private lateinit var imageCapture: ImageCapture
 
-    override fun onCreate(savedInstanceStatus: Bundle?){
-        super.onCreate(savedInstanceStatus)
+    private lateinit var imageAnalysis: ImageAnalysis
+
+    private var isCaptured = false
+
+    override fun onCreate(savedInstanceState: Bundle?){
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "スキャン画面"
 
@@ -111,6 +119,27 @@ class CameraActivity : AppCompatActivity() {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
 
+            imageAnalysis = ImageAnalysis.Builder().build()
+
+            imageAnalysis.setAnalyzer(
+                ContextCompat.getMainExecutor(this)
+            ) { imageProxy ->
+
+                // TODO: OCR
+                val detected = fakeScanCheck()
+
+                if (detected && !isCaptured) {
+                    isCaptured = true
+                    captureImage()
+                }
+
+                imageProxy.close()
+            }
+
+            imageCapture = ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build()
+
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try{
@@ -124,5 +153,34 @@ class CameraActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun fakeScanCheck(): Boolean {
+        // now random but OCR insert later
+        return (0..50).random() == 0
+    }
+
+    private fun captureImage() {
+        val file = File(cacheDir, "scan_${System.currentTimeMillis()}.jpg")
+
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(this),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    val uri = Uri.fromFile(file)
+
+                    Toast.makeText(this@CameraActivity, "スキャン完了", Toast.LENGTH_SHORT).show()
+
+                    // Insert AI
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    exception.printStackTrace()
+                }
+            }
+        )
     }
 }
