@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity(){
             isPasswordVisible = !isPasswordVisible
 
             if (isPasswordVisible){
-                etPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 tvShowPass.text = "パスワード非表示"
             }else{
                 etPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
