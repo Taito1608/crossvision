@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation("com.google.android.material:material:1.13.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -39,5 +39,5 @@ class ProgressActivity : AppCompatActivity(){
         return super.onOptionsItemSelected(item)
     }
 
-    val btnRegister = findViewById<Button>(R.id.btnRegister)
+    //val btnRegister = findViewById<Button>(R.id.btnRegister)
 }
