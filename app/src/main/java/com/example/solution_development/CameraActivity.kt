@@ -64,7 +64,12 @@ class CameraActivity : AppCompatActivity() {
         val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
 
         btnComplete.setOnClickListener {
-            val intent = Intent(this, ProgressActivity::class.java)
+            val intent = Intent(this, ConfirmationActivity::class.java)
+
+            intent.putExtra("productNumber", scannedList.lastOrNull())
+            intent.putExtra("process", "工程A") // ←後でHomeから渡す
+            intent.putExtra("construction", "工事A")
+
             startActivity(intent)
         }
 
