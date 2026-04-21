@@ -112,8 +112,8 @@
                 android:layout_marginRight="16dp"/>
 
             <Button
-                android:id="@+id/btnLocation"
-                android:text="置き場確認"
+                android:id="@+id/btnHistory"
+                android:text="履歴"
                 android:background="@drawable/button_bg"
                 android:textColor="#FFFFFF"
                 android:layout_width="140dp"
