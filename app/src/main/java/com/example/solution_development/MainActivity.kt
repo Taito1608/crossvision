@@ -42,5 +42,12 @@ class MainActivity : AppCompatActivity(){
                 val intent = Intent(this,HomeActivity::class.java)
                 startActivity(intent)
         }
+        
+        // ONNX Test button
+        val btnTestOnnx = findViewById<Button>(R.id.btnTestOnnx)
+        btnTestOnnx.setOnClickListener {
+            val intent = Intent(this, OnnxTestActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

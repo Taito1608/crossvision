@@ -16,7 +16,7 @@ class OnnxOcrEngine(private val context: Context) {
 
     companion object {
         private const val TAG = "OnnxOcrEngine"
-        private const val MODEL_NAME = "ocr_model.onnx"
+        private const val MODEL_NAME = "dummy_model.onnx"
         private const val INPUT_NAME = "data_0"
         private const val OUTPUT_NAME = "softmaxout_1"
     }
@@ -39,18 +39,30 @@ class OnnxOcrEngine(private val context: Context) {
     }
 
     fun loadModel(): Boolean {
+        Log.d(TAG, "loadModel() called, model: $MODEL_NAME")
         return try {
             ortEnvironment = OrtEnvironment.getEnvironment()
+            Log.d(TAG, "OrtEnvironment created")
+            
             val modelBytes = loadModelFromAssets(MODEL_NAME)
+            Log.d(TAG, "Model loaded from assets, size: ${modelBytes.size} bytes")
+            
             val sessionOptions = OrtSession.SessionOptions()
             session = ortEnvironment?.createSession(modelBytes, sessionOptions)
+            
+            if (session != null) {
+                Log.d(TAG, "Session created successfully")
+                Log.d(TAG, "Inputs: ${session?.inputMetadata?.keys}")
+                Log.d(TAG, "Outputs: ${session?.outputMetadata?.keys}")
+            }
+            
             isModelLoaded = session != null
             isModelLoaded
         } catch (e: OrtException) {
-            e.printStackTrace()
+            Log.e(TAG, "OrtException in loadModel", e)
             false
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Exception in loadModel", e)
             false
         }
     }

@@ -74,6 +74,17 @@
             android:layout_width="200dp"
             android:layout_height="52dp"/>
 
+        <Button
+            android:id="@+id/btnTestOnnx"
+            android:text="ONNX Test"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_bg"
+            android:elevation="8dp"
+            android:layout_width="200dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp" />
+
         <TextView
             android:id="@+id/tvVersion"
             android:text="var 0.0.0"

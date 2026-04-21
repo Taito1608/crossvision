@@ -3,6 +3,7 @@ package com.example.solution_development.test
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,13 +15,22 @@ class OnnxTestActivity : AppCompatActivity() {
     private lateinit var engine: OnnxOcrEngine
     private lateinit var statusText: TextView
     private lateinit var resultText: TextView
+    private lateinit var dummyBitmap: Bitmap
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onnx_test)
         
+        Log.d("OnnxTest", "Activity created")
+        Log.d("OnnxTest", "Initializing ONNX engine...")
+        
         statusText = findViewById(R.id.statusText)
         resultText = findViewById(R.id.resultText)
+        
+        // ダミー画像生成（224x224 白色）
+        dummyBitmap = Bitmap.createBitmap(224, 224, Bitmap.Config.ARGB_8888).apply {
+            eraseColor(Color.WHITE)
+        }
         
         // ONNX Runtime Engine initialization
         engine = OnnxOcrEngine(this)
@@ -28,11 +38,17 @@ class OnnxTestActivity : AppCompatActivity() {
         // Load model button
         val loadBtn = findViewById<Button>(R.id.loadBtn)
         loadBtn.setOnClickListener {
+            Log.d("OnnxTest", "Load Model button clicked")
             statusText.text = "Loading model..."
             Thread {
                 val success = engine.loadModel()
+                Log.d("OnnxTest", "Load Model result: $success")
                 runOnUiThread {
-                    statusText.text = if (success) "Model loaded successfully" else "Failed to load model"
+                    if (success) {
+                        statusText.text = "Model loaded ✓"
+                    } else {
+                        statusText.text = "Load failed ✗"
+                    }
                 }
             }.start()
         }
@@ -40,42 +56,27 @@ class OnnxTestActivity : AppCompatActivity() {
         // Run inference button
         val runBtn = findViewById<Button>(R.id.runBtn)
         runBtn.setOnClickListener {
-            runInferenceTest()
+            Log.d("OnnxTest", "Run Inference button clicked")
+            statusText.text = "Running..."
+            Thread {
+                try {
+                    val codes = engine.extractProductCode(dummyBitmap)
+                    Log.d("OnnxTest", "Inference result: $codes")
+                    runOnUiThread {
+                        resultText.text = codes.toString()
+                        statusText.text = "Success!"
+                    }
+                } catch (e: Exception) {
+                    Log.e("OnnxTest", "Inference error", e)
+                    runOnUiThread {
+                        resultText.text = "Error: ${e.message}"
+                        statusText.text = "Error!"
+                    }
+                }
+            }.start()
         }
         
         statusText.text = "Tap 'Load Model' to initialize ONNX Runtime"
-    }
-    
-    private fun runInferenceTest() {
-        if (!::engine.isInitialized) {
-            statusText.text = "Engine not initialized"
-            return
-        }
-        
-        statusText.text = "Creating dummy bitmap..."
-        
-        // Create dummy bitmap for testing
-        Thread {
-            val bitmap = Bitmap.createBitmap(224, 224, Bitmap.Config.ARGB_8888)
-            bitmap.eraseColor(Color.rgb(128, 128, 128))
-            
-            val startTime = System.currentTimeMillis()
-            val productCodes = engine.extractProductCode(bitmap)
-            val endTime = System.currentTimeMillis()
-            
-            runOnUiThread {
-                if (productCodes.isNotEmpty()) {
-                    resultText.text = """
-                        Inference completed in ${endTime - startTime}ms
-                        Product codes found: ${productCodes.joinToString(", ")}
-                    """.trimIndent()
-                    statusText.text = "Success!"
-                } else {
-                    resultText.text = "No product codes found (may need real model)"
-                    statusText.text = "Inference completed (no results)"
-                }
-            }
-        }.start()
     }
     
     override fun onDestroy() {
