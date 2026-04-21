@@ -92,9 +92,12 @@ class OnnxOcrEngine(private val context: Context) {
             results?.use { result ->
                 val outputTensor = result.get(OUTPUT_NAME).get()
                 val outputArray = outputTensor.getValue() as FloatArray
+                Log.d(TAG, "Output array size: ${outputArray.size}, first 5: ${outputArray.take(5).toList()}")
                 if (outputArray.all { it == 0f }) {
+                    Log.d(TAG, "All zeros, returning empty list")
                     emptyList()
                 } else {
+                    Log.d(TAG, "Non-zero output, returning dummy code")
                     listOf("49827570")
                 }
             } ?: emptyList()
