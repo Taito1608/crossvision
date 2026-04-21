@@ -28,6 +28,9 @@
             android:exported="false"
             android:theme="@style/Theme.CameraScreen"/>
         <activity android:name=".HomeActivity"/>
+        <activity android:name=".test.OnnxTestActivity"
+            android:exported="true"
+            android:label="ONNX Runtime Test"/>
     </application>
 
 </manifest>
