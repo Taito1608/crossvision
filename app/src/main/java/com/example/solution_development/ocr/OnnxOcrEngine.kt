@@ -53,8 +53,8 @@ class OnnxOcrEngine(private val context: Context) {
             
             if (session != null) {
                 Log.d(TAG, "Session created successfully")
-                Log.d(TAG, "Inputs: ${session?.inputMetadata?.keys}")
-                Log.d(TAG, "Outputs: ${session?.outputMetadata?.keys}")
+                Log.d(TAG, "Input names: ${session?.inputNames}")
+                Log.d(TAG, "Output names: ${session?.outputNames}")
             }
             
             isModelLoaded = session != null
