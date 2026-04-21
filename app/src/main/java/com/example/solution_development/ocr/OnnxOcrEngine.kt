@@ -11,7 +11,6 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
-import java.util.concurrent.TimeUnit
 
 class OnnxOcrEngine(private val context: Context) {
 
@@ -82,29 +81,43 @@ class OnnxOcrEngine(private val context: Context) {
     }
 
     fun extractProductCode(bitmap: Bitmap): List<String> {
+        Log.d(TAG, "extractProductCode() called")
         if (!isModelLoaded || session == null || ortEnvironment == null) {
+            Log.w(TAG, "Engine not ready")
             return emptyList()
         }
         return try {
+            Log.d(TAG, "Creating input tensor")
             val inputTensor = bitmapToInputTensor(bitmap)
+            Log.d(TAG, "Input tensor created")
             val inputs = hashMapOf(INPUT_NAME to inputTensor)
+            Log.d(TAG, "Running session.run() with input: $INPUT_NAME")
             val results = session?.run(inputs)
-            results?.use { result ->
-                val outputTensor = result.get(OUTPUT_NAME).get()
+            Log.d(TAG, "Session run completed, result is null: ${results == null}")
+            if (results == null) {
+                Log.w(TAG, "Session.run returned null")
+                return emptyList()
+            }
+            results.use { result ->
+                Log.d(TAG, "Result keys: ${result.keys}")
+                val outputTensor = result.get(OUTPUT_NAME)
+                Log.d(TAG, "Output tensor obtained")
                 val outputArray = outputTensor.getValue() as FloatArray
                 Log.d(TAG, "Output array size: ${outputArray.size}, first 5: ${outputArray.take(5).toList()}")
                 if (outputArray.all { it == 0f }) {
                     Log.d(TAG, "All zeros, returning empty list")
                     emptyList()
                 } else {
-                    Log.d(TAG, "Non-zero output, returning dummy code")
+                    Log.d(TAG, "Non-zero output found, returning dummy code")
                     listOf("49827570")
                 }
-            } ?: emptyList()
+            }
         } catch (e: OrtException) {
+            Log.e(TAG, "OrtException in extractProductCode", e)
             e.printStackTrace()
             emptyList()
         } catch (e: Exception) {
+            Log.e(TAG, "Exception in extractProductCode", e)
             e.printStackTrace()
             emptyList()
         }
