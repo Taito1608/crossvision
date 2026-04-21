@@ -92,17 +92,23 @@ class OnnxOcrEngine(private val context: Context) {
             Log.d(TAG, "Input tensor created")
             val inputs = hashMapOf(INPUT_NAME to inputTensor)
             Log.d(TAG, "Running session.run() with input: $INPUT_NAME")
-            val results = session?.run(inputs)
-            Log.d(TAG, "Session run completed, result is null: ${results == null}")
-            if (results == null) {
-                Log.w(TAG, "Session.run returned null")
-                return emptyList()
-            }
-            results.use { result ->
+            
+            session?.run(inputs)?.use { result ->
                 Log.d(TAG, "Getting output tensor: $OUTPUT_NAME")
-                val outputTensor = result.get(OUTPUT_NAME) as OnnxTensor
+                // OrtSession.Result.get(String) は Optional<OnnxValue> を返す
+                // Optional.get() で OnnxValue を取得 → OnnxTensor か確認
+                val outputTensor = result.get(OUTPUT_NAME)?.get() as? OnnxTensor
+                if (outputTensor == null) {
+                    Log.e(TAG, "Output is not an OnnxTensor or missing")
+                    return@use emptyList()
+                }
                 Log.d(TAG, "Output tensor obtained")
-                val outputArray = outputTensor.getValue() as FloatArray
+                
+                // floatBuffer から FloatArray を作成
+                val floatBuffer = outputTensor.floatBuffer
+                val outputArray = FloatArray(floatBuffer.remaining())
+                floatBuffer.get(outputArray)
+                
                 Log.d(TAG, "Output array size: ${outputArray.size}, first 5: ${outputArray.take(5).toList()}")
                 if (outputArray.all { it == 0f }) {
                     Log.d(TAG, "All zeros, returning empty list")
@@ -111,7 +117,7 @@ class OnnxOcrEngine(private val context: Context) {
                     Log.d(TAG, "Non-zero output found, returning dummy code")
                     listOf("49827570")
                 }
-            }
+            } ?: emptyList()
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in extractProductCode", e)
             e.printStackTrace()
