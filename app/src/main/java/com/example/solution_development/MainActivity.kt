@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.content.Intent
 import com.example.solution_development.R
+import com.example.solution_development.test.OnnxTestActivity
 
 class MainActivity : AppCompatActivity(){
     private lateinit var etId: EditText
