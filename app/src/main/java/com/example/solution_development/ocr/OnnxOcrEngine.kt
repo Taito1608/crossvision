@@ -18,8 +18,8 @@ class OnnxOcrEngine(private val context: Context) {
     companion object {
         private const val TAG = "OnnxOcrEngine"
         private const val MODEL_NAME = "dummy_model.onnx"
-        private const val INPUT_NAME = "data_0"
-        private const val OUTPUT_NAME = "softmaxout_1"
+        private const val INPUT_NAME = "input"
+        private const val OUTPUT_NAME = "output"
     }
 
     private var session: OrtSession? = null
