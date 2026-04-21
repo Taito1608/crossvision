@@ -100,9 +100,14 @@ class OnnxOcrEngine(private val context: Context) {
             }
             results.use { result ->
                 Log.d(TAG, "Getting output tensor: $OUTPUT_NAME")
-                val outputTensor = (result as OrtSession.Result).get(OUTPUT_NAME)
+                val outputTensor = result.get(OUTPUT_NAME)
                 Log.d(TAG, "Output tensor obtained")
-                val outputArray = outputTensor.getValue() as FloatArray
+                
+                // Get float array from tensor's floatBuffer to avoid getValue() ambiguity
+                val floatBuffer = outputTensor.floatBuffer
+                val outputArray = FloatArray(floatBuffer.remaining())
+                floatBuffer.get(outputArray)
+                
                 Log.d(TAG, "Output array size: ${outputArray.size}, first 5: ${outputArray.take(5).toList()}")
                 if (outputArray.all { it == 0f }) {
                     Log.d(TAG, "All zeros, returning empty list")
