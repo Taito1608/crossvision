@@ -64,7 +64,8 @@ class CameraActivity : AppCompatActivity() {
         val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
 
         btnComplete.setOnClickListener {
-            val intent = Intent(this, ProgressActivity::class.java)
+            val intent = Intent(this, ConfirmationActivity::class.java)
+
             startActivity(intent)
         }
 
