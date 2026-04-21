@@ -99,7 +99,7 @@ class OnnxOcrEngine(private val context: Context) {
                 return emptyList()
             }
             results.use { result ->
-                Log.d(TAG, "Result keys: ${result.keys}")
+                Log.d(TAG, "Result keys: ${result.entries.joinToString { it.key }}")
                 val outputTensor = result.get(OUTPUT_NAME)
                 Log.d(TAG, "Output tensor obtained")
                 val outputArray = outputTensor.getValue() as FloatArray
