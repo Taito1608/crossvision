@@ -11,8 +11,6 @@ import android.widget.EditText
 import android.widget.ListView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.solution_development.adapter.HistoryAdapter
-import com.example.solution_development.model.HistoryItem
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
