@@ -66,6 +66,21 @@ class CameraActivity : AppCompatActivity() {
         btnComplete.setOnClickListener {
             val intent = Intent(this, ConfirmationActivity::class.java)
 
+            // ダミーデータ：スキャン結果を追加
+            if (scannedList.isEmpty()) {
+                scannedList.add("123456")
+                scannedList.add("789012")
+                scannedList.add("345678")
+                scannedList.add("789012")
+                scannedList.add("345678")
+                scannedList.add("789012")
+                scannedList.add("345678")
+                scannedList.add("789012")
+                scannedList.add("345678")
+            }
+
+            intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+
             startActivity(intent)
         }
 
