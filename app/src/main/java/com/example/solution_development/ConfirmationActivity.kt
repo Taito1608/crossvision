@@ -5,6 +5,8 @@ import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ListView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import java.time.ZonedDateTime
@@ -16,6 +18,7 @@ class ConfirmationActivity : AppCompatActivity() {
     private lateinit var statusGroup: RadioGroup
     private lateinit var confirmButton: Button
     private lateinit var continueButton: Button
+    private lateinit var scannedListView: ListView
 
     private var selectedStatus: String = "STARTED"
 
@@ -28,13 +31,26 @@ class ConfirmationActivity : AppCompatActivity() {
         statusGroup = findViewById(R.id.status_group)
         confirmButton = findViewById(R.id.confirm_button)
         continueButton = findViewById(R.id.continue_button)
+        scannedListView = findViewById(R.id.scanned_list_view)
 
         // ===== Intentからデータ取得 =====
         val productNumber = intent.getStringExtra("productNumber") ?: "未取得"
         val process = intent.getStringExtra("process") ?: "未選択"
         val construction = intent.getStringExtra("construction") ?: "未選択"
+        val scannedList = intent.getStringArrayListExtra("scannedList") ?: arrayListOf()
 
         confirmationMessage.text = "写真エリア"
+
+        // ===== スキャン結果をListViewに表示 =====
+        if (scannedList.isNotEmpty()) {
+            val adapter = ArrayAdapter(
+                this,
+                R.layout.item_scanned,
+                R.id.text_code,
+                scannedList
+            )
+            scannedListView.adapter = adapter
+        }
 
         // ===== ステータス選択 =====
         statusGroup.setOnCheckedChangeListener { _, checkedId ->
