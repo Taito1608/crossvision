@@ -45,7 +45,8 @@ class ConfirmationActivity : AppCompatActivity() {
         if (scannedList.isNotEmpty()) {
             val adapter = ArrayAdapter(
                 this,
-                android.R.layout.simple_list_item_1,
+                R.layout.item_scanned,
+                R.id.text_code,
                 scannedList
             )
             scannedListView.adapter = adapter
