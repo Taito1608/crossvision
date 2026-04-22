@@ -1,0 +1,67 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#D8D8D8">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- ① 検索エリア -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+          <SearchView
+              android:id="@+id/search"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:iconifiedByDefault="false"
+              android:queryHint="検索" />
+        </LinearLayout>
+
+        <!-- ② リスト表示エリア -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:orientation="vertical"
+            android:background="@drawable/parts_box_rounded"
+            android:padding="8dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/historyRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+
+        <!-- ③ ボタンエリア -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/back_to_home_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/parts_box_rounded"
+                android:text="戻る" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

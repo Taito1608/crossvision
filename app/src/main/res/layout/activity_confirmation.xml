@@ -1,0 +1,155 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#D8D8D8">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- ① 写真エリア -->
+        <TextView
+            android:id="@+id/confirmation_message"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:gravity="center"
+            android:text="写真エリア"
+            android:textSize="18sp"
+            android:textColor="#000000" />
+
+        <!-- ② 検索エリア -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:orientation="vertical"
+            android:background="@drawable/parts_box_rounded">
+
+            <SearchView
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:iconifiedByDefault="false"
+                android:queryHint="検索" />
+
+            <ListView
+                android:id="@+id/scanned_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"/>
+        </LinearLayout>
+
+        <!-- ③ ステータスエリア -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <!-- タイトル -->
+            <TextView
+                android:id="@+id/overall_status_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="全体ステータス"
+                android:textSize="26sp"
+                android:textColor="#000000" />
+
+            <!-- セグメントボタン -->
+            <RadioGroup
+                android:id="@+id/status_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <RadioButton
+                    android:id="@+id/status_start"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="開始"
+                    android:background="@drawable/segment_background"
+                    android:textColor="@color/segment_text"/>
+
+                <RadioButton
+                    android:id="@+id/status_complete"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="完了"
+                    android:background="@drawable/segment_background"
+                    android:textColor="@color/segment_text"/>
+
+                <RadioButton
+                    android:id="@+id/status_stop"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="中止"
+                    android:background="@drawable/segment_background"
+                    android:textColor="@color/segment_text"/>
+
+                <RadioButton
+                    android:id="@+id/status_defect"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="不良"
+                    android:background="@drawable/segment_background"
+                    android:textColor="@color/segment_text"/>
+
+                <RadioButton
+                    android:id="@+id/status_cancel"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="取り消し"
+                    android:background="@drawable/segment_background"
+                    android:textColor="@color/segment_text"/>
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/continue_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/parts_box_rounded"
+                android:text="続行" />
+
+            <Button
+                android:id="@+id/confirm_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/parts_box_rounded"
+                android:text="確定" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
