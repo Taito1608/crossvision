@@ -9,6 +9,10 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.solution_development.adapter.HistoryAdapter
+import com.example.solution_development.model.HistoryItem
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -17,6 +21,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var etProcessText: EditText
     private lateinit var btnConstruction: Button
     private lateinit var btnProcess: Button
+
     private fun showLogoutDialog(){
         val builder = AlertDialog.Builder(this)
         builder.setTitle("ログアウト")
@@ -68,9 +73,15 @@ class HomeActivity : AppCompatActivity() {
         btnProcess.setOnClickListener { showProcessSheet() }
 
         val btnNumberReg = findViewById<Button>(R.id.btnNumberReg)
+        val btnHistory = findViewById<Button>(R.id.btnHistory)
 
         btnNumberReg.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnHistory.setOnClickListener {
+            val intent = Intent(this, HistoryActivity::class.java)
             startActivity(intent)
         }
     }
@@ -176,5 +187,5 @@ class HomeActivity : AppCompatActivity() {
 //        dialog.setContentView(view)
 //        dialog.show()
 //    }
-//
+
 }
