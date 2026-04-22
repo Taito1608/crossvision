@@ -5,9 +5,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
+import android.os.Handler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -39,6 +41,9 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var imageCapture: ImageCapture
     private lateinit var imageAnalysis: ImageAnalysis
 
+    // TODO ===== OCR =====
+    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
     // TODO ===== ??? =====
     private var isCaptured = false
     private val scannedList = mutableListOf<String>()
@@ -47,9 +52,12 @@ class CameraActivity : AppCompatActivity() {
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
+                Toast.makeText(this, "画像選択完了", Toast.LENGTH_SHORT).show()
                 sendToAI(uri)
             }
         }
+
+    private var isProcessing = false
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -148,6 +156,7 @@ class CameraActivity : AppCompatActivity() {
                 ContextCompat.getMainExecutor(this)
             ) { imageProxy: ImageProxy ->
 
+
                 // TODO: OCR
                 val mediaImage = imageProxy.image
 
@@ -160,26 +169,29 @@ class CameraActivity : AppCompatActivity() {
                     recognizer.process(image)
                         .addOnSuccessListener { visionText ->
                             val text = visionText.text
+                            val numbers = text.replace(Regex("[^0-9]"), "")
 
-                            // OCR Result
-                            if (text.isNotEmpty()) {
-                                val numbers = text.filter { it.isDigit() }
+                            if (numbers.length >= 6) {
+                                if (!scannedList.contains(numbers)) {
+                                    scannedList.add(numbers)
+                                }
 
-                                if (numbers.length >= 6) {
-                                    if (!scannedList.contains(numbers)) {
-                                        scannedList.add(numbers)
-                                    }
+                                if (!isCaptured) {
+                                    isCaptured = true
+                                    captureImage()
 
-                                    if (!isCaptured) {
-                                        isCaptured = true
-                                        captureImage()
-                                    }
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        isCaptured = false
+                                    }, 2000)
                                 }
                             }
                         }
                         .addOnCompleteListener {
+                            isProcessing = false
                             imageProxy.close()
                         }
+                } else {
+                    imageProxy.close()
                 }
             }
 
@@ -194,7 +206,9 @@ class CameraActivity : AppCompatActivity() {
                 cameraProvider.bindToLifecycle(
                     this,
                     cameraSelector,
-                    preview
+                    preview,
+                    imageAnalysis,
+                    imageCapture
                 )
             }catch (e: Exception){
                 e.printStackTrace()
@@ -228,10 +242,10 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
-    private fun fakeScanCheck(): Boolean {
-        // now random but OCR insert later
-        return (0..50).random() == 0
-    }
+    //private fun fakeScanCheck(): Boolean {
+    //    // now random but OCR insert later
+    //    return (0..50).random() == 0
+    //}
 
     private fun sendToAI(uri: Uri) {
         println("AI送信: $uri")
