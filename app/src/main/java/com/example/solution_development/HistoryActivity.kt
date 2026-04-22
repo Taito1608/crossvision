@@ -1,9 +1,11 @@
 package com.example.solution_development
 
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.content.Intent
+import com.example.solution_development.HomeActivity
 import androidx.recyclerview.widget.RecyclerView
 // import com.example.solution_development.adapter.HistoryAdapter
 // import com.example.solution_development.model.HistoryItem
+import android.widget.Button
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
@@ -22,5 +24,11 @@ class HistoryActivity : AppCompatActivity() {
 
         // recyclerView.layoutManager = LinearLayoutManager(this)
         // recyclerView.adapter = HistoryAdapter(sampleList)
+
+        val btnBackToHome = findViewById<Button>(R.id.back_to_home_button)
+        btnBackToHome.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
