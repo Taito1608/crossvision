@@ -32,9 +32,9 @@ class OnnxOcrEngine(private val context: Context) {
         private const val INPUT_HEIGHT = 48
         private const val INPUT_CHANNELS = 3
 
-        // ImageNet mean/std for BGR channels (0-255 スケール用)
-        private val MEAN_255 = floatArrayOf(103.53f, 116.28f, 123.675f) // B, G, R
-        private val STD_255 = floatArrayOf(57.375f, 57.12f, 58.395f)
+        // PaddleOCR normalization: (pixel - 127.5) / 127.5 (equivalent to mean=0.5, std=0.5 on [0,1])
+        private const val PADDLE_MEAN = 127.5f
+        private const val PADDLE_STD = 127.5f
 
         // 製品コード抽出用正規表現: 大文字英数字3文字以上 + 任意のハイフンと数字
         private val PRODUCT_CODE_PATTERN = Pattern.compile("[A-Z0-9]{3,}-?[0-9]*")
@@ -139,46 +139,51 @@ class OnnxOcrEngine(private val context: Context) {
     /**
      * BitmapをONNX入力用テンソルに変換
      * PaddleOCR Recognitionモデル用前処理:
-     * 1. リサイズ (INPUT_HEIGHT x INPUT_WIDTH)
-     * 2. BGR チャンネル順（PaddleOCR標準）
-     * 3. 正規化 (0-255 → mean/std で標準化)
-     * 4. NCHW 形式（planar）に変換
+     * 1. アスペクト比を維持してリサイズ (高さ=INPUT_HEIGHT、幅は比率に応じて)
+     * 2. 幅をINPUT_WIDTHまで0パディング
+     * 3. RGB チャンネル順（PyTorch/PNNX由来モデル）
+     * 4. 正規化 (pixel - 127.5) / 127.5 (PaddleOCR標準)
+     * 5. NCHW 形式（planar）に変換
      */
     private fun bitmapToInputTensor(bitmap: Bitmap): OnnxTensor {
-        // 画像をリサイズ
-        val resized = Bitmap.createScaledBitmap(bitmap, INPUT_WIDTH, INPUT_HEIGHT, true)
+        val srcW = bitmap.width
+        val srcH = bitmap.height
 
+        // アスペクト比を維持してリサイズ (高さ=48固定, 幅は比率に応じて)
+        val ratio = srcW.toFloat() / srcH.toFloat()
+        var resizedW = (ratio * INPUT_HEIGHT).toInt()
+        if (resizedW > INPUT_WIDTH) resizedW = INPUT_WIDTH
+        if (resizedW < 1) resizedW = 1
+
+        val resized = Bitmap.createScaledBitmap(bitmap, resizedW, INPUT_HEIGHT, true)
+
+        // アスペクト比維持画像 + 幅方向のパディング
         val totalSize = INPUT_CHANNELS * INPUT_HEIGHT * INPUT_WIDTH
-        val floatArray = FloatArray(totalSize)
-        val planeSize = INPUT_HEIGHT * INPUT_WIDTH  // 1チャンネルあたりの画素数
+        // 重要: パディング領域は -1.0 で埋める (PaddleOCR標準の前処理)
+        // 0で画像をパディング → 正規化(0-127.5)/127.5 = -1.0
+        // AndroidのFloatArrayはデフォルト0なので、明示的に-1.0に初期化
+        val floatArray = FloatArray(totalSize) { -1.0f }
+        val planeSize = INPUT_HEIGHT * INPUT_WIDTH
 
-        // ピクセル値を抽出し、BGR planar (0-255)
+        // ピクセル値を抽出し、RGB planar (0-255) → 正規化
         for (y in 0 until INPUT_HEIGHT) {
-            for (x in 0 until INPUT_WIDTH) {
+            for (x in 0 until resizedW) {
                 val pixel = resized.getPixel(x, y)
-                val r = ((pixel shr 16) and 0xFF).toFloat()   // 0-255
+                val r = ((pixel shr 16) and 0xFF).toFloat()
                 val g = ((pixel shr 8) and 0xFF).toFloat()
                 val b = (pixel and 0xFF).toFloat()
 
                 val base = y * INPUT_WIDTH + x
-                floatArray[base] = b                       // B チャンネル
-                floatArray[planeSize + base] = g           // G チャンネル
-                floatArray[2 * planeSize + base] = r       // R チャンネル
+                floatArray[base] = (r - PADDLE_MEAN) / PADDLE_STD
+                floatArray[planeSize + base] = (g - PADDLE_MEAN) / PADDLE_STD
+                floatArray[2 * planeSize + base] = (b - PADDLE_MEAN) / PADDLE_STD
             }
         }
 
-        // ImageNet mean/std 正規化 (0-255 -> 標準化)
-        for (i in 0 until planeSize) {
-            floatArray[i] = (floatArray[i] - MEAN_255[0]) / STD_255[0]
-            floatArray[planeSize + i] = (floatArray[planeSize + i] - MEAN_255[1]) / STD_255[1]
-            floatArray[2 * planeSize + i] = (floatArray[2 * planeSize + i] - MEAN_255[2]) / STD_255[2]
-        }
-
-        // Debug: log input stats
+        // Debug: log effective content width
+        Log.d(TAG, "Resize: ${srcW}x${srcH} → ${resizedW}x${INPUT_HEIGHT} (padded to ${INPUT_WIDTH}x${INPUT_HEIGHT})")
         Log.d(TAG, "Input stats: min=${floatArray.minOrNull()}, max=${floatArray.maxOrNull()}, avg=${floatArray.average()}")
-        Log.d(TAG, "First 20 input values (B): ${floatArray.take(20).joinToString { "%.4f".format(it) }}")
-        Log.d(TAG, "First 20 G values: ${floatArray.slice(planeSize until planeSize+20).joinToString { "%.4f".format(it) }}")
-        Log.d(TAG, "First 20 R values: ${floatArray.slice(2*planeSize until 2*planeSize+20).joinToString { "%.4f".format(it) }}")
+        Log.d(TAG, "First 20 input values (R): ${floatArray.take(20).joinToString { "%.4f".format(it) }}")
 
         val floatBuffer = ByteBuffer
             .allocateDirect(floatArray.size * 4)
@@ -187,7 +192,7 @@ class OnnxOcrEngine(private val context: Context) {
             .put(floatArray)
         floatBuffer.rewind()
 
-        // 形状: [1, 3, INPUT_HEIGHT, INPUT_WIDTH]  (NCHW)
+        // 形状: [1, 3, INPUT_HEIGHT, INPUT_WIDTH]  (NCHW, 動的幅対応)
         val shape = longArrayOf(1L, INPUT_CHANNELS.toLong(), INPUT_HEIGHT.toLong(), INPUT_WIDTH.toLong())
         return OnnxTensor.createTensor(ortEnvironment, floatBuffer, shape)
     }
@@ -204,8 +209,8 @@ class OnnxOcrEngine(private val context: Context) {
         val timeSteps = shape[1].toInt()
         val numClasses = shape[2].toInt()
 
-        Log.d(TAG, "decodeOutput: shape=${java.util.Arrays.toString(shape)}, batch=$batch, timeSteps=$timeSteps, numClasses=$numClasses")
-        Log.d(TAG, "Vocab diff: numClasses=$numClasses, dictSize=${charDict.size}")
+        Log.d(TAG, "decodeOutput: shape=[${shape[0]}, ${shape[1]}, ${shape[2]}] (batch=$batch, timeSteps=$timeSteps, numClasses=$numClasses)")
+        Log.d(TAG, "Vocab diff: numClasses=$numClasses, dictSize=${charDict.size}, diff=${numClasses - charDict.size}")
 
         require(logits.size == batch * timeSteps * numClasses) {
             "logits size ${logits.size} does not match shape[0]*shape[1]*shape[2] = ${batch * timeSteps * numClasses}"
@@ -216,6 +221,8 @@ class OnnxOcrEngine(private val context: Context) {
 
         // 単一バッチについて argmax でラベル列を得る
         val labels = IntArray(timeSteps)
+        var blankCount = 0
+        val nonBlankClasses = mutableSetOf<Int>()
         for (t in 0 until timeSteps) {
             var bestClass = 0
             var bestProb = Float.NEGATIVE_INFINITY
@@ -228,12 +235,12 @@ class OnnxOcrEngine(private val context: Context) {
                 }
             }
             labels[t] = bestClass
-            Log.d(TAG, "t=$t: argmax class=$bestClass prob=$bestProb")
+            if (bestClass == 0) blankCount++ else nonBlankClasses.add(bestClass)
         }
 
         // blank index を決定 (標準 CTC では 0)
         val blankIndex = 0
-        Log.d(TAG, "Using blankIndex=$blankIndex")
+        Log.d(TAG, "Argmax summary: blank(blankIndex=0)=$blankCount/$timeSteps, nonBlankClasses=${nonBlankClasses.size} unique classes")
 
         // CTC デコード: blank をスキップ、連続重複を除去
         val sb = StringBuilder()
@@ -256,7 +263,7 @@ class OnnxOcrEngine(private val context: Context) {
         }
 
         val result = sb.toString()
-        Log.d(TAG, "CTC decode: raw labels=${labels.take(20).joinToString()}, final='$result'")
+        Log.d(TAG, "CTC decode: raw labels=[first10]=${labels.take(10).joinToString()}, final='$result'")
         return result
     }
 

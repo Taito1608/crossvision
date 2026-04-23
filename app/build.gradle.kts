@@ -9,6 +9,7 @@ android {
     compileSdk {
         version = release(36)
     }
+    buildToolsVersion = "36.1.0"
 
     defaultConfig {
         applicationId = "com.example.solution_development"
@@ -56,6 +57,7 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation("com.google.android.material:material:1.13.0")
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.15.1")
     implementation("com.google.mlkit:text-recognition:16.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

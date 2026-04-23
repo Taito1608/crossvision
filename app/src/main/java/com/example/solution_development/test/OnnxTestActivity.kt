@@ -1,7 +1,7 @@
 package com.example.solution_development.test
 
 import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -9,29 +9,34 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.solution_development.ocr.OnnxOcrEngine
 import com.example.solution_development.R
+import java.io.ByteArrayOutputStream
 
 class OnnxTestActivity : AppCompatActivity() {
-    
+
     private lateinit var engine: OnnxOcrEngine
     private lateinit var statusText: TextView
     private lateinit var resultText: TextView
-    private lateinit var dummyBitmap: Bitmap
-    
+    private lateinit var testBitmap: Bitmap
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onnx_test)
-        
+
         Log.d("OnnxTest", "Activity created")
         Log.d("OnnxTest", "Initializing ONNX engine...")
-        
+
         statusText = findViewById(R.id.statusText)
         resultText = findViewById(R.id.resultText)
-        
-        // ダミー画像生成（224x224 白色）
-        dummyBitmap = Bitmap.createBitmap(224, 224, Bitmap.Config.ARGB_8888).apply {
-            eraseColor(Color.WHITE)
-        }
-        
+
+        // テスト画像を assets から読み込む（onnx/images/M4sb29-2.jpg）
+        testBitmap = loadAssetBitmap("onnx/images/M4sb29-2.jpg")
+            ?: run {
+                Log.e("OnnxTest", "Failed to load test image from assets")
+                finish()
+                return
+            }
+        Log.d("OnnxTest", "Test image loaded: ${testBitmap.width}x${testBitmap.height}")
+
         // ONNX Runtime Engine initialization
         engine = OnnxOcrEngine(this)
         
@@ -60,7 +65,7 @@ class OnnxTestActivity : AppCompatActivity() {
             statusText.text = "Running..."
             Thread {
                 try {
-                    val codes = engine.extractProductCode(dummyBitmap)
+                    val codes = engine.extractProductCode(testBitmap)
                     Log.d("OnnxTest", "Inference result: $codes")
                     runOnUiThread {
                         resultText.text = codes.toString()
@@ -75,10 +80,27 @@ class OnnxTestActivity : AppCompatActivity() {
                 }
             }.start()
         }
-        
+
         statusText.text = "Tap 'Load Model' to initialize ONNX Runtime"
     }
-    
+
+    /** Load a bitmap from assets WITHOUT scaling - let the engine handle preprocessing */
+    private fun loadAssetBitmap(assetPath: String): Bitmap? {
+        return try {
+            assets.open(assetPath).use { inputStream ->
+                // BitmapFactory.decodeStream() automatically applies EXIF orientation.
+                // This image has EXIF orientation=8 (Rotate 90 CCW), so Android gives
+                // us the correctly oriented 2048x1536 landscape bitmap automatically.
+                // DO NOT add manual rotation — that would double-rotate back to portrait.
+                BitmapFactory.decodeStream(inputStream)
+                    ?: return null
+            }
+        } catch (e: Exception) {
+            Log.e("OnnxTest", "Failed to load asset bitmap: $assetPath", e)
+            null
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         engine.release()

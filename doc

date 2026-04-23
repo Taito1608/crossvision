@@ -1,0 +1,45 @@
+---
+
+## 8. Perplexity 第2回相談用プロンプト
+
+```
+以下の状況レポートにもとづき、ONNX Runtime for Android で PaddleOCR認識モデルが空白（blank）だけを出力する原因と解決策を教えてください。
+
+【現在の状況】
+- AndroidエミュレーターでONNX Runtime 1.16.3を使用
+- モデル: pnnx_english.onnx (7.8MB, PaddleOCR English認識モデルをPNNX変換)
+- 入力: x, shape=[1,3,48,-1] NCHW, FLOAT
+- 出力: fetch_name_0, shape=[1,40,438], FLOAT
+- 文字辞書: dict.txt, 436文字 (0-9, A-Z)
+- テスト画像: M4sb29-2.jpg (JPEG, 1536x2048, EXIF orientation=8 → 2048x1536)
+
+【Python検証結果（同じモデル・同じ画像）】
+- EXIF transposed 2048x1536 → アスペクト比維持resize (64x48) → 0パディング (320x48)
+- 正規化: (pixel-127.5)/127.5, RGB NCHW形式
+- 結果: blank=23/40, decoded='cYnaGetaYaYelowb'
+- → モデルは正常に動作している
+
+【Android検証結果（同じ前処理で実装）】
+- 画像サイズ: 1536x2048（EXIF未適用）または2048x1536（EXIF適用後）
+- アスペクト比維持: 高さ48固定、幅＝比率に応じて、320まで0パディング
+- チャンネル順序: RGB（PyTorch/PNNX由来モデル）
+- 正規化: (pixel-127.5)/127.5
+- 結果: blank=40/40, decoded=''（何度試しても空白）
+
+【出力分布の比較】
+- Python: t=0 class0 prob≈0.90, 他のクラスにも意味のある分散
+- Android: t=0 class0 prob≈0.96, 他クラス=1/438（一様分布に近い）
+
+【重要な発見】
+1. モデルはPythonで検証済み（壊れていない）
+2. 入力前処理は正規化・アスペクト比・チャンネル順序すべて一致
+3. 同じバイナリモデルファイルを使用
+4. しかしAndroidではblank=40/40
+
+【知りたいこと】
+1. onnxruntime-android vs onnxruntime-python で出力分布が異なる理由は？
+2. Android版ONNX Runtimeで特定層が正しく実行されない原因はあるか？
+3. 入力テンソルのバイトオーダ（endianness）やメモリレイアウトの問題は？
+4. PNNX変換モデルにONNX Runtime Androidが対応していない演算がある可能性は？
+5. デバッグ用に中間テンソル値を取得する方法はあるか？
+```
