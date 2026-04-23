@@ -28,8 +28,8 @@ class OnnxTestActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
         resultText = findViewById(R.id.resultText)
 
-        // テスト画像を assets から読み込む（onnx/images/M4sb29-2.jpg）
-        testBitmap = loadAssetBitmap("onnx/images/M4sb29-2.jpg")
+        // テスト画像を assets から読み込む（テキスト認識に読みやすい320x80の画像）
+        testBitmap = loadAssetBitmap("onnx/images/test_label.jpg")
             ?: run {
                 Log.e("OnnxTest", "Failed to load test image from assets")
                 finish()
@@ -37,8 +37,9 @@ class OnnxTestActivity : AppCompatActivity() {
             }
         Log.d("OnnxTest", "Test image loaded: ${testBitmap.width}x${testBitmap.height}")
 
-        // ONNX Runtime Engine initialization
+        // ONNX Runtime Engine initialization - 高精度なRapidOCR PP-OCRv3モデルを使用
         engine = OnnxOcrEngine(this)
+        engine.setModelPreset(OnnxOcrEngine.ModelPreset.PP_OCR_V3_RAPIDOCR)
         
         // Load model button
         val loadBtn = findViewById<Button>(R.id.loadBtn)

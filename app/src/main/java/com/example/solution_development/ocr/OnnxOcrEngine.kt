@@ -14,25 +14,36 @@ import java.util.regex.Pattern
 
 class OnnxOcrEngine(private val context: Context) {
 
+    enum class ModelPreset(
+        val modelFile: String,
+        val dictFile: String,
+        val outputName: String,
+        val numClasses: Int
+    ) {
+        PNNX(
+            modelFile = "onnx/pnnx_english.onnx",
+            dictFile = "onnx/dict.txt",
+            outputName = "fetch_name_0",
+            numClasses = 438          // 436 dict + 1 blank + 1 extra
+        ),
+        PP_OCR_V3_RAPIDOCR(
+            modelFile = "onnx/ppocrv3_rec.onnx",
+            dictFile = "onnx/ppocrv3_dict.txt",
+            outputName = "softmax_2.tmp_0",
+            numClasses = 97           // 95 en_dict + 1 space + 1 blank
+        )
+    }
+
     companion object {
         private const val TAG = "OnnxOcrEngine"
 
-        // 本番モデル（PaddleOCR English Recognition Model）
-        private const val MODEL_NAME = "onnx/pnnx_english.onnx"
-
-        // 入力/出力名（PaddleOCR 標準 – 実際のモデルに合わせる）
-        private const val INPUT_NAME = "x"                  // モデル実際の入力名
-        private const val OUTPUT_NAME = "fetch_name_0"      // モデル実際の出力名（pnnx_english.onnx は fetch_name_0 を出力）
-
-        // 文字辞書ファイル
-        private const val DICT_FILE = "onnx/dict.txt"
-
-        // 入力画像サイズ（PaddleOCR 標準: 48x320）
+        // 入力/出力共通仕様
+        private const val INPUT_NAME = "x"
         private const val INPUT_WIDTH = 320
         private const val INPUT_HEIGHT = 48
         private const val INPUT_CHANNELS = 3
 
-        // PaddleOCR normalization: (pixel - 127.5) / 127.5 (equivalent to mean=0.5, std=0.5 on [0,1])
+        // PaddleOCR normalization: (pixel - 127.5) / 127.5
         private const val PADDLE_MEAN = 127.5f
         private const val PADDLE_STD = 127.5f
 
@@ -44,9 +55,22 @@ class OnnxOcrEngine(private val context: Context) {
     private var ortEnvironment: OrtEnvironment? = null
     private var isModelLoaded = false
 
+    // 選択中のモデル設定
+    private var currentPreset: ModelPreset = ModelPreset.PP_OCR_V3_RAPIDOCR
+
     // 文字辞書（インデックス → 文字）
     private val charDict = mutableListOf<String>()
     private var dictLoaded = false
+
+    /**
+     * 使用するモデルプリセットを設定
+     */
+    fun setModelPreset(preset: ModelPreset) {
+        release()
+        currentPreset = preset
+        charDict.clear()
+        dictLoaded = false
+    }
 
     /**
      * 文字辞書を assets から読み込む
@@ -54,16 +78,17 @@ class OnnxOcrEngine(private val context: Context) {
     private fun loadCharDict(): Boolean {
         return try {
             charDict.clear()
-            context.assets.open(DICT_FILE).use { inputStream ->
+            context.assets.open(currentPreset.dictFile).use { inputStream ->
                 inputStream.bufferedReader().forEachLine { line ->
                     charDict.add(line)
                 }
             }
             dictLoaded = charDict.isNotEmpty()
-            Log.d(TAG, "Char dict loaded: ${charDict.size} characters")
+            Log.d(TAG, "Char dict loaded: ${charDict.size} characters from ${currentPreset.dictFile}")
+            Log.d(TAG, "Expected numClasses: ${currentPreset.numClasses}, dictSize: ${charDict.size}, diff: ${currentPreset.numClasses - charDict.size}")
             dictLoaded
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to load char dict", e)
+            Log.e(TAG, "Failed to load char dict from ${currentPreset.dictFile}", e)
             false
         }
     }
@@ -88,7 +113,7 @@ class OnnxOcrEngine(private val context: Context) {
      * ONNXモデルをロード
      */
     fun loadModel(): Boolean {
-        Log.d(TAG, "loadModel() called, model: $MODEL_NAME")
+        Log.d(TAG, "loadModel() called, preset: ${currentPreset.name}")
         return try {
             // 文字辞書を先に読み込む
             if (!loadCharDict()) {
@@ -102,15 +127,15 @@ class OnnxOcrEngine(private val context: Context) {
 
             // モデルファイルの確認
             try {
-                context.assets.open(MODEL_NAME).close()
-                Log.d(TAG, "Model file exists in assets: $MODEL_NAME")
+                context.assets.open(currentPreset.modelFile).close()
+                Log.d(TAG, "Model file exists in assets: ${currentPreset.modelFile}")
             } catch (e: Exception) {
-                Log.e(TAG, "Model file NOT found in assets: $MODEL_NAME", e)
-                throw Exception("Model file '$MODEL_NAME' not found in assets/. Please place the PaddleOCR English ONNX model.")
+                Log.e(TAG, "Model file NOT found in assets: ${currentPreset.modelFile}", e)
+                throw Exception("Model file '${currentPreset.modelFile}' not found in assets.")
             }
 
             // モデルの読み込み
-            val modelBytes = loadModelFromAssets(MODEL_NAME)
+            val modelBytes = loadModelFromAssets(currentPreset.modelFile)
             Log.d(TAG, "Model loaded from assets, size: ${modelBytes.size} bytes")
 
             // セッションの作成
@@ -121,8 +146,7 @@ class OnnxOcrEngine(private val context: Context) {
                 Log.d(TAG, "Session created successfully")
                 Log.d(TAG, "Input names: ${session?.inputNames}")
                 Log.d(TAG, "Output names: ${session?.outputNames}")
-                Log.d(TAG, "Input info: ${session?.inputInfo}")
-                Log.d(TAG, "Output info: ${session?.outputInfo}")
+                Log.d(TAG, "Output key to use: ${session?.outputNames?.firstOrNull()}")
             }
 
             isModelLoaded = session != null
@@ -139,10 +163,10 @@ class OnnxOcrEngine(private val context: Context) {
     /**
      * BitmapをONNX入力用テンソルに変換
      * PaddleOCR Recognitionモデル用前処理:
-     * 1. アスペクト比を維持してリサイズ (高さ=INPUT_HEIGHT、幅は比率に応じて)
-     * 2. 幅をINPUT_WIDTHまで0パディング
-     * 3. RGB チャンネル順（PyTorch/PNNX由来モデル）
-     * 4. 正規化 (pixel - 127.5) / 127.5 (PaddleOCR標準)
+     * 1. アスペクト比を維持してリサイズ (高さ=48固定, 幅は比率に応じて)
+     * 2. 幅をINPUT_WIDTHまで-1.0パディング (正規化後の黒)
+     * 3. RGB チャンネル順
+     * 4. 正規化 (pixel - 127.5) / 127.5
      * 5. NCHW 形式（planar）に変換
      */
     private fun bitmapToInputTensor(bitmap: Bitmap): OnnxTensor {
@@ -159,9 +183,7 @@ class OnnxOcrEngine(private val context: Context) {
 
         // アスペクト比維持画像 + 幅方向のパディング
         val totalSize = INPUT_CHANNELS * INPUT_HEIGHT * INPUT_WIDTH
-        // 重要: パディング領域は -1.0 で埋める (PaddleOCR標準の前処理)
-        // 0で画像をパディング → 正規化(0-127.5)/127.5 = -1.0
-        // AndroidのFloatArrayはデフォルト0なので、明示的に-1.0に初期化
+        // 重要: パディング領域は -1.0 で埋める (正規化後の黒)
         val floatArray = FloatArray(totalSize) { -1.0f }
         val planeSize = INPUT_HEIGHT * INPUT_WIDTH
 
@@ -180,10 +202,8 @@ class OnnxOcrEngine(private val context: Context) {
             }
         }
 
-        // Debug: log effective content width
         Log.d(TAG, "Resize: ${srcW}x${srcH} → ${resizedW}x${INPUT_HEIGHT} (padded to ${INPUT_WIDTH}x${INPUT_HEIGHT})")
         Log.d(TAG, "Input stats: min=${floatArray.minOrNull()}, max=${floatArray.maxOrNull()}, avg=${floatArray.average()}")
-        Log.d(TAG, "First 20 input values (R): ${floatArray.take(20).joinToString { "%.4f".format(it) }}")
 
         val floatBuffer = ByteBuffer
             .allocateDirect(floatArray.size * 4)
@@ -192,7 +212,7 @@ class OnnxOcrEngine(private val context: Context) {
             .put(floatArray)
         floatBuffer.rewind()
 
-        // 形状: [1, 3, INPUT_HEIGHT, INPUT_WIDTH]  (NCHW, 動的幅対応)
+        // 形状: [1, 3, INPUT_HEIGHT, INPUT_WIDTH]  (NCHW)
         val shape = longArrayOf(1L, INPUT_CHANNELS.toLong(), INPUT_HEIGHT.toLong(), INPUT_WIDTH.toLong())
         return OnnxTensor.createTensor(ortEnvironment, floatBuffer, shape)
     }
@@ -213,16 +233,18 @@ class OnnxOcrEngine(private val context: Context) {
         Log.d(TAG, "Vocab diff: numClasses=$numClasses, dictSize=${charDict.size}, diff=${numClasses - charDict.size}")
 
         require(logits.size == batch * timeSteps * numClasses) {
-            "logits size ${logits.size} does not match shape[0]*shape[1]*shape[2] = ${batch * timeSteps * numClasses}"
+            "logits size ${logits.size} does not match ${batch * timeSteps * numClasses}"
         }
         if (batch != 1) {
             Log.w(TAG, "Batch size > 1 detected; only first batch will be processed")
         }
 
-        // 単一バッチについて argmax でラベル列を得る
+        // CTC greedy decode
         val labels = IntArray(timeSteps)
         var blankCount = 0
         val nonBlankClasses = mutableSetOf<Int>()
+        val nonBlankChars = StringBuilder()
+
         for (t in 0 until timeSteps) {
             var bestClass = 0
             var bestProb = Float.NEGATIVE_INFINITY
@@ -235,14 +257,22 @@ class OnnxOcrEngine(private val context: Context) {
                 }
             }
             labels[t] = bestClass
-            if (bestClass == 0) blankCount++ else nonBlankClasses.add(bestClass)
+            if (bestClass == 0) {
+                blankCount++
+            } else {
+                nonBlankClasses.add(bestClass)
+                val dictIndex = bestClass - 1
+                if (dictIndex in 0 until charDict.size) {
+                    nonBlankChars.append(charDict[dictIndex])
+                }
+            }
         }
 
-        // blank index を決定 (標準 CTC では 0)
         val blankIndex = 0
-        Log.d(TAG, "Argmax summary: blank(blankIndex=0)=$blankCount/$timeSteps, nonBlankClasses=${nonBlankClasses.size} unique classes")
+        Log.d(TAG, "Argmax summary: blank=$blankCount/$timeSteps, nonBlankClasses=${nonBlankClasses.size} unique")
+        Log.d(TAG, "Non-blank chars sequence: '$nonBlankChars'")
 
-        // CTC デコード: blank をスキップ、連続重複を除去
+        // CTC decode: skip blanks, merge consecutive duplicates
         val sb = StringBuilder()
         var last = -1
         for (t in 0 until timeSteps) {
@@ -252,7 +282,6 @@ class OnnxOcrEngine(private val context: Context) {
                 continue
             }
             if (cur == last) continue
-            // dict 対応: blankIndex=0 → class 0=blank, class 1..N → dict[0..N-1]
             val dictIndex = cur - 1
             if (dictIndex in 0 until charDict.size) {
                 sb.append(charDict[dictIndex])
@@ -263,7 +292,7 @@ class OnnxOcrEngine(private val context: Context) {
         }
 
         val result = sb.toString()
-        Log.d(TAG, "CTC decode: raw labels=[first10]=${labels.take(10).joinToString()}, final='$result'")
+        Log.d(TAG, "CTC decode: labels=[first10]=${labels.take(10).joinToString()}, final='$result'")
         return result
     }
 
@@ -272,7 +301,7 @@ class OnnxOcrEngine(private val context: Context) {
      */
     private fun extractProductCodes(text: String): List<String> {
         if (text.isBlank()) return emptyList()
-        val matcher = PRODUCT_CODE_PATTERN.matcher(text)
+        val matcher = PRODUCT_CODE_PATTERN.matcher(text.uppercase())
         val codes = mutableSetOf<String>()
         while (matcher.find()) {
             val code = matcher.group()
@@ -286,7 +315,7 @@ class OnnxOcrEngine(private val context: Context) {
      * メイン推論エントリーポイント
      */
     fun extractProductCode(bitmap: Bitmap): List<String> {
-        Log.d(TAG, "extractProductCode() called, bitmap size: ${bitmap.width}x${bitmap.height}")
+        Log.d(TAG, "extractProductCode() called, bitmap size: ${bitmap.width}x${bitmap.height}, preset: ${currentPreset.name}")
         if (!isModelLoaded || session == null || ortEnvironment == null) {
             Log.w(TAG, "Engine not ready (loaded=$isModelLoaded)")
             return emptyList()
@@ -296,54 +325,34 @@ class OnnxOcrEngine(private val context: Context) {
             return emptyList()
         }
         return try {
-            Log.d(TAG, "Creating input tensor (${INPUT_WIDTH}x${INPUT_HEIGHT})")
             val inputTensor = bitmapToInputTensor(bitmap)
-            Log.d(TAG, "Input tensor created, shape: ${inputTensor.info.shape}")
 
             val inputs = hashMapOf(INPUT_NAME to inputTensor)
-            Log.d(TAG, "Running session.run() with input: $INPUT_NAME")
-
             session?.run(inputs)?.use { result ->
-                Log.d(TAG, "Session run completed")
-
-                // Choose the expected output name; if not in session's outputNames, pick the first.
-                val chosenKey = if (session!!.outputNames.contains(OUTPUT_NAME)) {
-                    OUTPUT_NAME
+                // Select output key: try preset first, then fallback to actual output name
+                val chosenKey = if (session!!.outputNames.contains(currentPreset.outputName)) {
+                    currentPreset.outputName
                 } else {
-                    Log.w(TAG, "OUTPUT_NAME '$OUTPUT_NAME' not in session outputs. Trying first output...")
+                    Log.w(TAG, "Output '${currentPreset.outputName}' not found, using first output")
                     session!!.outputNames.firstOrNull()
-                        ?: run { Log.e(TAG, "No output names available from session"); return@use emptyList() }
-                }
-
-                Log.d(TAG, "Using output key: '$chosenKey'")
-
-                val optionalVal = result.get(chosenKey)
-                if (optionalVal == null || !optionalVal.isPresent) {
-                    Log.e(TAG, "Optional value for key '$chosenKey' is empty or null")
-                    return@use emptyList()
+                        ?: run { Log.e(TAG, "No output names available"); return@use emptyList() }
                 }
 
                 @Suppress("UNCHECKED_CAST")
-                val outputTensor = optionalVal.get() as? OnnxTensor
-                    ?: run {
-                        Log.e(TAG, "Output value is not OnnxTensor (type=${optionalVal.get().javaClass.simpleName})")
-                        return@use emptyList()
-                    }
+                val outputTensor = result.get(chosenKey)?.get() as? OnnxTensor
+                    ?: run { Log.e(TAG, "Output '$chosenKey' is not OnnxTensor"); return@use emptyList() }
 
-                Log.d(TAG, "Output tensor obtained: shape=${java.util.Arrays.toString(outputTensor.info.shape)}, type=${outputTensor.info.type}")
+                Log.d(TAG, "Output shape=${java.util.Arrays.toString(outputTensor.info.shape)}, type=${outputTensor.info.type}")
 
-                val floatBuffer = outputTensor.floatBuffer
-                val outputArray = FloatArray(floatBuffer.remaining())
-                floatBuffer.get(outputArray)
+                val outputArray = FloatArray(outputTensor.floatBuffer.remaining())
+                outputTensor.floatBuffer.get(outputArray)
 
-                Log.d(TAG, "Output array size: ${outputArray.size}")
                 if (outputArray.isNotEmpty()) {
                     Log.d(TAG, "Output stats: min=${outputArray.minOrNull()}, max=${outputArray.maxOrNull()}, avg=${outputArray.average()}")
-                    Log.d(TAG, "First 20 values: ${outputArray.take(20).joinToString { "%.6f".format(it) }}")
                 }
 
                 if (outputArray.all { it == 0f }) {
-                    Log.w(TAG, "All output values are zero - model may not have produced valid output")
+                    Log.w(TAG, "All output values are zero")
                     return@use emptyList()
                 }
 
@@ -356,18 +365,14 @@ class OnnxOcrEngine(private val context: Context) {
                 }
 
                 val productCodes = extractProductCodes(decodedText)
-                Log.d(TAG, "Extracted ${productCodes.size} product code(s): $productCodes")
-
+                Log.d(TAG, "Extracted ${productCodes.size} code(s): $productCodes")
                 productCodes
             } ?: emptyList()
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in extractProductCode", e)
-            Log.e(TAG, "Model shape mismatch or inference error: ${e.message}")
             emptyList()
         } catch (e: Exception) {
             Log.e(TAG, "Exception in extractProductCode", e)
-            Log.e(TAG, "Error type: ${e.javaClass.simpleName}, message: ${e.message}")
-            e.printStackTrace()
             emptyList()
         }
     }
