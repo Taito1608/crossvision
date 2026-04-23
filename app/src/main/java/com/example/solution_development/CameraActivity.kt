@@ -3,50 +3,71 @@ package com.example.solution_development
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageFormat
+import android.graphics.Rect
+import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
-import android.os.Handler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.camera.view.PreviewView
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
+import com.example.solution_development.ocr.OnnxOcrEngine
+import java.io.ByteArrayOutputStream
 import java.io.File
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import com.google.mlkit.vision.common.InputImage
+import java.util.regex.Pattern
 
-
-private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+// ============================================================
+// [ML Kit code - preserved for reference]
+// import com.google.mlkit.vision.text.TextRecognition
+// import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+// import com.google.mlkit.vision.common.InputImage
+//
+// private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+// ============================================================
 
 class CameraActivity : AppCompatActivity() {
 
+    companion object {
+        private const val TAG = "CameraActivity"
+    }
+
     // TODO ===== UI =====
     private lateinit var previewView: PreviewView
-    //private lateinit var btnComplete: Button
     private lateinit var btnSelectImage: Button
 
     // TODO ===== CameraX =====
     private lateinit var imageCapture: ImageCapture
-    private lateinit var imageAnalysis: ImageAnalysis
+    private lateinit var imageAnalysis: androidx.camera.core.ImageAnalysis
 
-    // TODO ===== OCR =====
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    // TODO ===== OCR (ONNX PaddleOCR v3) =====
+    private lateinit var engine: OnnxOcrEngine
 
     // TODO ===== ??? =====
     private var isCaptured = false
     private val scannedList = mutableListOf<String>()
+
+    // 鉄鋼製品の使用可能文字のみを抽出する正規表現
+    // 許可: 0-9, A-Z, a-z, +, -, ., /, _, スペース
+    private val ALLOWED_CHARS_PATTERN = Pattern.compile("[A-Za-z0-9+_.\\-/ ]{6,}")
+
+    // 推論中のフレームを防止するフラグ
+    private var isProcessing = false
 
     // TODO ===== AI =====
     private val pickImageLauncher =
@@ -57,9 +78,7 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
-    private var isProcessing = false
-
-    override fun onCreate(savedInstanceState: Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
@@ -69,7 +88,7 @@ class CameraActivity : AppCompatActivity() {
         previewView = findViewById(R.id.previewView)
 
         val btnComplete = findViewById<Button>(R.id.btnComplete)
-        val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
+        btnSelectImage = findViewById(R.id.btnSelectImage)
 
         btnComplete.setOnClickListener {
             val intent = Intent(this, ConfirmationActivity::class.java)
@@ -96,32 +115,45 @@ class CameraActivity : AppCompatActivity() {
             pickImageLauncher.launch("image/*")
         }
 
-        //btnShutter.setOnClickListener{
-        //    val photoFile = File(cacheDir, "ocr_temp.jpg")
+        // ============================================================
+        // [ML Kit shutter button code - preserved for reference]
+        // btnShutter.setOnClickListener{
+        //     val photoFile = File(cacheDir, "ocr_temp.jpg")
+        //     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        //     imageCapture.takePicture(
+        //         outputOptions,
+        //         ContextCompat.getMainExecutor(this),
+        //         object : ImageCapture.OnImageSavedCallback {
+        //             override fun onImageSaved(outputFileResults: ImageCapture.outputFileResults){
+        //                 val savedUri = Uri.fromFile(photoFile)
+        //                 Toast.makeText(this@CameraActivity, "スキャン成功", Toast.LENGTH_SHORT).show()
+        //                 runOCR(savedUri)
+        //             }
+        //             override fun onError(exception: ImageCaptureException){
+        //                 Toast.makeText(this@CameraActivity,"スキャン成功: ${exception.message}", Toast.LENGTH_SHORT).show()
+        //             }
+        //         }
+        //     )
+        // }
+        // ============================================================
 
-        //    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        // Initialize ONNX OCR Engine
+        engine = OnnxOcrEngine(this)
+        engine.setModelPreset(OnnxOcrEngine.ModelPreset.PP_OCR_V3_RAPIDOCR)
 
-        //    imageCapture.takePicture(
-        //        outputOptions,
-        //        ContextCompat.getMainExecutor(this),
-        //        object : ImageCapture.OnImageSavedCallback {
-        //            override fun onImageSaved(outputFileResults: ImageCapture.outputFileResults){
-
-        //                val savedUri = Uri.fromFile(photoFile)
-        //                Toast.makeText(this@CameraActivity, "スキャン成功", Toast.LENGTH_SHORT).show()
-
-        //                // send to OCR(filepass)
-        //                runOCR(savedUri)
-
-        //                //finish()
-        //            }
-
-        //            override fun onError(exception: ImageCaptureException){
-        //                Toast.makeText(this@CameraActivity,"スキャン成功: ${exception.message}", Toast.LENGTH_SHORT).show()
-        //            }
-        //        }
-        //    )
-        //}
+        // Load model in background thread
+        Thread {
+            val success = engine.loadModel()
+            Log.d(TAG, "ONNX model load result: $success")
+            runOnUiThread {
+                if (success) {
+                    Log.d(TAG, "ONNX model loaded successfully")
+                } else {
+                    Log.e(TAG, "Failed to load ONNX model")
+                    Toast.makeText(this, "モデルの読み込みに失敗しました", Toast.LENGTH_LONG).show()
+                }
+            }
+        }.start()
 
         if(ContextCompat.checkSelfPermission(
             this,
@@ -166,47 +198,99 @@ class CameraActivity : AppCompatActivity() {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
 
-            imageAnalysis = ImageAnalysis.Builder().build()
+            imageAnalysis = androidx.camera.core.ImageAnalysis.Builder()
+                .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
 
             imageAnalysis.setAnalyzer(
                 ContextCompat.getMainExecutor(this)
             ) { imageProxy: ImageProxy ->
 
+                if (isProcessing) {
+                    imageProxy.close()
+                    return@setAnalyzer
+                }
+                isProcessing = true
 
-                // TODO: OCR
+                // ============================================================
+                // [ML Kit OCR code - preserved for reference]
+                // val mediaImage = imageProxy.image
+                // if (mediaImage != null) {
+                //     val image = InputImage.fromMediaImage(
+                //         mediaImage,
+                //         imageProxy.imageInfo.rotationDegrees
+                //     )
+                //     recognizer.process(image)
+                //         .addOnSuccessListener { visionText ->
+                //             val text = visionText.text
+                //             val numbers = text.replace(Regex("[^0-9]"), "")
+                //             if (numbers.length >= 6) {
+                //                 if (!scannedList.contains(numbers)) {
+                //                     scannedList.add(numbers)
+                //                 }
+                //                 if (!isCaptured) {
+                //                     isCaptured = true
+                //                     captureImage()
+                //                     Handler(Looper.getMainLooper()).postDelayed({
+                //                         isCaptured = false
+                //                     }, 2000)
+                //                 }
+                //             }
+                //         }
+                //         .addOnCompleteListener {
+                //             isProcessing = false
+                //             imageProxy.close()
+                //         }
+                // } else {
+                //     imageProxy.close()
+                // }
+                // ============================================================
+
+                // ONNX PaddleOCR v3 inference
                 val mediaImage = imageProxy.image
-
                 if (mediaImage != null) {
-                    val image = InputImage.fromMediaImage(
-                        mediaImage,
-                        imageProxy.imageInfo.rotationDegrees
-                    )
+                    try {
+                        val bitmap = imageProxyToBitmap(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                        if (bitmap != null) {
+                            Thread {
+                                try {
+                                    val codes = engine.extractProductCode(bitmap)
+                                    if (codes.isNotEmpty()) {
+                                        runOnUiThread {
+                                            for (code in codes) {
+                                                if (!scannedList.contains(code)) {
+                                                    scannedList.add(code)
+                                                    Log.d(TAG, "New code detected: $code")
+                                                }
+                                            }
 
-                    recognizer.process(image)
-                        .addOnSuccessListener { visionText ->
-                            val text = visionText.text
-                            val numbers = text.replace(Regex("[^0-9]"), "")
-
-                            if (numbers.length >= 6) {
-                                if (!scannedList.contains(numbers)) {
-                                    scannedList.add(numbers)
+                                            if (!isCaptured) {
+                                                isCaptured = true
+                                                captureImage()
+                                                Handler(Looper.getMainLooper()).postDelayed({
+                                                    isCaptured = false
+                                                }, 2000)
+                                            }
+                                        }
+                                    }
+                                } catch (e2: Exception) {
+                                    Log.e(TAG, "ONNX OCR error", e2)
+                                } finally {
+                                    runOnUiThread { isProcessing = false }
+                                    imageProxy.close()
                                 }
-
-                                if (!isCaptured) {
-                                    isCaptured = true
-                                    captureImage()
-
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        isCaptured = false
-                                    }, 2000)
-                                }
-                            }
-                        }
-                        .addOnCompleteListener {
+                            }.start()
+                        } else {
                             isProcessing = false
                             imageProxy.close()
                         }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Image conversion error", e)
+                        isProcessing = false
+                        imageProxy.close()
+                    }
                 } else {
+                    isProcessing = false
                     imageProxy.close()
                 }
             }
@@ -230,6 +314,44 @@ class CameraActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    /**
+     * ImageProxy (YUV_420_888) を Bitmap に変換
+     */
+    private fun imageProxyToBitmap(image: android.media.Image, rotationDegrees: Int): Bitmap? {
+        return try {
+            val planes = image.planes
+            val yBuffer = planes[0].buffer
+            val uBuffer = planes[1].buffer
+            val vBuffer = planes[2].buffer
+            val ySize = yBuffer.remaining()
+            val uSize = uBuffer.remaining()
+            val vSize = vBuffer.remaining()
+
+            val nv21 = ByteArray(ySize + uSize + vSize)
+            yBuffer.get(nv21, 0, ySize)
+            vBuffer.get(nv21, ySize, vSize)
+            uBuffer.get(nv21, ySize + vSize, uSize)
+
+            val yuvImage = YuvImage(nv21, ImageFormat.NV21, image.width, image.height, null)
+            val out = ByteArrayOutputStream()
+            yuvImage.compressToJpeg(Rect(0, 0, image.width, image.height), 80, out)
+            val imageBytes = out.toByteArray()
+            var bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
+            // Apply rotation if needed
+            if (rotationDegrees != 0) {
+                val matrix = android.graphics.Matrix()
+                matrix.postRotate(rotationDegrees.toFloat())
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            }
+
+            bitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to convert ImageProxy to Bitmap", e)
+            null
+        }
     }
 
     private fun captureImage() {
@@ -258,11 +380,6 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
-    //private fun fakeScanCheck(): Boolean {
-    //    // now random but OCR insert later
-    //    return (0..50).random() == 0
-    //}
-
     private fun sendToAI(uri: Uri) {
         println("AI送信: $uri")
     }
@@ -273,5 +390,10 @@ class CameraActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        engine.release()
     }
 }
