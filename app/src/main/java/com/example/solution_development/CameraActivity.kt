@@ -1,17 +1,24 @@
 package com.example.solution_development
 
 import android.Manifest
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.os.Looper
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import android.os.Handler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.*
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -22,7 +29,10 @@ import androidx.core.content.ContextCompat
 import androidx.camera.view.PreviewView
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import android.util.Log
 import java.io.File
+import java.io.InputStream
+import java.util.concurrent.Executors
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.google.mlkit.vision.common.InputImage
@@ -47,14 +57,12 @@ class CameraActivity : AppCompatActivity() {
     // TODO ===== ??? =====
     private var isCaptured = false
     private val scannedList = mutableListOf<String>()
+    private val cameraExecutor = Executors.newSingleThreadExecutor()
 
     // TODO ===== AI =====
     private val pickImageLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                Toast.makeText(this, "画像選択完了", Toast.LENGTH_SHORT).show()
-                sendToAI(uri)
-            }
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { processGalleryImage(it) }
         }
 
     private var isProcessing = false
@@ -73,19 +81,6 @@ class CameraActivity : AppCompatActivity() {
 
         btnComplete.setOnClickListener {
             val intent = Intent(this, ConfirmationActivity::class.java)
-
-            // ダミーデータ：スキャン結果を追加
-            if (scannedList.isEmpty()) {
-                scannedList.add("123456")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-            }
 
             intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
 
@@ -143,8 +138,6 @@ class CameraActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray,
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if(requestCode == 1001){
             if(grantResults.isNotEmpty() &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -168,48 +161,7 @@ class CameraActivity : AppCompatActivity() {
 
             imageAnalysis = ImageAnalysis.Builder().build()
 
-            imageAnalysis.setAnalyzer(
-                ContextCompat.getMainExecutor(this)
-            ) { imageProxy: ImageProxy ->
-
-
-                // TODO: OCR
-                val mediaImage = imageProxy.image
-
-                if (mediaImage != null) {
-                    val image = InputImage.fromMediaImage(
-                        mediaImage,
-                        imageProxy.imageInfo.rotationDegrees
-                    )
-
-                    recognizer.process(image)
-                        .addOnSuccessListener { visionText ->
-                            val text = visionText.text
-                            val numbers = text.replace(Regex("[^0-9]"), "")
-
-                            if (numbers.length >= 6) {
-                                if (!scannedList.contains(numbers)) {
-                                    scannedList.add(numbers)
-                                }
-
-                                if (!isCaptured) {
-                                    isCaptured = true
-                                    captureImage()
-
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        isCaptured = false
-                                    }, 2000)
-                                }
-                            }
-                        }
-                        .addOnCompleteListener {
-                            isProcessing = false
-                            imageProxy.close()
-                        }
-                } else {
-                    imageProxy.close()
-                }
-            }
+            startAnalyzer()
 
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
@@ -217,42 +169,137 @@ class CameraActivity : AppCompatActivity() {
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-            try{
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    imageAnalysis,
-                    imageCapture
-                )
-            }catch (e: Exception){
-                e.printStackTrace()
-            }
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                this,
+                cameraSelector,
+                preview,
+                imageAnalysis,
+                imageCapture
+            )
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun captureImage() {
-        val file = File(
-            getExternalFilesDir(null),
-            "scan_${System.currentTimeMillis()}.jpg"
-        )
+    private fun startAnalyzer() {
+        imageAnalysis.setAnalyzer(
+            ContextCompat.getMainExecutor(this)
+        ) { imageProxy ->
 
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+            if (isProcessing) {
+                imageProxy.close()
+                return@setAnalyzer
+            }
+
+            isProcessing = true
+
+            val mediaImage = imageProxy.image
+
+            if (mediaImage != null) {
+                val image = InputImage.fromMediaImage(
+                    mediaImage,
+                    imageProxy.imageInfo.rotationDegrees
+                )
+
+                recognizer.process(image)
+                    .addOnSuccessListener { visionText ->
+                        val text = visionText.text
+                        val numbers = text.replace(Regex("[^0-9]"), "")
+
+                        if (numbers.length >= 6) {
+                            if (!scannedList.contains(numbers)) {
+                                scannedList.add(numbers)
+                            }
+
+                            triggerCapture()
+                        }
+                    }
+                    .addOnCompleteListener {
+                        isProcessing = false
+                        imageProxy.close()
+                    }
+            } else {
+                imageProxy.close()
+                isProcessing = false
+            }
+        }
+    }
+
+    private fun triggerCapture() {
+        if (!isCaptured) {
+            isCaptured = true
+
+            imageAnalysis.clearAnalyzer()
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                captureImage()
+            }, 400)
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                isCaptured = false
+
+                startAnalyzer()
+            }, 2000)
+        }
+    }
+
+    private fun captureImage() {
+        val filename = "scan_${System.currentTimeMillis()}.jpg"
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
+            //put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+            contentResolver,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        ).build()
+
+        //val uri = contentResolver.insert(
+        //    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        //    values
+        //) ?: run {
+        //    Toast.makeText(this, "URI作成失敗", Toast.LENGTH_SHORT).show()
+        //    return
+        //}
+
+        //if (uri == null) {
+        //    Toast.makeText(this, "保存失敗", Toast.LENGTH_SHORT).show()
+        //    return
+        //}
+
+
 
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val uri = Uri.fromFile(file)
-                    Toast.makeText(this@CameraActivity, "スキャン完了", Toast.LENGTH_SHORT).show()
+                    //val uri = Uri.fromFile(file)
 
-                    sendToAI(uri)
+                    val savedUri = outputFileResults.savedUri
+
+                    Log.d("SAVE", "保存成功: $savedUri")
+
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "保存成功",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    savedUri?.let {
+                        sendToAI(it)
+                    }
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     exception.printStackTrace()
+
+                    Log.e("CAMERA_ERROR", "保存失敗: ${exception.message}")
+                    Toast.makeText(this@CameraActivity, "保存エラー", Toast.LENGTH_LONG).show()
                 }
             }
         )
@@ -263,8 +310,53 @@ class CameraActivity : AppCompatActivity() {
     //    return (0..50).random() == 0
     //}
 
+    private fun processGalleryImage(uri: Uri) {
+        try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            val image = InputImage.fromBitmap(bitmap, 0)
+
+            recognizer.process(image)
+                .addOnSuccessListener { visionText ->
+                    val text = visionText.text
+                    val numbers = text.replace(Regex("[^0-9]"), "")
+
+                    if (numbers.isNotEmpty()) {
+                        scannedList.add(numbers)
+                    }
+
+                    Toast.makeText(this, "検出完了", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     private fun sendToAI(uri: Uri) {
         println("AI送信: $uri")
+    }
+
+    private fun checkPermissions() {
+        val permissions = mutableListOf(
+            Manifest.permission.CAMERA
+        )
+
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+        }
+
+        val denied = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (denied.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                denied.toTypedArray(),
+                100
+            )
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
