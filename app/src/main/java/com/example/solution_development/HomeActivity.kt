@@ -7,7 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
+import android.widget.AutoCompleteTextView
 import android.widget.ListView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,10 +15,13 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class HomeActivity : AppCompatActivity() {
-    private lateinit var etConstructionText: EditText
-    private lateinit var etProcessText: EditText
+    private lateinit var etConstructionText: AutoCompleteTextView
+    private lateinit var etProcessText: AutoCompleteTextView
     private lateinit var btnConstruction: Button
     private lateinit var btnProcess: Button
+
+    private val constructionItems = listOf("工事A", "工事B", "工事C", "工事D", "工事E", "工事F", "工事G", "工事H")
+    private val processItems = listOf("工程A", "工程B", "工程C", "工程D", "工程E", "工程F", "工程G", "工程H")
 
     private fun showLogoutDialog(){
         val builder = AlertDialog.Builder(this)
@@ -67,6 +70,20 @@ class HomeActivity : AppCompatActivity() {
         etConstructionText = findViewById(R.id.etConstructionText)
         etProcessText = findViewById(R.id.etProcessText)
 
+        val constructionAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, constructionItems)
+        etConstructionText.setAdapter(constructionAdapter)
+        etConstructionText.threshold = 1
+        etConstructionText.setOnClickListener {
+            etConstructionText.showDropDown()
+        }
+
+        val processAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, processItems)
+        etProcessText.setAdapter(processAdapter)
+        etProcessText.threshold = 1
+        etProcessText.setOnClickListener {
+            etProcessText.showDropDown()
+        }
+
         btnConstruction.setOnClickListener { showConstructionSheet() }
         btnProcess.setOnClickListener { showProcessSheet() }
 
@@ -92,13 +109,11 @@ class HomeActivity : AppCompatActivity() {
 
         val listView = view.findViewById<ListView>(R.id.listConstruction)
 
-        val items = listOf("工事A","工事B","工事C","工事D","工事E","工事F","工事G","工事H")
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, constructionItems)
         listView.adapter = adapter
 
         listView.setOnItemClickListener{ _, _, position, _ ->
-            etConstructionText.setText(items[position])
+            etConstructionText.setText(constructionItems[position], false)
             dialog.dismiss()
         }
 
@@ -112,13 +127,11 @@ class HomeActivity : AppCompatActivity() {
 
         val listView = view.findViewById<ListView>(R.id.listProcess)
 
-        val items = listOf("工程A","工程B","工程C","工程D","工程E","工程F","工程G","工程H")
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, processItems)
         listView.adapter = adapter
 
         listView.setOnItemClickListener{ _, _, position, _ ->
-            etProcessText.setText(items[position])
+            etProcessText.setText(processItems[position], false)
             dialog.dismiss()
         }
 
