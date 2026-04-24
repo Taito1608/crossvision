@@ -139,6 +139,17 @@ class HistoryActivity : AppCompatActivity() {
         }
     }
 
+    private fun statusToJapanese(status: String): String {
+        return when (status.lowercase()) {
+            "active", "started" -> "開始"
+            "completed" -> "完了"
+            "stopped" -> "中止"
+            "defect" -> "不良"
+            "cancelled", "canceled" -> "取消"
+            else -> status
+        }
+    }
+
     private inner class ProductHistoryAdapter(
         private val items: List<ProductHistoryItem>
     ) : BaseAdapter() {
@@ -159,7 +170,7 @@ class HistoryActivity : AppCompatActivity() {
             val constructionText = view.findViewById<TextView>(R.id.text_construction)
 
             codeText.text = item.code
-            statusText.text = "進捗: ${item.status}"
+            statusText.text = "進捗: ${statusToJapanese(item.status)}"
             processText.text = "工程: ${item.process}"
             constructionText.text = "工事: ${item.construction}"
 
