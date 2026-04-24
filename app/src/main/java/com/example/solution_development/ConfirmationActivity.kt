@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.RadioGroup
 import android.widget.Spinner
@@ -30,7 +31,7 @@ import java.net.URL
 class ConfirmationActivity : AppCompatActivity() {
 
     private data class StatusOption(val code: String, val label: String)
-    private data class ScannedItem(val code: String, var status: String)
+    private data class ScannedItem(var code: String, var status: String)
 
     private lateinit var confirmationMessage: TextView
     private lateinit var statusGroup: RadioGroup
@@ -286,11 +287,33 @@ class ConfirmationActivity : AppCompatActivity() {
             val view = convertView ?: LayoutInflater.from(this@ConfirmationActivity)
                 .inflate(R.layout.item_scanned, parent, false)
 
-            val codeText = view.findViewById<TextView>(R.id.text_code)
+            val codeEdit = view.findViewById<EditText>(R.id.text_code)
             val statusSpinner = view.findViewById<Spinner>(R.id.spinner_status)
+            val deleteButton = view.findViewById<Button>(R.id.button_delete)
             val item = items[position]
 
-            codeText.text = item.code
+            if (codeEdit.text.toString() != item.code) {
+                codeEdit.setText(item.code)
+            }
+            codeEdit.tag = position
+            codeEdit.setOnFocusChangeListener { editView, hasFocus ->
+                if (!hasFocus) {
+                    val itemPosition = editView.tag as? Int ?: return@setOnFocusChangeListener
+                    val editedCode = (editView as EditText).text.toString().trim()
+                    if (itemPosition in items.indices) {
+                        items[itemPosition].code = editedCode
+                    }
+                }
+            }
+
+            deleteButton.tag = position
+            deleteButton.setOnClickListener { clickedView ->
+                val itemPosition = clickedView.tag as? Int ?: return@setOnClickListener
+                if (itemPosition in items.indices) {
+                    items.removeAt(itemPosition)
+                    notifyDataSetChanged()
+                }
+            }
 
             if (statusSpinner.adapter == null) {
                 val spinnerAdapter = ArrayAdapter(
