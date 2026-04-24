@@ -8,13 +8,16 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <TextView
+    <EditText
         android:id="@+id/text_code"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
+        android:background="@android:color/transparent"
+        android:inputType="text"
+        android:singleLine="true"
         android:textSize="18sp" />
 
     <Spinner
@@ -22,5 +25,12 @@
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown" />
+
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="削除" />
 
 </LinearLayout>
