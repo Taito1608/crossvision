@@ -64,24 +64,22 @@ class CameraActivity : AppCompatActivity() {
         val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
 
         btnComplete.setOnClickListener {
-            val intent = Intent(this, ConfirmationActivity::class.java)
+            val confirmationIntent = Intent(this, ConfirmationActivity::class.java)
+            val process = this.intent.getStringExtra("process")
+            val construction = this.intent.getStringExtra("construction")
 
             // ダミーデータ：スキャン結果を追加
             if (scannedList.isEmpty()) {
                 scannedList.add("123456")
                 scannedList.add("789012")
                 scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
             }
 
-            intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+            confirmationIntent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+            confirmationIntent.putExtra("process", process)
+            confirmationIntent.putExtra("construction", construction)
 
-            startActivity(intent)
+            startActivity(confirmationIntent)
         }
 
         btnSelectImage.setOnClickListener {

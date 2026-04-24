@@ -75,6 +75,8 @@ class HomeActivity : AppCompatActivity() {
 
         btnNumberReg.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
+            intent.putExtra("process", etProcessText.text?.toString()?.trim().orEmpty())
+            intent.putExtra("construction", etConstructionText.text?.toString()?.trim().orEmpty())
             startActivity(intent)
         }
 
