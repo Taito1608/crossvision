@@ -31,13 +31,20 @@ class OnnxOcrEngine(private val context: Context) {
             dictFile = "onnx/ppocrv3_dict.txt",
             outputName = "softmax_2.tmp_0",
             numClasses = 97           // 95 en_dict + 1 space + 1 blank
+        ),
+        // Official PP-OCRv3 English PP-OCR model (converted from PaddlePaddle)
+        PP_OCRV3_OFFICIAL(
+            modelFile = "onnx/en_PP-OCRv3_rec.onnx",
+            dictFile = "onnx/en_PP-OCRv3_dict.txt",
+            outputName = "fetch_name_0",   // default output name from paddle2onnx conversion
+            numClasses = 97           // 95 en_dict chars + 1 space + 1 blank = 97
         )
     }
 
     companion object {
         private const val TAG = "OnnxOcrEngine"
 
-        // 入力/出力共通仕様
+        // Recognition model input spec
         private const val INPUT_NAME = "x"
         private const val INPUT_WIDTH = 320
         private const val INPUT_HEIGHT = 48
@@ -47,16 +54,29 @@ class OnnxOcrEngine(private val context: Context) {
         private const val PADDLE_MEAN = 127.5f
         private const val PADDLE_STD = 127.5f
 
+        // Detection model: ImageNet normalization
+        private val DET_MEAN = floatArrayOf(0.485f, 0.456f, 0.406f)
+        private val DET_STD = floatArrayOf(0.229f, 0.224f, 0.225f)
+        private const val DET_MAX_SIDE = 960
+        private const val DET_THRESH = 0.3f
+        private const val DET_PAD_EXPAND = 30  // pixels to expand detected box
+
         // 製品コード抽出用正規表現: 大文字英数字3文字以上 + 任意のハイフンと数字
         private val PRODUCT_CODE_PATTERN = Pattern.compile("[A-Z0-9]{3,}-?[0-9]*")
+
+        // Allowed characters for product codes (filter step)
+        private val ALLOWED_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+# "
     }
 
-    private var session: OrtSession? = null
+    // Recognition session
+    private var recSession: OrtSession? = null
+    // Detection session
+    private var detSession: OrtSession? = null
     private var ortEnvironment: OrtEnvironment? = null
     private var isModelLoaded = false
 
     // 選択中のモデル設定
-    private var currentPreset: ModelPreset = ModelPreset.PP_OCR_V3_RAPIDOCR
+    private var currentPreset: ModelPreset = ModelPreset.PP_OCRV3_OFFICIAL
 
     // 文字辞書（インデックス → 文字）
     private val charDict = mutableListOf<String>()
@@ -110,7 +130,7 @@ class OnnxOcrEngine(private val context: Context) {
     }
 
     /**
-     * ONNXモデルをロード
+     * ONNXモデルをロード（det + rec）
      */
     fun loadModel(): Boolean {
         Log.d(TAG, "loadModel() called, preset: ${currentPreset.name}")
@@ -125,31 +145,35 @@ class OnnxOcrEngine(private val context: Context) {
             ortEnvironment = OrtEnvironment.getEnvironment()
             Log.d(TAG, "OrtEnvironment created")
 
-            // モデルファイルの確認
+            // === Load Recognition model ===
             try {
                 context.assets.open(currentPreset.modelFile).close()
-                Log.d(TAG, "Model file exists in assets: ${currentPreset.modelFile}")
+                Log.d(TAG, "Rec model file exists: ${currentPreset.modelFile}")
             } catch (e: Exception) {
-                Log.e(TAG, "Model file NOT found in assets: ${currentPreset.modelFile}", e)
+                Log.e(TAG, "Rec model file NOT found: ${currentPreset.modelFile}", e)
                 throw Exception("Model file '${currentPreset.modelFile}' not found in assets.")
             }
-
-            // モデルの読み込み
-            val modelBytes = loadModelFromAssets(currentPreset.modelFile)
-            Log.d(TAG, "Model loaded from assets, size: ${modelBytes.size} bytes")
-
-            // セッションの作成
+            val recModelBytes = loadModelFromAssets(currentPreset.modelFile)
+            Log.d(TAG, "Rec model loaded, size: ${recModelBytes.size} bytes")
             val sessionOptions = OrtSession.SessionOptions()
-            session = ortEnvironment?.createSession(modelBytes, sessionOptions)
+            recSession = ortEnvironment?.createSession(recModelBytes, sessionOptions)
+            Log.d(TAG, "Rec session created. Output names: ${recSession?.outputNames}")
 
-            if (session != null) {
-                Log.d(TAG, "Session created successfully")
-                Log.d(TAG, "Input names: ${session?.inputNames}")
-                Log.d(TAG, "Output names: ${session?.outputNames}")
-                Log.d(TAG, "Output key to use: ${session?.outputNames?.firstOrNull()}")
+            // === Load Detection model (DB text detection) ===
+            val detModelPath = "onnx/det.onnx"
+            try {
+                context.assets.open(detModelPath).close()
+                Log.d(TAG, "Det model file exists: $detModelPath")
+                val detModelBytes = loadModelFromAssets(detModelPath)
+                Log.d(TAG, "Det model loaded, size: ${detModelBytes.size} bytes")
+                detSession = ortEnvironment?.createSession(detModelBytes, sessionOptions)
+                Log.d(TAG, "Det session created. Output names: ${detSession?.outputNames}")
+            } catch (e: Exception) {
+                Log.w(TAG, "Det model not found, falling back to full-image recognition: ${e.message}")
+                detSession = null
             }
 
-            isModelLoaded = session != null
+            isModelLoaded = recSession != null
             isModelLoaded
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in loadModel", e)
@@ -312,11 +336,13 @@ class OnnxOcrEngine(private val context: Context) {
     }
 
     /**
-     * メイン推論エントリーポイント
+     * メイン推論エントリーポイント: det → rec → filter
+     * If det model is loaded, detect text regions first, then recognize each.
+     * Otherwise, recognize the full image directly.
      */
     fun extractProductCode(bitmap: Bitmap): List<String> {
-        Log.d(TAG, "extractProductCode() called, bitmap size: ${bitmap.width}x${bitmap.height}, preset: ${currentPreset.name}")
-        if (!isModelLoaded || session == null || ortEnvironment == null) {
+        Log.d(TAG, "extractProductCode() called, bitmap=${bitmap.width}x${bitmap.height}, preset=${currentPreset.name}")
+        if (!isModelLoaded || recSession == null || ortEnvironment == null) {
             Log.w(TAG, "Engine not ready (loaded=$isModelLoaded)")
             return emptyList()
         }
@@ -324,50 +350,42 @@ class OnnxOcrEngine(private val context: Context) {
             Log.e(TAG, "Character dictionary not loaded")
             return emptyList()
         }
+
         return try {
-            val inputTensor = bitmapToInputTensor(bitmap)
+            if (detSession != null) {
+                // === det → rec pipeline ===
+                val regions = detectTextRegions(bitmap)
+                Log.d(TAG, "Detected ${regions.size} text regions")
+                if (regions.isEmpty()) return emptyList()
 
-            val inputs = hashMapOf(INPUT_NAME to inputTensor)
-            session?.run(inputs)?.use { result ->
-                // Select output key: try preset first, then fallback to actual output name
-                val chosenKey = if (session!!.outputNames.contains(currentPreset.outputName)) {
-                    currentPreset.outputName
-                } else {
-                    Log.w(TAG, "Output '${currentPreset.outputName}' not found, using first output")
-                    session!!.outputNames.firstOrNull()
-                        ?: run { Log.e(TAG, "No output names available"); return@use emptyList() }
+                val allCodes = mutableSetOf<String>()
+                for ((i, region) in regions.withIndex()) {
+                    val crop = cropBitmap(bitmap, region)
+                    if (crop == null) continue
+                    // Expand crop with padding
+                    val padded = padCrop(crop)
+                    val text = recognizeBitmap(padded)
+                    Log.d(TAG, "Region $i: '${text}' (crop=${crop.width}x${crop.height})")
+                    if (text.isNotBlank()) {
+                        // Filter to allowed characters
+                        val filtered = filterProductCode(text)
+                        if (filtered.isNotBlank()) {
+                            val codes = extractProductCodes(filtered)
+                            allCodes.addAll(codes)
+                        }
+                    }
                 }
-
-                @Suppress("UNCHECKED_CAST")
-                val outputTensor = result.get(chosenKey)?.get() as? OnnxTensor
-                    ?: run { Log.e(TAG, "Output '$chosenKey' is not OnnxTensor"); return@use emptyList() }
-
-                Log.d(TAG, "Output shape=${java.util.Arrays.toString(outputTensor.info.shape)}, type=${outputTensor.info.type}")
-
-                val outputArray = FloatArray(outputTensor.floatBuffer.remaining())
-                outputTensor.floatBuffer.get(outputArray)
-
-                if (outputArray.isNotEmpty()) {
-                    Log.d(TAG, "Output stats: min=${outputArray.minOrNull()}, max=${outputArray.maxOrNull()}, avg=${outputArray.average()}")
-                }
-
-                if (outputArray.all { it == 0f }) {
-                    Log.w(TAG, "All output values are zero")
-                    return@use emptyList()
-                }
-
-                val decodedText = decodeOutput(outputArray, outputTensor.info.shape)
-                Log.d(TAG, "Decoded text: '$decodedText'")
-
-                if (decodedText.isBlank()) {
-                    Log.w(TAG, "Decoded text is blank")
-                    return@use emptyList()
-                }
-
-                val productCodes = extractProductCodes(decodedText)
-                Log.d(TAG, "Extracted ${productCodes.size} code(s): $productCodes")
-                productCodes
-            } ?: emptyList()
+                Log.d(TAG, "All extracted codes: $allCodes")
+                allCodes.toList()
+            } else {
+                // === Fallback: recognition only (full image) ===
+                Log.d(TAG, "No det model, using full image recognition")
+                val text = recognizeBitmap(bitmap)
+                Log.d(TAG, "Decoded: '$text'")
+                if (text.isBlank()) return emptyList()
+                val filtered = filterProductCode(text)
+                extractProductCodes(filtered)
+            }
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in extractProductCode", e)
             emptyList()
@@ -378,16 +396,197 @@ class OnnxOcrEngine(private val context: Context) {
     }
 
     /**
+     * Detect text regions using DB text detection model.
+     * Returns list of [x1, y1, x2, y2] bounding boxes in original image coordinates.
+     */
+    private fun detectTextRegions(bitmap: Bitmap): List<IntArray> {
+        val srcH = bitmap.height
+        val srcW = bitmap.width
+
+        // Resize for detection (max side = DET_MAX_SIDE, multiple of 32)
+        val scale = minOf(DET_MAX_SIDE.toFloat() / srcH, DET_MAX_SIDE.toFloat() / srcW)
+        val newH = ((srcH * scale).toInt() + 31) / 32 * 32
+        val newW = ((srcW * scale).toInt() + 31) / 32 * 32
+
+        val resized = Bitmap.createScaledBitmap(bitmap, newW, newH, true)
+        val pixels = IntArray(newW * newH)
+        resized.getPixels(pixels, 0, newW, 0, 0, newW, newH)
+
+        // Build NCHW float array with ImageNet normalization
+        val totalSize = 3 * newH * newW
+        val floatArray = FloatArray(totalSize)
+        val planeSize = newH * newW
+        for (y in 0 until newH) {
+            for (x in 0 until newW) {
+                val pixel = pixels[y * newW + x]
+                val r = ((pixel shr 16) and 0xFF).toFloat() / 255f
+                val g = ((pixel shr 8) and 0xFF).toFloat() / 255f
+                val b = (pixel and 0xFF).toFloat() / 255f
+                val base = y * newW + x
+                floatArray[base] = (r - DET_MEAN[0]) / DET_STD[0]
+                floatArray[planeSize + base] = (g - DET_MEAN[1]) / DET_STD[1]
+                floatArray[2 * planeSize + base] = (b - DET_MEAN[2]) / DET_STD[2]
+            }
+        }
+
+        val env = ortEnvironment ?: return emptyList()
+        val inputBuffer = ByteBuffer.allocateDirect(totalSize * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
+        inputBuffer.put(floatArray); inputBuffer.rewind()
+        val shape = longArrayOf(1L, 3L, newH.toLong(), newW.toLong())
+        val inputTensor = OnnxTensor.createTensor(env, inputBuffer, shape)
+        val inputName = detSession?.inputNames?.firstOrNull() ?: "x"
+
+        val outputs = detSession?.run(hashMapOf(inputTensor)) ?: return emptyList()
+        inputTensor.close()
+
+        // Output: [1, 1, H, W] text segmentation map
+        val outputTensor = useWithClose(outputs) { outs ->
+            val key = detSession!!.outputNames.firstOrNull() ?: return@useWithClose null
+            @Suppress("UNCHECKED_CAST")
+            (outs.get(key)?.get() as? OnnxTensor)
+        } ?: return emptyList()
+
+        val outShape = outputTensor.info.shape
+        val outH = outShape[2].toInt()
+        val outW = outShape[3].toInt()
+        val outPixels = FloatArray(outputTensor.floatBuffer.remaining())
+        outputTensor.floatBuffer.get(outPixels)
+
+        // Threshold to get binary map
+        val binary = Array(outH) { BooleanArray(outW) }
+        for (y in 0 until outH) {
+            for (x in 0 until outW) {
+                binary[y][x] = outPixels[y * outW + x] > DET_THRESH
+            }
+        }
+
+        // Simple connected component finder (flood fill)
+        val visited = Array(outH) { BooleanArray(outW) }
+        val boxes = mutableListOf<IntArray>()
+        val scaleX = srcW.toFloat() / outW
+        val scaleY = srcH.toFloat() / outH
+
+        for (y in 0 until outH) {
+            for (x in 0 until outW) {
+                if (binary[y][x] && !visited[y][x]) {
+                    // BFS flood fill
+                    val queue = ArrayDeque<Pair<Int, Int>>()
+                    queue.add(Pair(x, y))
+                    visited[y][x] = true
+                    var minX = x; var maxX = x; var minY = y; var maxY = y
+                    var count = 0
+                    while (queue.isNotEmpty()) {
+                        val (cx, cy) = queue.removeFirst()
+                        count++
+                        if (cx < minX) minX = cx; if (cx > maxX) maxX = cx
+                        if (cy < minY) minY = cy; if (cy > maxY) maxY = cy
+                        for (dy in -1..1) {
+                            for (dx in -1..1) {
+                                val nx = cx + dx; val ny = cy + dy
+                                if (nx in 0 until outW && ny in 0 until outH && binary[ny][nx] && !visited[ny][nx]) {
+                                    visited[ny][nx] = true
+                                    queue.add(Pair(nx, ny))
+                                }
+                            }
+                        }
+                    }
+                    if (count >= 5) {  // minimum component size
+                        val x1 = (minX * scaleX).toInt() - DET_PAD_EXPAND
+                        val y1 = (minY * scaleY).toInt() - DET_PAD_EXPAND
+                        val x2 = (maxX * scaleX).toInt() + DET_PAD_EXPAND
+                        val y2 = (maxY * scaleY).toInt() + DET_PAD_EXPAND
+                        boxes.add(intArrayOf(
+                            x1.coerceIn(0, srcW - 1),
+                            y1.coerceIn(0, srcH - 1),
+                            x2.coerceIn(0, srcW - 1),
+                            y2.coerceIn(0, srcH - 1)
+                        ))
+                    }
+                }
+            }
+        }
+        outputTensor.close()
+        return boxes
+    }
+
+    /** Crop bitmap to region [x1, y1, x2, y2] */
+    private fun cropBitmap(bitmap: Bitmap, region: IntArray): Bitmap? {
+        return try {
+            val x1 = region[0]; val y1 = region[1]; val x2 = region[2]; val y2 = region[3]
+            if (x2 <= x1 || y2 <= y1) return null
+            Bitmap.createBitmap(bitmap, x1, y1, x2 - x1, y2 - y1)
+        } catch (e: Exception) {
+            Log.e(TAG, "cropBitmap failed", e)
+            null
+        }
+    }
+
+    /** Add gray padding around a crop for better recognition */
+    private fun padCrop(crop: Bitmap): Bitmap {
+        val pad = 10
+        val newW = crop.width + 2 * pad
+        val newH = crop.height + 2 * pad
+        val result = Bitmap.createBitmap(newW, newH, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(result)
+        canvas.drawColor(android.graphics.Color.rgb(128, 128, 128))
+        canvas.drawBitmap(crop, pad.toFloat(), pad.toFloat(), null)
+        return result
+    }
+
+    /** Run recognition on a bitmap and return decoded text */
+    private fun recognizeBitmap(bitmap: Bitmap): String {
+        if (recSession == null || ortEnvironment == null) return ""
+        val inputTensor = bitmapToInputTensor(bitmap)
+        val inputs = hashMapOf(INPUT_NAME to inputTensor)
+        return recSession?.run(inputs)?.use { result ->
+            val chosenKey = if (recSession!!.outputNames.contains(currentPreset.outputName)) {
+                currentPreset.outputName
+            } else {
+                recSession!!.outputNames.firstOrNull() ?: return@use ""
+            }
+            @Suppress("UNCHECKED_CAST")
+            val outputTensor = result.get(chosenKey)?.get() as? OnnxTensor
+                ?: return@use ""
+            val shape = outputTensor.info.shape
+            val outputArray = FloatArray(outputTensor.floatBuffer.remaining())
+            outputTensor.floatBuffer.get(outputArray)
+            decodeOutput(outputArray, shape)
+        } ?: ""
+    }
+
+    /** Filter text to only allowed product code characters (preserving mixed case) */
+    private fun filterProductCode(text: String): String {
+        val sb = StringBuilder()
+        for (c in text) {
+            if (ALLOWED_CHARS.contains(c)) {
+                sb.append(c)
+            }
+        }
+        return sb.toString()
+    }
+
+    /** Auto-close helper */
+    private inline fun <T> useWithClose(closeable: AutoCloseable, block: (AutoCloseable) -> T): T {
+        return try {
+            block(closeable)
+        } finally {
+            try { closeable.close() } catch (_: Exception) {}
+        }
+    }
+
+    /**
      * リソース解放
      */
     fun release() {
         try {
-            session?.close()
+            recSession?.close()
+            detSession?.close()
             ortEnvironment?.close()
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
-            session = null
+            recSession = null
+            detSession = null
             ortEnvironment = null
             isModelLoaded = false
             dictLoaded = false
