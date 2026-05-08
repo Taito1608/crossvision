@@ -46,8 +46,12 @@ class HistoryActivity : AppCompatActivity() {
         historyAdapter = ProductHistoryAdapter(historyItems)
         historyListView.adapter = historyAdapter
 
-        if (authToken.isBlank()) {
-            Toast.makeText(this, "APIトークンが未設定です", Toast.LENGTH_LONG).show()
+        if (authToken.isBlank() || authToken == "YOUR_API_TOKEN") {
+            Toast.makeText(
+                this,
+                "APIトークンが未設定またはプレースホルダです。",
+                Toast.LENGTH_LONG
+            ).show()
         } else {
             fetchProducts()
         }
