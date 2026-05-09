@@ -47,9 +47,6 @@ import com.google.mlkit.vision.common.InputImage
 import java.io.ByteArrayOutputStream
 
 
-private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-private lateinit var overlayView: ScanOverlayView
-
 class CameraActivity : AppCompatActivity() {
 
     // TODO ===== UI =====
@@ -63,7 +60,7 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var imageAnalysis: ImageAnalysis
 
     // TODO ===== OCR =====
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    private lateinit var recognizer: com.google.mlkit.vision.text.TextRecognizer
 
     // TODO ===== ??? =====
     private var isCaptured = false
@@ -82,25 +79,47 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "スキャン画面"
+        try {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.title = "スキャン画面"
 
-        previewView = findViewById(R.id.previewView)
-        overlay = findViewById(R.id.overlay)
+            // ML Kit の初期化
+            recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-        val btnComplete = findViewById<Button>(R.id.btnComplete)
-        val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
+            previewView = findViewById(R.id.previewView)
+            overlay = findViewById(R.id.overlay)
 
-        btnComplete.setOnClickListener {
-            val intent = Intent(this, ConfirmationActivity::class.java)
+            val btnComplete = findViewById<Button>(R.id.btnComplete)
+            val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
 
-            intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+            btnComplete.setOnClickListener {
+                val intent = Intent(this, ConfirmationActivity::class.java)
 
-            startActivity(intent)
-        }
+                intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
 
-        btnSelectImage.setOnClickListener {
-            pickImageLauncher.launch("image/*")
+                startActivity(intent)
+            }
+
+            btnSelectImage.setOnClickListener {
+                pickImageLauncher.launch("image/*")
+            }
+
+            if(ContextCompat.checkSelfPermission(
+                this,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ){
+                startCamera()
+            }else{
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    1001
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("CameraActivity", "onCreate error", e)
+            Toast.makeText(this, "初期化中にエラーが発生しました", Toast.LENGTH_LONG).show()
         }
 
         //btnShutter.setOnClickListener{
@@ -162,40 +181,54 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun startCamera(){
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        try {
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
+            cameraProviderFuture.addListener({
+                try {
+                    val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder().build().also{
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
+                    val preview = Preview.Builder().build().also{
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
 
-            imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
+                    imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
 
-            startAnalyzer()
+                    imageCapture = ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .build()
 
-            imageCapture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build()
+                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(
+                        this,
+                        cameraSelector,
+                        preview,
+                        imageAnalysis,
+                        imageCapture
+                    )
 
-            cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageAnalysis,
-                imageCapture
-            )
-        }, ContextCompat.getMainExecutor(this))
+                    // Viewのレイアウトが完了した後に Analyzer を開始
+                    overlay.post {
+                        startAnalyzer()
+                    }
+                } catch (e: Exception) {
+                    Log.e("CameraActivity", "Camera binding error", e)
+                    Toast.makeText(this@CameraActivity, "カメラバインドエラー: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }, ContextCompat.getMainExecutor(this))
+        } catch (e: Exception) {
+            Log.e("CameraActivity", "startCamera error", e)
+            Toast.makeText(this, "カメラ初期化エラー", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun startAnalyzer() {
-        imageAnalysis.setAnalyzer(
-            ContextCompat.getMainExecutor(this)
-        ) { imageProxy ->
+        try {
+            imageAnalysis.setAnalyzer(
+                ContextCompat.getMainExecutor(this)
+            ) { imageProxy ->
 
             if (isProcessing || isCaptured) {
                 imageProxy.close()
@@ -210,12 +243,32 @@ class CameraActivity : AppCompatActivity() {
                 val bitmap = imageProxy.toBitmap()
                 val rect = overlay.getScanRect()
 
+                // Rect が有効かどうか確認
+                if (rect.width() <= 0 || rect.height() <= 0) {
+                    imageProxy.close()
+                    isProcessing = false
+                    return@setAnalyzer
+                }
+
+                // Bitmap の範囲内でクロップ領域を計算
+                val cropLeft = rect.left.coerceIn(0, bitmap.width)
+                val cropTop = rect.top.coerceIn(0, bitmap.height)
+                val cropWidth = (rect.right - rect.left).coerceAtLeast(1).coerceAtMost(bitmap.width - cropLeft)
+                val cropHeight = (rect.bottom - rect.top).coerceAtLeast(1).coerceAtMost(bitmap.height - cropTop)
+
+                // Crop サイズが有効かチェック
+                if (cropWidth <= 0 || cropHeight <= 0) {
+                    imageProxy.close()
+                    isProcessing = false
+                    return@setAnalyzer
+                }
+
                 val cropped = Bitmap.createBitmap(
                     bitmap,
-                    rect.left.coerceAtLeast(0),
-                    rect.top.coerceAtLeast(0),
-                    rect.width().coerceAtMost(bitmap.width - rect.left),
-                    rect.height().coerceAtMost(bitmap.height - rect.top)
+                    cropLeft,
+                    cropTop,
+                    cropWidth,
+                    cropHeight
                 )
 
                 val image = InputImage.fromMediaImage(
@@ -223,27 +276,36 @@ class CameraActivity : AppCompatActivity() {
                     imageProxy.imageInfo.rotationDegrees
                 )
 
-                recognizer.process(image)
-                    .addOnSuccessListener { visionText ->
-                        val text = visionText.text
-                        val numbers = text.replace(Regex("[^0-9]"), "")
+                try {
+                    recognizer.process(image)
+                        .addOnSuccessListener { visionText ->
+                            val text = visionText.text
+                            val numbers = text.replace(Regex("[^0-9]"), "")
 
-                        if (numbers.length >= 6) {
-                            if (!scannedList.contains(numbers)) {
-                                scannedList.add(numbers)
+                            if (numbers.length >= 6) {
+                                if (!scannedList.contains(numbers)) {
+                                    scannedList.add(numbers)
+                                }
+
+                                triggerCapture()
                             }
-
-                            triggerCapture()
                         }
-                    }
-                    .addOnCompleteListener {
-                        isProcessing = false
-                        imageProxy.close()
-                    }
+                        .addOnCompleteListener {
+                            isProcessing = false
+                            imageProxy.close()
+                        }
+                } catch (e: Exception) {
+                    Log.e("CameraActivity", "OCR processing error", e)
+                    isProcessing = false
+                    imageProxy.close()
+                }
             } else {
                 imageProxy.close()
                 isProcessing = false
             }
+            }
+        } catch (e: Exception) {
+            Log.e("CameraActivity", "startAnalyzer error", e)
         }
     }
 
