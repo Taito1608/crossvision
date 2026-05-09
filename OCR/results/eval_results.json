@@ -1,0 +1,569 @@
+{
+  "summary": {
+    "num_images": 14,
+    "total_gt": 39,
+    "tp": 0,
+    "fp": 39,
+    "fn": 39,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0,
+    "partial_recall": 0.0,
+    "avg_lcs_similarity": 0.2959,
+    "avg_edit_similarity": 0.1914,
+    "total_time": 29.58,
+    "avg_time": 2.11
+  },
+  "details": [
+    {
+      "filename": "IMG_0787.jpg",
+      "gt_codes": [
+        "BISb30N-16"
+      ],
+      "texts": [
+        "Xa",
+        "B/Sb3oN-11"
+      ],
+      "num_boxes": 2,
+      "found": [
+        "SB3ON-11"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "SB3ON-11"
+      ],
+      "false_neg": [
+        "BISB30N-16"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.7,
+      "edit_similarity": 0.5833,
+      "elapsed": 1.01,
+      "img_hw": [
+        3024,
+        4032
+      ]
+    },
+    {
+      "filename": "M5sb24-10.jpg",
+      "gt_codes": [
+        "M5sb24-10"
+      ],
+      "texts": [
+        "MABHONRE",
+        "",
+        "M5b24I0"
+      ],
+      "num_boxes": 3,
+      "found": [
+        "MABHONRE",
+        "M5B24I0"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "MABHONRE",
+        "M5B24I0"
+      ],
+      "false_neg": [
+        "M5SB24-10"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.6667,
+      "edit_similarity": 0.2667,
+      "elapsed": 2.02,
+      "img_hw": [
+        1536,
+        2048
+      ]
+    },
+    {
+      "filename": "IMG_1537.jpg",
+      "gt_codes": [
+        "BISb40N-27",
+        "BISb40N-8",
+        "BISb40N-26",
+        "BISb40N-9"
+      ],
+      "texts": [
+        "",
+        ""
+      ],
+      "num_boxes": 2,
+      "found": [],
+      "true_pos": [],
+      "false_pos": [],
+      "false_neg": [
+        "BISB40N-27",
+        "BISB40N-8",
+        "BISB40N-26",
+        "BISB40N-9"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.0,
+      "edit_similarity": 0.0,
+      "elapsed": 2.19,
+      "img_hw": [
+        4032,
+        3024
+      ]
+    },
+    {
+      "filename": "IMG_1548.jpg",
+      "gt_codes": [
+        "BISb40N-46"
+      ],
+      "texts": [
+        "",
+        ""
+      ],
+      "num_boxes": 2,
+      "found": [],
+      "true_pos": [],
+      "false_pos": [],
+      "false_neg": [
+        "BISB40N-46"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.0,
+      "edit_similarity": 0.0,
+      "elapsed": 2.19,
+      "img_hw": [
+        4032,
+        3024
+      ]
+    },
+    {
+      "filename": "IMG_1571.jpg",
+      "gt_codes": [
+        "BISb30N-13A",
+        "BISb30N-13"
+      ],
+      "texts": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "num_boxes": 4,
+      "found": [],
+      "true_pos": [],
+      "false_pos": [],
+      "false_neg": [
+        "BISB30N-13A",
+        "BISB30N-13"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.0,
+      "edit_similarity": 0.0,
+      "elapsed": 2.28,
+      "img_hw": [
+        4032,
+        3024
+      ]
+    },
+    {
+      "filename": "IMG_0422.jpg",
+      "gt_codes": [
+        "BISb30N-7A",
+        "BISb30N-4I",
+        "BISb30N-7A"
+      ],
+      "texts": [
+        "B1Sb30x",
+        "T",
+        "",
+        "",
+        "sh",
+        "3oN-4",
+        "",
+        "AXa",
+        "MXa",
+        "BISb3ON",
+        "A",
+        "",
+        "Xa",
+        "Xa",
+        "31Sh",
+        "30N"
+      ],
+      "num_boxes": 16,
+      "found": [
+        "B1SB30X",
+        "3ON-4",
+        "AXA",
+        "MXA",
+        "BISB3ON",
+        "31SH",
+        "30N"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "B1SB30X",
+        "3ON-4",
+        "AXA",
+        "MXA",
+        "BISB3ON",
+        "31SH",
+        "30N"
+      ],
+      "false_neg": [
+        "BISB30N-7A",
+        "BISB30N-4I",
+        "BISB30N-7A"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.6,
+      "edit_similarity": 0.375,
+      "elapsed": 2.18,
+      "img_hw": [
+        4032,
+        2268
+      ]
+    },
+    {
+      "filename": "IMG20250416153020.jpg",
+      "gt_codes": [
+        "BISb30N-23",
+        "BISb30N-7"
+      ],
+      "texts": [
+        "9S/8",
+        "L-NOE",
+        "OXV",
+        "IDX?V",
+        "189S1",
+        "-NOES",
+        "IAxv"
+      ],
+      "num_boxes": 7,
+      "found": [
+        "L-NOE",
+        "OXV",
+        "IDX",
+        "189S1",
+        "NOES",
+        "IAXV"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "L-NOE",
+        "OXV",
+        "IDX",
+        "189S1",
+        "NOES",
+        "IAXV"
+      ],
+      "false_neg": [
+        "BISB30N-23",
+        "BISB30N-7"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.2632,
+      "edit_similarity": 0.0968,
+      "elapsed": 2.43,
+      "img_hw": [
+        3468,
+        4624
+      ]
+    },
+    {
+      "filename": "multi_008_yellow_green.JPG",
+      "gt_codes": [
+        "BISb30N-7A",
+        "BISb30N-41",
+        "BISb30N-7A",
+        "BISb30N-53",
+        "BISb30N-37A"
+      ],
+      "texts": [
+        "E"
+      ],
+      "num_boxes": 1,
+      "found": [],
+      "true_pos": [],
+      "false_pos": [],
+      "false_neg": [
+        "BISB30N-7A",
+        "BISB30N-41",
+        "BISB30N-7A",
+        "BISB30N-53",
+        "BISB30N-37A"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.0,
+      "edit_similarity": 0.0,
+      "elapsed": 2.08,
+      "img_hw": [
+        5712,
+        4284
+      ]
+    },
+    {
+      "filename": "N5G15-X1Y1.jpg",
+      "gt_codes": [
+        "N5G15-X1Y1"
+      ],
+      "texts": [
+        "A4YL21L",
+        "V5GI5-XIY"
+      ],
+      "num_boxes": 2,
+      "found": [
+        "A4YL21L",
+        "V5GI5-XIY"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "A4YL21L",
+        "V5GI5-XIY"
+      ],
+      "false_neg": [
+        "N5G15-X1Y1"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.6,
+      "edit_similarity": 0.3125,
+      "elapsed": 1.96,
+      "img_hw": [
+        1536,
+        2048
+      ]
+    },
+    {
+      "filename": "multi_001_sunny_yellow.JPG",
+      "gt_codes": [
+        "BISb30N-36",
+        "BISb30N-40",
+        "BISb30N-19",
+        "BISb30N-20",
+        "BISb30N-56",
+        "BISb30N-34",
+        "BISb30N-12",
+        "BISb30N-26"
+      ],
+      "texts": [
+        "s-MoC9S7",
+        "",
+        "sNOE9S",
+        "Ya1",
+        "V1",
+        "3QN-4",
+        "3Sh",
+        "?Xal",
+        "3/Sh",
+        "AXq",
+        "31Sb3oN-7",
+        "AYa",
+        "AYa1",
+        "3S",
+        "3oN-34",
+        "SISh30N?-2.",
+        "ZT-NoC9S/S",
+        "",
+        "BISk",
+        "",
+        "ICGNOE9S7S",
+        "N"
+      ],
+      "num_boxes": 22,
+      "found": [
+        "S-MOC9S7",
+        "SNOE9S",
+        "YA1",
+        "3QN-4",
+        "3SH",
+        "XAL",
+        "AXQ",
+        "31SB3ON-7",
+        "AYA",
+        "AYA1",
+        "3ON-34",
+        "SISH30N",
+        "ZT-NOC9S",
+        "BISK",
+        "ICGNOE9S7S"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "S-MOC9S7",
+        "SNOE9S",
+        "YA1",
+        "3QN-4",
+        "3SH",
+        "XAL",
+        "AXQ",
+        "31SB3ON-7",
+        "AYA",
+        "AYA1",
+        "3ON-34",
+        "SISH30N",
+        "ZT-NOC9S",
+        "BISK",
+        "ICGNOE9S7S"
+      ],
+      "false_neg": [
+        "BISB30N-36",
+        "BISB30N-40",
+        "BISB30N-19",
+        "BISB30N-20",
+        "BISB30N-56",
+        "BISB30N-34",
+        "BISB30N-12",
+        "BISB30N-26"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.4125,
+      "edit_similarity": 0.2449,
+      "elapsed": 2.69,
+      "img_hw": [
+        5712,
+        4284
+      ]
+    },
+    {
+      "filename": "015_B15b30N-41__B15b30N-7A_45deg_NW_yellow.JPG",
+      "gt_codes": [
+        "BISb30N-7A",
+        "BISb30N-4I",
+        "BISb30N-7A",
+        "BISb30N-53"
+      ],
+      "texts": [
+        "L",
+        "Bsbao",
+        "Eba",
+        "B",
+        "",
+        "",
+        "B",
+        "",
+        "R"
+      ],
+      "num_boxes": 9,
+      "found": [
+        "BSBAO",
+        "EBA"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "BSBAO",
+        "EBA"
+      ],
+      "false_neg": [
+        "BISB30N-7A",
+        "BISB30N-4I",
+        "BISB30N-7A",
+        "BISB30N-53"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.2,
+      "edit_similarity": 0.175,
+      "elapsed": 2.23,
+      "img_hw": [
+        5712,
+        4284
+      ]
+    },
+    {
+      "filename": "IMG20250416160821.jpg",
+      "gt_codes": [
+        "BISb30N-19",
+        "BISb30N-20"
+      ],
+      "texts": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "U",
+        "",
+        ""
+      ],
+      "num_boxes": 8,
+      "found": [],
+      "true_pos": [],
+      "false_pos": [],
+      "false_neg": [
+        "BISB30N-19",
+        "BISB30N-20"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.0,
+      "edit_similarity": 0.0,
+      "elapsed": 2.4,
+      "img_hw": [
+        4000,
+        3000
+      ]
+    },
+    {
+      "filename": "IMG_1536.jpg",
+      "gt_codes": [
+        "BISb40N-23",
+        "BISb40N-15"
+      ],
+      "texts": [
+        ""
+      ],
+      "num_boxes": 1,
+      "found": [],
+      "true_pos": [],
+      "false_pos": [],
+      "false_neg": [
+        "BISB40N-23",
+        "BISB40N-15"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.0,
+      "edit_similarity": 0.0,
+      "elapsed": 1.94,
+      "img_hw": [
+        4032,
+        3024
+      ]
+    },
+    {
+      "filename": "IMG_0771.jpg",
+      "gt_codes": [
+        "BISb40N-23",
+        "BISb40N-15",
+        "BISb40N-27"
+      ],
+      "texts": [
+        "BTSb40NE2",
+        "",
+        "R?Sb40N-I5",
+        "3ISb?4cN-21",
+        "Ya"
+      ],
+      "num_boxes": 5,
+      "found": [
+        "BTSB40NE2",
+        "SB40N-I5",
+        "3ISB",
+        "4CN-21"
+      ],
+      "true_pos": [],
+      "false_pos": [
+        "BTSB40NE2",
+        "SB40N-I5",
+        "3ISB",
+        "4CN-21"
+      ],
+      "false_neg": [
+        "BISB40N-23",
+        "BISB40N-15",
+        "BISB40N-27"
+      ],
+      "partial_matches": [],
+      "lcs_similarity": 0.7,
+      "edit_similarity": 0.625,
+      "elapsed": 1.98,
+      "img_hw": [
+        4032,
+        3024
+      ]
+    }
+  ]
+}
