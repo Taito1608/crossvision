@@ -94,6 +94,20 @@ class CameraActivity : AppCompatActivity() {
 
             btnComplete.setOnClickListener {
                 val intent = Intent(this, ConfirmationActivity::class.java)
+                
+//                 val process = this.intent.getStringExtra("process")
+//                 val construction = this.intent.getStringExtra("construction")
+
+//                 // ダミーデータ：スキャン結果を追加
+//                 if (scannedList.isEmpty()) {
+//                     scannedList.add("123456")
+//                     scannedList.add("789012")
+//                     scannedList.add("345678")
+//                 }
+
+//                 confirmationIntent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+//                 confirmationIntent.putExtra("process", process)
+//                 confirmationIntent.putExtra("construction", construction)
 
                 intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
 

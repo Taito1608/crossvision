@@ -16,6 +16,8 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        val apiToken = (project.findProperty("crossvisionApiToken") as? String) ?: ""
+        buildConfigField("String", "CROSSVISION_API_TOKEN", "\"$apiToken\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +39,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
