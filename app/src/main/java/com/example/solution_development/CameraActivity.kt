@@ -7,6 +7,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.content.pm.PackageManager
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ImageFormat
+import android.graphics.Paint
+import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,6 +21,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import android.os.Handler
+import android.util.AttributeSet
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -30,20 +36,25 @@ import androidx.camera.view.PreviewView
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import android.util.Log
+import androidx.graphics.*
+import android.graphics.Rect
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.Executors
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.google.mlkit.vision.common.InputImage
+import java.io.ByteArrayOutputStream
 
 
 private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+private lateinit var overlayView: ScanOverlayView
 
 class CameraActivity : AppCompatActivity() {
 
     // TODO ===== UI =====
     private lateinit var previewView: PreviewView
+    private lateinit var overlay: ScanOverlayView
     //private lateinit var btnComplete: Button
     private lateinit var btnSelectImage: Button
 
@@ -75,6 +86,7 @@ class CameraActivity : AppCompatActivity() {
         supportActionBar?.title = "スキャン画面"
 
         previewView = findViewById(R.id.previewView)
+        overlay = findViewById(R.id.overlay)
 
         val btnComplete = findViewById<Button>(R.id.btnComplete)
         val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
@@ -159,7 +171,7 @@ class CameraActivity : AppCompatActivity() {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
 
-            imageAnalysis = ImageAnalysis.Builder().build()
+            imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
 
             startAnalyzer()
 
@@ -185,7 +197,7 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this)
         ) { imageProxy ->
 
-            if (isProcessing) {
+            if (isProcessing || isCaptured) {
                 imageProxy.close()
                 return@setAnalyzer
             }
@@ -195,6 +207,17 @@ class CameraActivity : AppCompatActivity() {
             val mediaImage = imageProxy.image
 
             if (mediaImage != null) {
+                val bitmap = imageProxy.toBitmap()
+                val rect = overlay.getScanRect()
+
+                val cropped = Bitmap.createBitmap(
+                    bitmap,
+                    rect.left.coerceAtLeast(0),
+                    rect.top.coerceAtLeast(0),
+                    rect.width().coerceAtMost(bitmap.width - rect.left),
+                    rect.height().coerceAtMost(bitmap.height - rect.top)
+                )
+
                 val image = InputImage.fromMediaImage(
                     mediaImage,
                     imageProxy.imageInfo.rotationDegrees
@@ -225,21 +248,20 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun triggerCapture() {
-        if (!isCaptured) {
-            isCaptured = true
+        if (isCaptured) return
+        isCaptured = true
 
-            imageAnalysis.clearAnalyzer()
+        //imageAnalysis.clearAnalyzer()
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                captureImage()
-            }, 400)
+        Handler(Looper.getMainLooper()).postDelayed({
+            captureImage()
+        }, 400)
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                isCaptured = false
-
-                startAnalyzer()
-            }, 2000)
-        }
+        //Handler(Looper.getMainLooper()).postDelayed({
+        //    isCaptured = false
+//
+        //    startAnalyzer()
+        //}, 2500)
     }
 
     private fun captureImage() {
@@ -303,6 +325,30 @@ class CameraActivity : AppCompatActivity() {
                 }
             }
         )
+    }
+
+    fun ImageProxy.toBitmap(): Bitmap {
+        val yBuffer = planes[0].buffer
+        val uBuffer = planes[1].buffer
+        val vBuffer = planes[2].buffer
+
+        val ySize = yBuffer.remaining()
+        val uSize = uBuffer.remaining()
+        val vSize = vBuffer.remaining()
+
+        val nv21 = ByteArray(ySize + uSize + vSize)
+
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
+        val imageBytes = out.toByteArray()
+
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 
     //private fun fakeScanCheck(): Boolean {
