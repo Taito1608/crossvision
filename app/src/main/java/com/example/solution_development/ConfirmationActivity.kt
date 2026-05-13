@@ -13,8 +13,10 @@ import android.widget.ListView
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.ImageView
 import android.widget.Toast
 import android.content.Intent
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +35,7 @@ class ConfirmationActivity : AppCompatActivity() {
     private data class StatusOption(val code: String, val label: String)
     private data class ScannedItem(var code: String, var status: String)
 
-    private lateinit var confirmationMessage: TextView
+    private lateinit var confirmationImage: ImageView
     private lateinit var statusGroup: RadioGroup
     private lateinit var confirmButton: Button
     private lateinit var continueButton: Button
@@ -67,7 +69,7 @@ class ConfirmationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_confirmation)
 
         // ===== View取得 =====
-        confirmationMessage = findViewById(R.id.confirmation_message)
+        confirmationImage = findViewById(R.id.confirmation_image)
         statusGroup = findViewById(R.id.status_group)
         confirmButton = findViewById(R.id.confirm_button)
         continueButton = findViewById(R.id.continue_button)
@@ -78,7 +80,11 @@ class ConfirmationActivity : AppCompatActivity() {
         val construction = intent.getStringExtra("construction").orEmpty().ifBlank { "unknown" }
         val scannedList = intent.getStringArrayListExtra("scannedList") ?: arrayListOf()
 
-        confirmationMessage.text = "写真エリア"
+        val latestCaptured = CapturedImageStore.getImages().firstOrNull()
+        if (latestCaptured != null) {
+            val bmp = BitmapFactory.decodeByteArray(latestCaptured, 0, latestCaptured.size)
+            confirmationImage.setImageBitmap(bmp)
+        }
 
         // ===== スキャン結果をListViewに表示 =====
         scannedItems.clear()
