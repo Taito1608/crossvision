@@ -59,11 +59,11 @@ class MainActivity : AppCompatActivity(){
             Log.d("MainActivity", "Starting product code fetch; token length=${token.length}")
 
             Thread {
-                val codes = fetchProductCodes(token)
-                if (codes != null && codes.isNotEmpty()){
-                    ProductCodeStore.saveCodes(this, codes)
+                val candidates = fetchProductCodes(token)
+                if (candidates != null && candidates.isNotEmpty()){
+                    ProductCodeStore.saveCandidates(this, candidates)
                     runOnUiThread {
-                        Toast.makeText(this, "製品コードを取得しました: ${codes.size}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "製品コードを取得しました: ${candidates.size}", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     runOnUiThread {

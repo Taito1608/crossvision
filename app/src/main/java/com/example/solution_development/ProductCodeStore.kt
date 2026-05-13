@@ -5,18 +5,18 @@ import org.json.JSONArray
 
 object ProductCodeStore {
     private const val PREFS_NAME = "crossvision_prefs"
-    private const val KEY_CODES = "product_codes_json"
+    private const val KEY_CANDIDATES = "product_candidates_json"
 
-    fun saveCodes(context: Context, codes: List<String>) {
+    fun saveCandidates(context: Context, candidates: List<String>) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val arr = JSONArray()
-        for (c in codes) arr.put(c)
-        prefs.edit().putString(KEY_CODES, arr.toString()).apply()
+        for (c in candidates) arr.put(c)
+        prefs.edit().putString(KEY_CANDIDATES, arr.toString()).apply()
     }
 
-    fun getCodes(context: Context): List<String> {
+    fun getCandidates(context: Context): List<String> {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = prefs.getString(KEY_CODES, null) ?: return emptyList()
+        val json = prefs.getString(KEY_CANDIDATES, null) ?: return emptyList()
         return try {
             val arr = JSONArray(json)
             val list = mutableListOf<String>()
@@ -29,6 +29,6 @@ object ProductCodeStore {
 
     fun clear(context: Context) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().remove(KEY_CODES).apply()
+        prefs.edit().remove(KEY_CANDIDATES).apply()
     }
 }
