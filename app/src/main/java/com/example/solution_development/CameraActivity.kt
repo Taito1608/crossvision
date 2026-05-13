@@ -87,8 +87,9 @@ class CameraActivity : AppCompatActivity() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = "スキャン画面"
 
-            // ONNX PaddleOCR の初期化
+            // ONNX PaddleOCR の初期化（PP-OCRv5 + カスタム辞書）
             engine = OnnxOcrEngine(this)
+            engine.setModelPreset(OnnxOcrEngine.ModelPreset.PP_OCR_V5_CUSTOM)
 
             previewView = findViewById(R.id.previewView)
             overlay = findViewById(R.id.overlay)
@@ -139,7 +140,15 @@ class CameraActivity : AppCompatActivity() {
             Toast.makeText(this, "初期化中にエラーが発生しました", Toast.LENGTH_LONG).show()
         }
 
-        // ONNX engine is initialized in onCreate above
+        // Load ONNX model in background thread
+        Thread {
+            val success = engine.loadModel()
+            Log.d(TAG, "ONNX model load result: $success")
+            runOnUiThread {
+                if (!success) {
+                    Toast.makeText(this, "モデルの読み込みに失敗しました", Toast.LENGTH_LONG).show()
+                }
+            }
         }.start()
 
         if(ContextCompat.checkSelfPermission(

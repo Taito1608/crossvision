@@ -31,6 +31,12 @@ class OnnxOcrEngine(private val context: Context) {
             dictFile = "onnx/ppocrv3_dict.txt",
             outputName = "softmax_2.tmp_0",
             numClasses = 97           // 95 en_dict + 1 space + 1 blank
+        ),
+        PP_OCR_V5_CUSTOM(
+            modelFile = "onnx/rec_v5.onnx",
+            dictFile = "onnx/custom_dict.txt",
+            outputName = "softmax_2.tmp_0",
+            numClasses = 438          // v5 full dict (437 chars + blank)
         )
     }
 
