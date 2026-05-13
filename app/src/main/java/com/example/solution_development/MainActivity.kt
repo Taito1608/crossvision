@@ -48,11 +48,10 @@ class MainActivity : AppCompatActivity(){
         btnLogin.setOnClickListener{
             val token = BuildConfig.CROSSVISION_API_TOKEN ?: ""
             if (token.isEmpty()){
-                Toast.makeText(this, "APIトークンが設定されていません。gradle.properties の crossvisionApiToken を設定してください", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "APIトークンが設定されていません。", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            // 取得結果にかかわらず画面遷移を許可
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
 
@@ -94,7 +93,6 @@ class MainActivity : AppCompatActivity(){
                 return null
             }
 
-            // Try multiple possible JSON shapes
             val results = mutableListOf<String>()
 
             if (response.trim().startsWith("{")) {
@@ -122,7 +120,6 @@ class MainActivity : AppCompatActivity(){
                         }
                     }
                 } else {
-                    // Fallback: scan object properties for any JSON arrays and extract codes from objects inside
                     val keys = obj.keys()
                     while (keys.hasNext()) {
                         val k = keys.next()
