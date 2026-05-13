@@ -71,6 +71,8 @@ class CameraActivity : AppCompatActivity() {
 
     // Prevent concurrent inference
     private var isProcessing = false
+    // Throttle detection: last successful detection timestamp
+    private var lastDetectionTime = 0L
 
     // Gallery picker
     private val pickImageLauncher =
@@ -105,33 +107,12 @@ class CameraActivity : AppCompatActivity() {
                 pickImageLauncher.launch("image/*")
             }
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                startCamera()
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.CAMERA),
-                    1001
-                )
-            }
         } catch (e: Exception) {
             Log.e("CameraActivity", "onCreate error", e)
             Toast.makeText(this, "初期化中にエラーが発生しました", Toast.LENGTH_LONG).show()
         }
 
-        // Load ONNX models in background
-        Thread {
-            val success = engine.loadModel()
-            Log.d(TAG, "ONNX model load result: $success")
-            runOnUiThread {
-                if (!success) {
-                    Toast.makeText(this, "モデルの読み込みに失敗しました", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.start()
-
+        // Start camera if permission granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
@@ -143,6 +124,17 @@ class CameraActivity : AppCompatActivity() {
                 1001
             )
         }
+
+        // Load ONNX models in background
+        Thread {
+            val success = engine.loadModel()
+            Log.i(TAG, "ONNX model load result: $success")
+            runOnUiThread {
+                if (!success) {
+                    Toast.makeText(this, "モデルの読み込みに失敗しました", Toast.LENGTH_LONG).show()
+                }
+            }
+        }.start()
     }
 
     override fun onRequestPermissionsResult(
@@ -219,6 +211,14 @@ class CameraActivity : AppCompatActivity() {
                     imageProxy.close()
                     return@setAnalyzer
                 }
+
+                // Throttle: skip frames if detection ran too recently
+                val now = System.currentTimeMillis()
+                if (now - lastDetectionTime < OnnxOcrEngine.DETECTION_INTERVAL_MS) {
+                    imageProxy.close()
+                    return@setAnalyzer
+                }
+
                 isProcessing = true
 
                 val mediaImage = imageProxy.image
@@ -229,20 +229,30 @@ class CameraActivity : AppCompatActivity() {
                         if (bitmap != null) {
                             Thread {
                                 try {
+                                    Log.i(TAG, "OCR pipeline start: bitmap=${bitmap.width}x${bitmap.height}")
+                                    val t0 = System.currentTimeMillis()
+
                                     // Run full pipeline: detect → crop → recognize
                                     val (codes, regions) = engine.extractProductCode(bitmap)
+
+                                    val elapsed = System.currentTimeMillis() - t0
+                                    Log.i(TAG, "OCR pipeline done: ${elapsed}ms, regions=${regions.size}, codes=$codes")
+
+                                    lastDetectionTime = System.currentTimeMillis()
 
                                     // Scan complete condition: detection found text regions
                                     if (regions.isNotEmpty()) {
                                         runOnUiThread {
-                                            Log.d(TAG,
-                                                "スキャン完了: ${regions.size}領域検出, ${codes.size}コード"
-                                            )
+                                            Toast.makeText(
+                                                this@CameraActivity,
+                                                "スキャン完了: ${regions.size}領域検出",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
 
                                             for (code in codes) {
                                                 if (!scannedList.contains(code)) {
                                                     scannedList.add(code)
-                                                    Log.d(TAG, "New code detected: $code")
+                                                    Log.i(TAG, "New code detected: $code")
                                                 }
                                             }
 
@@ -399,7 +409,8 @@ class CameraActivity : AppCompatActivity() {
             Thread {
                 try {
                     val (codes, regions) = engine.extractProductCode(bitmap)
-                    if (codes.isNotEmpty()) {
+                    Log.i(TAG, "Gallery OCR: regions=${regions.size}, codes=$codes")
+                    if (regions.isNotEmpty()) {
                         runOnUiThread {
                             for (code in codes) {
                                 if (!scannedList.contains(code)) {

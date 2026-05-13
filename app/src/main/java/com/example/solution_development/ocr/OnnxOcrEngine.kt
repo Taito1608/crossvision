@@ -55,7 +55,8 @@ class OnnxOcrEngine(private val context: Context) {
 
         // Detection model input spec (PP-OCRv5 det)
         private const val DET_INPUT_NAME = "x"
-        private const val DET_INPUT_SIZE = 640  // det model expects 640x640
+        // det_v5.onnx accepts dynamic [batch, 3, H, W]; use 640 for accuracy or 480 for speed
+        private const val DET_INPUT_SIZE = 640
 
         // PaddleOCR normalization
         private const val PADDLE_MEAN = 127.5f
@@ -68,6 +69,9 @@ class OnnxOcrEngine(private val context: Context) {
 
         // Product code extraction pattern
         private val PRODUCT_CODE_PATTERN = Pattern.compile("[A-Z0-9]{3,}-?[0-9]*")
+
+        // Throttle: run detection every N ms to avoid overwhelming the device
+        const val DETECTION_INTERVAL_MS = 500L
     }
 
     // Recognition session
@@ -136,7 +140,7 @@ class OnnxOcrEngine(private val context: Context) {
     // ─── Model Loading ─────────────────────────────────────────
 
     fun loadModel(): Boolean {
-        Log.d(TAG, "loadModel() called, preset: ${currentPreset.name}")
+        Log.i(TAG, "loadModel() called, preset: ${currentPreset.name}")
         return try {
             if (!loadCharDict()) {
                 Log.e(TAG, "Failed to load character dictionary")
@@ -144,39 +148,47 @@ class OnnxOcrEngine(private val context: Context) {
             }
 
             ortEnvironment = OrtEnvironment.getEnvironment()
-            Log.d(TAG, "OrtEnvironment created")
+            Log.i(TAG, "OrtEnvironment created")
 
             // Load recognition model
             try {
                 context.assets.open(currentPreset.modelFile).close()
-                Log.d(TAG, "Rec model file exists: ${currentPreset.modelFile}")
+                Log.i(TAG, "Rec model file exists: ${currentPreset.modelFile}")
             } catch (e: Exception) {
                 Log.e(TAG, "Rec model NOT found: ${currentPreset.modelFile}", e)
                 throw Exception("Model '${currentPreset.modelFile}' not found in assets.")
             }
 
             val recModelBytes = loadModelFromAssets(currentPreset.modelFile)
-            Log.d(TAG, "Rec model loaded, size: ${recModelBytes.size} bytes")
+            Log.i(TAG, "Rec model loaded, size: ${recModelBytes.size} bytes")
 
-            val sessionOptions = OrtSession.SessionOptions()
-            recSession = ortEnvironment?.createSession(recModelBytes, sessionOptions)
+            val recSessionOptions = OrtSession.SessionOptions().apply {
+                setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+                setIntraOpNumThreads(2)
+            }
+            recSession = ortEnvironment?.createSession(recModelBytes, recSessionOptions)
             isRecLoaded = recSession != null
-            Log.d(TAG, "Rec session created: $isRecLoaded, outputs=${recSession?.outputNames}")
+            Log.i(TAG, "Rec session created: $isRecLoaded, inputs=${recSession?.inputNames}, outputs=${recSession?.outputNames}")
 
             // Load detection model (det_v5.onnx)
             try {
                 val detPath = "onnx/det_v5.onnx"
                 context.assets.open(detPath).close()
                 val detModelBytes = loadModelFromAssets(detPath)
-                Log.d(TAG, "Det model loaded, size: ${detModelBytes.size} bytes")
-                detSession = ortEnvironment?.createSession(detModelBytes, sessionOptions)
+                Log.i(TAG, "Det model loaded, size: ${detModelBytes.size} bytes")
+                val detSessionOptions = OrtSession.SessionOptions().apply {
+                    setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+                    setIntraOpNumThreads(2)
+                }
+                detSession = ortEnvironment?.createSession(detModelBytes, detSessionOptions)
                 isDetLoaded = detSession != null
-                Log.d(TAG, "Det session created: $isDetLoaded, outputs=${detSession?.outputNames}")
+                Log.i(TAG, "Det session created: $isDetLoaded, inputs=${detSession?.inputNames}, outputs=${detSession?.outputNames}")
             } catch (e: Exception) {
                 Log.w(TAG, "Det model not found, detection disabled: ${e.message}")
                 isDetLoaded = false
             }
 
+            Log.i(TAG, "Model loading complete: rec=$isRecLoaded, det=$isDetLoaded")
             isRecLoaded
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in loadModel", e)
@@ -199,33 +211,59 @@ class OnnxOcrEngine(private val context: Context) {
             return emptyList()
         }
 
+        val t0 = System.currentTimeMillis()
         return try {
             val inputTensor = bitmapToDetTensor(bitmap)
+            val t1 = System.currentTimeMillis()
+            Log.i(TAG, "Det input prep: ${t1 - t0}ms")
 
             val inputs = hashMapOf(DET_INPUT_NAME to inputTensor)
             detSession?.run(inputs)?.use { result ->
                 val outputName = detSession!!.outputNames.firstOrNull()
-                    ?: return@use emptyList()
+                    ?: run { Log.e(TAG, "Det session has no outputs"); return@use emptyList() }
 
                 @Suppress("UNCHECKED_CAST")
                 val outputTensor = result.get(outputName)?.get() as? OnnxTensor
-                    ?: return@use emptyList()
+                    ?: run { Log.e(TAG, "Det output '$outputName' is not OnnxTensor"); return@use emptyList() }
 
                 val shape = outputTensor.info.shape
-                Log.d(TAG, "Det output shape=${shape.contentToString()}")
+                Log.i(TAG, "Det output: name=$outputName, shape=${shape.contentToString()}")
 
                 val outputArray = FloatArray(outputTensor.floatBuffer.remaining())
                 outputTensor.floatBuffer.get(outputArray)
 
-                // DBNet output: [1, 1, H, W] probability map
-                if (shape.size == 4) {
-                    val detH = shape[2].toInt()
-                    val detW = shape[3].toInt()
-                    postProcessDet(outputArray, detH, detW, bitmap.width, bitmap.height)
-                } else {
-                    Log.w(TAG, "Unexpected det output shape: ${shape.contentToString()}")
-                    emptyList()
+                val t2 = System.currentTimeMillis()
+                Log.i(TAG, "Det inference: ${t2 - t1}ms, outputSize=${outputArray.size}")
+
+                // Log output stats for debugging
+                if (outputArray.isNotEmpty()) {
+                    var minF = Float.MAX_VALUE; var maxF = Float.MIN_VALUE; var sumF = 0f
+                    for (v in outputArray) { if (v < minF) minF = v; if (v > maxF) maxF = v; sumF += v }
+                    Log.i(TAG, "Det output stats: min=$minF, max=$maxF, avg=${sumF / outputArray.size}")
                 }
+
+                // DBNet output: [1, 1, H, W] or [1, H, W] probability map
+                val regions = when {
+                    shape.size == 4 -> {
+                        val detH = shape[2].toInt()
+                        val detW = shape[3].toInt()
+                        Log.i(TAG, "Det post-processing: ${detW}x$detH → ${bitmap.width}x${bitmap.height}")
+                        postProcessDet(outputArray, detH, detW, bitmap.width, bitmap.height)
+                    }
+                    shape.size == 3 -> {
+                        val detH = shape[1].toInt()
+                        val detW = shape[2].toInt()
+                        postProcessDet(outputArray, detH, detW, bitmap.width, bitmap.height)
+                    }
+                    else -> {
+                        Log.w(TAG, "Unexpected det output shape: ${shape.contentToString()}")
+                        emptyList()
+                    }
+                }
+
+                val t3 = System.currentTimeMillis()
+                Log.i(TAG, "Det total: ${t3 - t0}ms, regions=${regions.size}")
+                regions
             } ?: emptyList()
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in detectTextRegions", e)
