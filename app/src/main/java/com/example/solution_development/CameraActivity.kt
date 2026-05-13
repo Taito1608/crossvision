@@ -49,31 +49,30 @@ class CameraActivity : AppCompatActivity() {
         private const val TAG = "CameraActivity"
     }
 
-    // TODO ===== UI =====
+    // UI
     private lateinit var previewView: PreviewView
     private lateinit var overlay: ScanOverlayView
     private lateinit var btnSelectImage: Button
 
-    // TODO ===== CameraX =====
+    // CameraX
     private lateinit var imageCapture: ImageCapture
     private lateinit var imageAnalysis: androidx.camera.core.ImageAnalysis
 
-    // TODO ===== OCR (ONNX PaddleOCR) =====
+    // OCR (ONNX PaddleOCR)
     private lateinit var engine: OnnxOcrEngine
 
-    // TODO ===== ??? =====
+    // State
     private var isCaptured = false
     private val scannedList = mutableListOf<String>()
     private val cameraExecutor = Executors.newSingleThreadExecutor()
 
-    // 鉄鋼製品の使用可能文字のみを抽出する正規表現
-    // 許可: 0-9, A-Z, a-z, +, -, ., /, _, スペース
+    // Allowed characters pattern for steel product codes
     private val ALLOWED_CHARS_PATTERN = Pattern.compile("[A-Za-z0-9+_.\\-/ ]{6,}")
 
-    // 推論中のフレームを防止するフラグ
+    // Prevent concurrent inference
     private var isProcessing = false
 
-    // TODO ===== AI =====
+    // Gallery picker
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let { processGalleryImage(it) }
@@ -87,7 +86,7 @@ class CameraActivity : AppCompatActivity() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = "スキャン画面"
 
-            // ONNX PaddleOCR の初期化（PP-OCRv5 + カスタム辞書）
+            // Initialize ONNX PaddleOCR (PP-OCRv5 + custom dictionary)
             engine = OnnxOcrEngine(this)
             engine.setModelPreset(OnnxOcrEngine.ModelPreset.PP_OCR_V5_CUSTOM)
 
@@ -98,23 +97,7 @@ class CameraActivity : AppCompatActivity() {
 
             btnComplete.setOnClickListener {
                 val intent = Intent(this, ConfirmationActivity::class.java)
-                
-//                 val process = this.intent.getStringExtra("process")
-//                 val construction = this.intent.getStringExtra("construction")
-
-//                 // ダミーデータ：スキャン結果を追加
-//                 if (scannedList.isEmpty()) {
-//                     scannedList.add("123456")
-//                     scannedList.add("789012")
-//                     scannedList.add("345678")
-//                 }
-
-//                 confirmationIntent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
-//                 confirmationIntent.putExtra("process", process)
-//                 confirmationIntent.putExtra("construction", construction)
-
                 intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
-
                 startActivity(intent)
             }
 
@@ -122,13 +105,11 @@ class CameraActivity : AppCompatActivity() {
                 pickImageLauncher.launch("image/*")
             }
 
-            if(ContextCompat.checkSelfPermission(
-                this,
-                    Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED
-            ){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
                 startCamera()
-            }else{
+            } else {
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.CAMERA),
@@ -140,7 +121,7 @@ class CameraActivity : AppCompatActivity() {
             Toast.makeText(this, "初期化中にエラーが発生しました", Toast.LENGTH_LONG).show()
         }
 
-        // Load ONNX model in background thread
+        // Load ONNX models in background
         Thread {
             val success = engine.loadModel()
             Log.d(TAG, "ONNX model load result: $success")
@@ -151,13 +132,11 @@ class CameraActivity : AppCompatActivity() {
             }
         }.start()
 
-        if(ContextCompat.checkSelfPermission(
-            this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             startCamera()
-        }else{
+        } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.CAMERA),
@@ -171,18 +150,19 @@ class CameraActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray,
     ) {
-        if(requestCode == 1001){
-            if(grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 1001) {
+            if (grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
                 startCamera()
-            }else{
-                Toast.makeText(this, "カメラ権限が必要です",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "カメラ権限が必要です", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
     }
 
-    private fun startCamera(){
+    private fun startCamera() {
         try {
             val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -190,11 +170,13 @@ class CameraActivity : AppCompatActivity() {
                 try {
                     val cameraProvider = cameraProviderFuture.get()
 
-                    val preview = Preview.Builder().build().also{
+                    val preview = Preview.Builder().build().also {
                         it.setSurfaceProvider(previewView.surfaceProvider)
                     }
 
-                    imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
+                    imageAnalysis = ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
 
                     imageCapture = ImageCapture.Builder()
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
@@ -211,13 +193,16 @@ class CameraActivity : AppCompatActivity() {
                         imageCapture
                     )
 
-                    // Viewのレイアウトが完了した後に Analyzer を開始
                     overlay.post {
                         startAnalyzer()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Camera binding error", e)
-                    Toast.makeText(this@CameraActivity, "カメラバインドエラー: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "カメラバインドエラー: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }, ContextCompat.getMainExecutor(this))
         } catch (e: Exception) {
@@ -228,9 +213,7 @@ class CameraActivity : AppCompatActivity() {
 
     private fun startAnalyzer() {
         try {
-            imageAnalysis.setAnalyzer(
-                cameraExecutor
-            ) { imageProxy ->
+            imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
 
                 if (isProcessing || isCaptured) {
                     imageProxy.close()
@@ -238,17 +221,24 @@ class CameraActivity : AppCompatActivity() {
                 }
                 isProcessing = true
 
-                // ONNX PaddleOCR inference
                 val mediaImage = imageProxy.image
                 if (mediaImage != null) {
                     try {
-                        val bitmap = imageProxyToBitmap(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                        val bitmap =
+                            imageProxyToBitmap(mediaImage, imageProxy.imageInfo.rotationDegrees)
                         if (bitmap != null) {
                             Thread {
                                 try {
-                                    val codes = engine.extractProductCode(bitmap)
-                                    if (codes.isNotEmpty()) {
+                                    // Run full pipeline: detect → crop → recognize
+                                    val (codes, regions) = engine.extractProductCode(bitmap)
+
+                                    // Scan complete condition: detection found text regions
+                                    if (regions.isNotEmpty()) {
                                         runOnUiThread {
+                                            Log.d(TAG,
+                                                "スキャン完了: ${regions.size}領域検出, ${codes.size}コード"
+                                            )
+
                                             for (code in codes) {
                                                 if (!scannedList.contains(code)) {
                                                     scannedList.add(code)
@@ -295,23 +285,18 @@ class CameraActivity : AppCompatActivity() {
         if (isCaptured) return
         isCaptured = true
 
-        //imageAnalysis.clearAnalyzer()
-
         Handler(Looper.getMainLooper()).postDelayed({
             captureImage()
         }, 400)
-
-        //Handler(Looper.getMainLooper()).postDelayed({
-        //    isCaptured = false
-//
-        //    startAnalyzer()
-        //}, 2500)
     }
 
     /**
-     * ImageProxy (YUV_420_888) を Bitmap に変換
+     * ImageProxy (YUV_420_888) → Bitmap
      */
-    private fun imageProxyToBitmap(image: android.media.Image, rotationDegrees: Int): Bitmap? {
+    private fun imageProxyToBitmap(
+        image: android.media.Image,
+        rotationDegrees: Int
+    ): Bitmap? {
         return try {
             val planes = image.planes
             val yBuffer = planes[0].buffer
@@ -332,11 +317,12 @@ class CameraActivity : AppCompatActivity() {
             val imageBytes = out.toByteArray()
             var bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-            // Apply rotation if needed
             if (rotationDegrees != 0) {
                 val matrix = android.graphics.Matrix()
                 matrix.postRotate(rotationDegrees.toFloat())
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                bitmap = Bitmap.createBitmap(
+                    bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+                )
             }
 
             bitmap
@@ -353,7 +339,6 @@ class CameraActivity : AppCompatActivity() {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
-            //put(MediaStore.Images.Media.IS_PENDING, 1)
         }
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(
@@ -362,46 +347,19 @@ class CameraActivity : AppCompatActivity() {
             contentValues
         ).build()
 
-        //val uri = contentResolver.insert(
-        //    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        //    values
-        //) ?: run {
-        //    Toast.makeText(this, "URI作成失敗", Toast.LENGTH_SHORT).show()
-        //    return
-        //}
-
-        //if (uri == null) {
-        //    Toast.makeText(this, "保存失敗", Toast.LENGTH_SHORT).show()
-        //    return
-        //}
-
-
-
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    //val uri = Uri.fromFile(file)
-
                     val savedUri = outputFileResults.savedUri
-
                     Log.d("SAVE", "保存成功: $savedUri")
-
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "保存成功",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    savedUri?.let {
-                        sendToAI(it)
-                    }
+                    Toast.makeText(this@CameraActivity, "保存成功", Toast.LENGTH_SHORT).show()
+                    savedUri?.let { sendToAI(it) }
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     exception.printStackTrace()
-
                     Log.e("CAMERA_ERROR", "保存失敗: ${exception.message}")
                     Toast.makeText(this@CameraActivity, "保存エラー", Toast.LENGTH_LONG).show()
                 }
@@ -440,7 +398,7 @@ class CameraActivity : AppCompatActivity() {
 
             Thread {
                 try {
-                    val codes = engine.extractProductCode(bitmap)
+                    val (codes, regions) = engine.extractProductCode(bitmap)
                     if (codes.isNotEmpty()) {
                         runOnUiThread {
                             for (code in codes) {
@@ -459,14 +417,13 @@ class CameraActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
     private fun sendToAI(uri: Uri) {
         println("AI送信: $uri")
     }
 
     private fun checkPermissions() {
-        val permissions = mutableListOf(
-            Manifest.permission.CAMERA
-        )
+        val permissions = mutableListOf(Manifest.permission.CAMERA)
 
         if (android.os.Build.VERSION.SDK_INT >= 33) {
             permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
@@ -477,11 +434,7 @@ class CameraActivity : AppCompatActivity() {
         }
 
         if (denied.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                this,
-                denied.toTypedArray(),
-                100
-            )
+            ActivityCompat.requestPermissions(this, denied.toTypedArray(), 100)
         }
     }
 
