@@ -1,0 +1,70 @@
+{
+  "image": "IMG_1548.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 2,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 0.0,
+      "box_points": [
+        [
+          1705,
+          2608
+        ],
+        [
+          1705,
+          2557
+        ],
+        [
+          1907,
+          2557
+        ],
+        [
+          1907,
+          2608
+        ]
+      ],
+      "expanded_box": [
+        1665,
+        2547,
+        1947,
+        2618
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 1.7623909711837769,
+      "box_points": [
+        [
+          806,
+          2642
+        ],
+        [
+          883,
+          178
+        ],
+        [
+          2051,
+          213
+        ],
+        [
+          1974,
+          2677
+        ]
+      ],
+      "expanded_box": [
+        557,
+        0,
+        2300,
+        3176
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    }
+  ]
+}

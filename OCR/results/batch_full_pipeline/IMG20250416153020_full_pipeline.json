@@ -1,0 +1,230 @@
+{
+  "image": "IMG20250416153020.jpg",
+  "image_size": [
+    4624,
+    3468
+  ],
+  "num_detections": 7,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 10.251198768615723,
+      "box_points": [
+        [
+          2972,
+          3046
+        ],
+        [
+          3001,
+          2883
+        ],
+        [
+          3615,
+          2996
+        ],
+        [
+          3586,
+          3159
+        ]
+      ],
+      "expanded_box": [
+        2844,
+        2828,
+        3743,
+        3214
+      ],
+      "recognized_text": "IAX",
+      "product_codes": [
+        "IAX"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 9.462321281433105,
+      "box_points": [
+        [
+          1389,
+          2704
+        ],
+        [
+          1412,
+          2565
+        ],
+        [
+          2535,
+          2757
+        ],
+        [
+          2512,
+          2895
+        ]
+      ],
+      "expanded_box": [
+        1160,
+        2499,
+        2764,
+        2961
+      ],
+      "recognized_text": "-NI",
+      "product_codes": []
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 4.5377726554870605,
+      "box_points": [
+        [
+          203,
+          1783
+        ],
+        [
+          210,
+          1693
+        ],
+        [
+          646,
+          1728
+        ],
+        [
+          639,
+          1818
+        ]
+      ],
+      "expanded_box": [
+        115,
+        1668,
+        734,
+        1843
+      ],
+      "recognized_text": "YOtASIA",
+      "product_codes": [
+        "YOTASIA"
+      ]
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          2557,
+          881
+        ],
+        [
+          3048,
+          881
+        ],
+        [
+          3048,
+          1019
+        ],
+        [
+          2557,
+          1019
+        ]
+      ],
+      "expanded_box": [
+        2459,
+        854,
+        3146,
+        1046
+      ],
+      "recognized_text": "1bX?V",
+      "product_codes": [
+        "1BX"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 87.35746002197266,
+      "box_points": [
+        [
+          1787,
+          580
+        ],
+        [
+          2512,
+          545
+        ],
+        [
+          2517,
+          656
+        ],
+        [
+          1792,
+          690
+        ]
+      ],
+      "expanded_box": [
+        1641,
+        516,
+        2663,
+        719
+      ],
+      "recognized_text": "L-NOE",
+      "product_codes": [
+        "L-NOE"
+      ]
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 85.44258117675781,
+      "box_points": [
+        [
+          3527,
+          574
+        ],
+        [
+          4393,
+          503
+        ],
+        [
+          4409,
+          701
+        ],
+        [
+          3542,
+          772
+        ]
+      ],
+      "expanded_box": [
+        3351,
+        450,
+        4585,
+        825
+      ],
+      "recognized_text": "BXV",
+      "product_codes": [
+        "BXV"
+      ]
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 87.51044464111328,
+      "box_points": [
+        [
+          2636,
+          532
+        ],
+        [
+          3135,
+          510
+        ],
+        [
+          3140,
+          633
+        ],
+        [
+          2641,
+          655
+        ]
+      ],
+      "expanded_box": [
+        2536,
+        481,
+        3240,
+        684
+      ],
+      "recognized_text": "9S/a",
+      "product_codes": []
+    }
+  ]
+}

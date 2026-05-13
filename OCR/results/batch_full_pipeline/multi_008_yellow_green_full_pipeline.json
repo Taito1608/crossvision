@@ -1,0 +1,40 @@
+{
+  "image": "multi_008_yellow_green.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 1,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 14.03624439239502,
+      "box_points": [
+        [
+          3493,
+          2592
+        ],
+        [
+          3519,
+          2490
+        ],
+        [
+          3558,
+          2500
+        ],
+        [
+          3531,
+          2602
+        ]
+      ],
+      "expanded_box": [
+        3480,
+        2468,
+        3571,
+        2624
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "total_images": 15,
+  "total_time_seconds": 33.76,
+  "results": [
+    {
+      "image": "015_B15b30N-41__B15b30N-7A_45deg_NW_yellow.JPG",
+      "status": "OK",
+      "num_detections": 9,
+      "product_codes": [],
+      "time_seconds": 1.94
+    },
+    {
+      "image": "IMG20250416153020.jpg",
+      "status": "OK",
+      "num_detections": 7,
+      "product_codes": [
+        "IAX",
+        "YOTASIA",
+        "1BX",
+        "L-NOE",
+        "BXV"
+      ],
+      "time_seconds": 3.08
+    },
+    {
+      "image": "IMG20250416160821.jpg",
+      "status": "OK",
+      "num_detections": 8,
+      "product_codes": [],
+      "time_seconds": 2.31
+    },
+    {
+      "image": "IMG_0422.jpg",
+      "status": "OK",
+      "num_detections": 16,
+      "product_codes": [
+        "3ON",
+        "BLSB",
+        "XAT",
+        "BISB3ON-7",
+        "AXA",
+        "AXA",
+        "3ON-41",
+        "BISLEON"
+      ],
+      "time_seconds": 1.99
+    },
+    {
+      "image": "IMG_0771.jpg",
+      "status": "OK",
+      "num_detections": 5,
+      "product_codes": [
+        "BISB4GNI27",
+        "SB40N-15",
+        "LBISB49N-2A"
+      ],
+      "time_seconds": 2.19
+    },
+    {
+      "image": "IMG_0787.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "BISB3ON16",
+        "AXAL"
+      ],
+      "time_seconds": 2.07
+    },
+    {
+      "image": "IMG_1536.jpg",
+      "status": "OK",
+      "num_detections": 1,
+      "product_codes": [],
+      "time_seconds": 2.18
+    },
+    {
+      "image": "IMG_1537.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [],
+      "time_seconds": 2.16
+    },
+    {
+      "image": "IMG_1548.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [],
+      "time_seconds": 2.61
+    },
+    {
+      "image": "IMG_1571.jpg",
+      "status": "OK",
+      "num_detections": 4,
+      "product_codes": [],
+      "time_seconds": 2.14
+    },
+    {
+      "image": "M4sb29-2.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "M4SB29-2"
+      ],
+      "time_seconds": 2.17
+    },
+    {
+      "image": "M5sb24-10.jpg",
+      "status": "OK",
+      "num_detections": 3,
+      "product_codes": [
+        "M5SB2410",
+        "YUMASURON"
+      ],
+      "time_seconds": 2.13
+    },
+    {
+      "image": "N5G15-X1Y1.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "N5G5-XIY",
+        "A4Y2T"
+      ],
+      "time_seconds": 2.09
+    },
+    {
+      "image": "multi_001_sunny_yellow.JPG",
+      "status": "OK",
+      "num_detections": 22,
+      "product_codes": [
+        "9GNOE9S",
+        "BLSB",
+        "ZINOE9S",
+        "BISB30N",
+        "30N-34",
+        "BISB",
+        "AYC",
+        "AYA1",
+        "BISB3ON-19",
+        "AXA",
+        "SB3",
+        "XA1",
+        "3QN-4O",
+        "BISB",
+        "7OX",
+        "AYAL",
+        "9S-NOE9S",
+        "9E-NOC9S7A"
+      ],
+      "time_seconds": 3.01
+    },
+    {
+      "image": "multi_008_yellow_green.JPG",
+      "status": "OK",
+      "num_detections": 1,
+      "product_codes": [],
+      "time_seconds": 1.68
+    }
+  ]
+}

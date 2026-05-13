@@ -1,0 +1,280 @@
+{
+  "image": "015_B15b30N-41__B15b30N-7A_45deg_NW_yellow.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 9,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 40.91438674926758,
+      "box_points": [
+        [
+          2437,
+          3514
+        ],
+        [
+          2873,
+          3023
+        ],
+        [
+          2985,
+          3118
+        ],
+        [
+          2550,
+          3609
+        ]
+      ],
+      "expanded_box": [
+        2328,
+        2906,
+        3094,
+        3726
+      ],
+      "recognized_text": "B",
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 45.0,
+      "box_points": [
+        [
+          2768,
+          2832
+        ],
+        [
+          2954,
+          2650
+        ],
+        [
+          3009,
+          2704
+        ],
+        [
+          2823,
+          2885
+        ]
+      ],
+      "expanded_box": [
+        2720,
+        2603,
+        3057,
+        2932
+      ],
+      "recognized_text": "H",
+      "product_codes": []
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 55.00798034667969,
+      "box_points": [
+        [
+          1193,
+          2835
+        ],
+        [
+          1634,
+          2534
+        ],
+        [
+          1709,
+          2638
+        ],
+        [
+          1268,
+          2940
+        ]
+      ],
+      "expanded_box": [
+        1090,
+        2453,
+        1812,
+        3021
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 45.690277099609375,
+      "box_points": [
+        [
+          2953,
+          3017
+        ],
+        [
+          3593,
+          2405
+        ],
+        [
+          3687,
+          2499
+        ],
+        [
+          3047,
+          3111
+        ]
+      ],
+      "expanded_box": [
+        2807,
+        2264,
+        3833,
+        3252
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 56.3099365234375,
+      "box_points": [
+        [
+          1670,
+          2324
+        ],
+        [
+          1856,
+          2202
+        ],
+        [
+          1893,
+          2256
+        ],
+        [
+          1706,
+          2378
+        ]
+      ],
+      "expanded_box": [
+        1626,
+        2167,
+        1937,
+        2413
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 56.43368148803711,
+      "box_points": [
+        [
+          1863,
+          2453
+        ],
+        [
+          2589,
+          1982
+        ],
+        [
+          2642,
+          2061
+        ],
+        [
+          1917,
+          2532
+        ]
+      ],
+      "expanded_box": [
+        1708,
+        1872,
+        2797,
+        2642
+      ],
+      "recognized_text": "Bu",
+      "product_codes": []
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 63.78862380981445,
+      "box_points": [
+        [
+          436,
+          2024
+        ],
+        [
+          1005,
+          1751
+        ],
+        [
+          1034,
+          1809
+        ],
+        [
+          465,
+          2083
+        ]
+      ],
+      "expanded_box": [
+        317,
+        1685,
+        1153,
+        2149
+      ],
+      "recognized_text": "B",
+      "product_codes": []
+    },
+    {
+      "box_index": 7,
+      "angle_degree": 59.534454345703125,
+      "box_points": [
+        [
+          1515,
+          2108
+        ],
+        [
+          2148,
+          1744
+        ],
+        [
+          2191,
+          1814
+        ],
+        [
+          1557,
+          2178
+        ]
+      ],
+      "expanded_box": [
+        1380,
+        1658,
+        2326,
+        2264
+      ],
+      "recognized_text": "B",
+      "product_codes": []
+    },
+    {
+      "box_index": 8,
+      "angle_degree": 53.13010025024414,
+      "box_points": [
+        [
+          1166,
+          1723
+        ],
+        [
+          1252,
+          1660
+        ],
+        [
+          1273,
+          1688
+        ],
+        [
+          1188,
+          1751
+        ]
+      ],
+      "expanded_box": [
+        1145,
+        1642,
+        1294,
+        1769
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    }
+  ]
+}

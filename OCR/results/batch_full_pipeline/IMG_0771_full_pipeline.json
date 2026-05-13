@@ -1,0 +1,166 @@
+{
+  "image": "IMG_0771.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 5,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 74.05460357666016,
+      "box_points": [
+        [
+          110,
+          3748
+        ],
+        [
+          845,
+          3543
+        ],
+        [
+          890,
+          3695
+        ],
+        [
+          155,
+          3901
+        ]
+      ],
+      "expanded_box": [
+        0,
+        3472,
+        1046,
+        3972
+      ],
+      "recognized_text": "K?Ya",
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 77.0385971069336,
+      "box_points": [
+        [
+          115,
+          3151
+        ],
+        [
+          2047,
+          2717
+        ],
+        [
+          2095,
+          2921
+        ],
+        [
+          163,
+          3355
+        ]
+      ],
+      "expanded_box": [
+        0,
+        2590,
+        2491,
+        3482
+      ],
+      "recognized_text": "BISb4GNi27",
+      "product_codes": [
+        "BISB4GNI27"
+      ]
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 84.42780303955078,
+      "box_points": [
+        [
+          300,
+          1790
+        ],
+        [
+          327,
+          1788
+        ],
+        [
+          349,
+          2011
+        ],
+        [
+          322,
+          2013
+        ]
+      ],
+      "expanded_box": [
+        291,
+        1743,
+        358,
+        2058
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 85.7161865234375,
+      "box_points": [
+        [
+          1033,
+          1859
+        ],
+        [
+          2784,
+          1731
+        ],
+        [
+          2802,
+          1964
+        ],
+        [
+          1051,
+          2093
+        ]
+      ],
+      "expanded_box": [
+        680,
+        1659,
+        3024,
+        2165
+      ],
+      "recognized_text": "B!Sb40N-15",
+      "product_codes": [
+        "SB40N-15"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 8.1809720993042,
+      "box_points": [
+        [
+          232,
+          349
+        ],
+        [
+          265,
+          126
+        ],
+        [
+          2420,
+          429
+        ],
+        [
+          2387,
+          652
+        ]
+      ],
+      "expanded_box": [
+        0,
+        21,
+        2857,
+        757
+      ],
+      "recognized_text": "LBISb49N-2a",
+      "product_codes": [
+        "LBISB49N-2A"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "image": "IMG_0771.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 5,
+  "all_product_codes": [
+    "LENOL9CID",
+    "I-NOLAR",
+    "D1S640N-23"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 74.05,
+      "det_score": 0.0,
+      "box_points": [
+        [
+          0,
+          3855
+        ],
+        [
+          1079,
+          3435
+        ],
+        [
+          1124,
+          3587
+        ],
+        [
+          0,
+          4008
+        ]
+      ],
+      "recognized_text": "X",
+      "text_filtered": "X",
+      "confidence": 0.0153,
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 77.04,
+      "det_score": 0.0,
+      "box_points": [
+        [
+          0,
+          3342
+        ],
+        [
+          2641,
+          2525
+        ],
+        [
+          2689,
+          2729
+        ],
+        [
+          0,
+          3546
+        ]
+      ],
+      "recognized_text": "LeNoL?9cid",
+      "text_filtered": "LeNoL9cid",
+      "confidence": 0.0138,
+      "product_codes": [
+        "LENOL9CID"
+      ]
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 84.43,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          285,
+          1722
+        ],
+        [
+          341,
+          1720
+        ],
+        [
+          363,
+          2078
+        ],
+        [
+          307,
+          2080
+        ]
+      ],
+      "recognized_text": "N",
+      "text_filtered": "N",
+      "confidence": 0.0136,
+      "product_codes": []
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 85.72,
+      "det_score": 0.0,
+      "box_points": [
+        [
+          502,
+          1750
+        ],
+        [
+          3023,
+          1622
+        ],
+        [
+          3023,
+          2072
+        ],
+        [
+          520,
+          2201
+        ]
+      ],
+      "recognized_text": "I-NOLAR",
+      "text_filtered": "I-NOLAR",
+      "confidence": 0.0146,
+      "product_codes": [
+        "I-NOLAR"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 8.18,
+      "det_score": 0.0,
+      "box_points": [
+        [
+          0,
+          191
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          3023,
+          586
+        ],
+        [
+          3023,
+          809
+        ]
+      ],
+      "recognized_text": "D1S640N-23",
+      "text_filtered": "D1S640N-23",
+      "confidence": 0.0203,
+      "product_codes": [
+        "D1S640N-23"
+      ]
+    }
+  ]
+}

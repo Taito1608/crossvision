@@ -1,0 +1,74 @@
+{
+  "image": "N5G15-X1Y1.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 2,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 83.81376647949219,
+      "box_points": [
+        [
+          357,
+          1275
+        ],
+        [
+          1958,
+          1097
+        ],
+        [
+          1973,
+          1240
+        ],
+        [
+          372,
+          1418
+        ]
+      ],
+      "expanded_box": [
+        34,
+        1033,
+        2048,
+        1482
+      ],
+      "recognized_text": "N5G5-XIY",
+      "product_codes": [
+        "N5G5-XIY"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 86.04244995117188,
+      "box_points": [
+        [
+          336,
+          381
+        ],
+        [
+          1928,
+          268
+        ],
+        [
+          1938,
+          413
+        ],
+        [
+          346,
+          526
+        ]
+      ],
+      "expanded_box": [
+        16,
+        217,
+        2048,
+        577
+      ],
+      "recognized_text": "A4Y2T",
+      "product_codes": [
+        "A4Y2T"
+      ]
+    }
+  ]
+}

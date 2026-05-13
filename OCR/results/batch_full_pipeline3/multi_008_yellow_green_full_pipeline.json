@@ -1,0 +1,81 @@
+{
+  "image": "multi_008_yellow_green.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 1,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 1
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 14.03624439239502,
+          "cx": 3525,
+          "cy": 2546
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 14.04,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              3493,
+              2592
+            ],
+            [
+              3519,
+              2490
+            ],
+            [
+              3558,
+              2500
+            ],
+            [
+              3531,
+              2602
+            ]
+          ],
+          "recognized_text": "E",
+          "text_filtered": "E",
+          "confidence": 0.0154,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              3467,
+              2446
+            ],
+            [
+              3584,
+              2446
+            ],
+            [
+              3584,
+              2646
+            ],
+            [
+              3467,
+              2646
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": []
+}

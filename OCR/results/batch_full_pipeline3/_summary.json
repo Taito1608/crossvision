@@ -1,0 +1,486 @@
+{
+  "total": 15,
+  "labeled": 15,
+  "time": 36.51,
+  "avg_exact": 0.075,
+  "avg_partial": 0.3528,
+  "results": [
+    {
+      "image": "015_B15b30N-41__B15b30N-7A_45deg_NW_yellow.JPG",
+      "status": "OK",
+      "dets": 9,
+      "prods": [],
+      "correct": [
+        "BISb30N-7A",
+        "BISb30N-4I",
+        "BISb30N-7A",
+        "BISb30N-53"
+      ],
+      "time": 2.89,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-7A",
+          "BISb30N-4I",
+          "BISb30N-7A",
+          "BISb30N-53"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG20250416153020.jpg",
+      "status": "OK",
+      "dets": 7,
+      "prods": [
+        "TAV",
+        "YEASIA",
+        "1OXV",
+        "L-NOE9S",
+        "AXV",
+        "E9SI8"
+      ],
+      "correct": [
+        "BISb30N-23",
+        "BISb30N-7"
+      ],
+      "time": 2.85,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-23",
+          "BISb30N-7"
+        ],
+        "extra": [
+          "TAV",
+          "YEASIA",
+          "1OXV",
+          "L-NOE9S",
+          "AXV",
+          "E9SI8"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG20250416160821.jpg",
+      "status": "OK",
+      "dets": 8,
+      "prods": [],
+      "correct": [
+        "BISb30N-19",
+        "BISb30N-20"
+      ],
+      "time": 2.29,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-19",
+          "BISb30N-20"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_0422.jpg",
+      "status": "OK",
+      "dets": 16,
+      "prods": [
+        "BSB3",
+        "MXA",
+        "XXA1",
+        "TBISB3ON-7A",
+        "NXA",
+        "AXA",
+        "SB3ON-4",
+        "3SB",
+        "WBISEON"
+      ],
+      "correct": [
+        "BISb30N-7A",
+        "BISb30N-4I",
+        "BISb30N-7A"
+      ],
+      "time": 2.49,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recogni": "TBISB3ON-7A",
+            "corr": "BISb30N-7A"
+          }
+        ],
+        "misses": [
+          "BISb30N-4I",
+          "BISb30N-7A"
+        ],
+        "extra": [
+          "BSB3",
+          "MXA",
+          "XXA1",
+          "NXA",
+          "AXA",
+          "SB3ON-4",
+          "3SB",
+          "WBISEON"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.3333
+      }
+    },
+    {
+      "image": "IMG_0771.jpg",
+      "status": "OK",
+      "dets": 5,
+      "prods": [
+        "HSAMIA",
+        "BS4ON",
+        "BISB40-2"
+      ],
+      "correct": [
+        "BISb40N-23",
+        "BISb40N-15",
+        "BISb40N-27"
+      ],
+      "time": 2.38,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recogni": "BISB40-2",
+            "corr": "BISb40N-23"
+          }
+        ],
+        "misses": [
+          "BISb40N-15",
+          "BISb40N-27"
+        ],
+        "extra": [
+          "HSAMIA",
+          "BS4ON"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.3333
+      }
+    },
+    {
+      "image": "IMG_0787.jpg",
+      "status": "OK",
+      "dets": 2,
+      "prods": [
+        "BIS13ON-16",
+        "AXAL"
+      ],
+      "correct": [
+        "BISb30N-16"
+      ],
+      "time": 2.21,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recogni": "BIS13ON-16",
+            "corr": "BISb30N-16"
+          }
+        ],
+        "misses": [],
+        "extra": [
+          "AXAL"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 1.0
+      }
+    },
+    {
+      "image": "IMG_1536.jpg",
+      "status": "OK",
+      "dets": 1,
+      "prods": [],
+      "correct": [
+        "BISb40N-23",
+        "BISb40N-15"
+      ],
+      "time": 2.17,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb40N-23",
+          "BISb40N-15"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_1537.jpg",
+      "status": "OK",
+      "dets": 2,
+      "prods": [],
+      "correct": [
+        "BISb40N-27",
+        "BISb40N-8",
+        "BISb40N-26",
+        "BISb40N-9"
+      ],
+      "time": 2.2,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb40N-27",
+          "BISb40N-8",
+          "BISb40N-26",
+          "BISb40N-9"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_1548.jpg",
+      "status": "OK",
+      "dets": 2,
+      "prods": [],
+      "correct": [
+        "BISb40N-46"
+      ],
+      "time": 2.13,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb40N-46"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_1571.jpg",
+      "status": "OK",
+      "dets": 4,
+      "prods": [],
+      "correct": [
+        "BISb30N-13A",
+        "BISb30N-13"
+      ],
+      "time": 2.2,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-13A",
+          "BISb30N-13"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "M4sb29-2.jpg",
+      "status": "OK",
+      "dets": 2,
+      "prods": [
+        "M4SB29-2"
+      ],
+      "correct": [
+        "M4sb29-2"
+      ],
+      "time": 2.01,
+      "match": {
+        "exact_matches": [
+          {
+            "recogni": "M4SB29-2",
+            "corr": "M4sb29-2"
+          }
+        ],
+        "partial_matches": [],
+        "misses": [],
+        "extra": [],
+        "exact_rate": 1.0,
+        "partial_rate": 1.0
+      }
+    },
+    {
+      "image": "M5sb24-10.jpg",
+      "status": "OK",
+      "dets": 3,
+      "prods": [
+        "7M5SB2410",
+        "HAAULW"
+      ],
+      "correct": [
+        "M5sb24-10"
+      ],
+      "time": 2.25,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recogni": "7M5SB2410",
+            "corr": "M5sb24-10"
+          }
+        ],
+        "misses": [],
+        "extra": [
+          "HAAULW"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 1.0
+      }
+    },
+    {
+      "image": "N5G15-X1Y1.jpg",
+      "status": "OK",
+      "dets": 2,
+      "prods": [
+        "N5G5-XY",
+        "A4W2"
+      ],
+      "correct": [
+        "N5G15-X1Y1"
+      ],
+      "time": 2.16,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recogni": "N5G5-XY",
+            "corr": "N5G15-X1Y1"
+          }
+        ],
+        "misses": [],
+        "extra": [
+          "A4W2"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 1.0
+      }
+    },
+    {
+      "image": "multi_001_sunny_yellow.JPG",
+      "status": "OK",
+      "dets": 22,
+      "prods": [
+        "CNOE9S",
+        "BISB",
+        "AYSCL-NOEQS",
+        "BISB30N-20",
+        "B3ON-34",
+        "BISB",
+        "AYCL",
+        "AYA1",
+        "SB3ON-19",
+        "AXA",
+        "SB3C",
+        "LXAL",
+        "6B30N-4O",
+        "BISB",
+        "V7OX",
+        "LYAL",
+        "9S-NOE9S",
+        "9E-NOE9S"
+      ],
+      "correct": [
+        "BISb30N-36",
+        "BISb30N-40",
+        "BISb30N-19",
+        "BISb30N-20",
+        "BISb30N-56",
+        "BISb30N-34",
+        "BISb30N-12",
+        "BISb30N-26"
+      ],
+      "time": 3.25,
+      "match": {
+        "exact_matches": [
+          {
+            "recogni": "BISB30N-20",
+            "corr": "BISb30N-20"
+          }
+        ],
+        "partial_matches": [
+          {
+            "recogni": "BISB",
+            "corr": "BISb30N-36"
+          },
+          {
+            "recogni": "BISB",
+            "corr": "BISb30N-40"
+          },
+          {
+            "recogni": "SB3ON-19",
+            "corr": "BISb30N-19"
+          },
+          {
+            "recogni": "BISB",
+            "corr": "BISb30N-56"
+          }
+        ],
+        "misses": [
+          "BISb30N-34",
+          "BISb30N-12",
+          "BISb30N-26"
+        ],
+        "extra": [
+          "CNOE9S",
+          "AYSCL-NOEQS",
+          "B3ON-34",
+          "AYCL",
+          "AYA1",
+          "AXA",
+          "SB3C",
+          "LXAL",
+          "6B30N-4O",
+          "V7OX",
+          "LYAL",
+          "9S-NOE9S",
+          "9E-NOE9S"
+        ],
+        "exact_rate": 0.125,
+        "partial_rate": 0.625
+      }
+    },
+    {
+      "image": "multi_008_yellow_green.JPG",
+      "status": "OK",
+      "dets": 1,
+      "prods": [],
+      "correct": [
+        "BISb30N-7A",
+        "BISb30N-41",
+        "BISb30N-7A",
+        "BISb30N-53",
+        "BISb30N-37A"
+      ],
+      "time": 3.03,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-7A",
+          "BISb30N-41",
+          "BISb30N-7A",
+          "BISb30N-53",
+          "BISb30N-37A"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    }
+  ]
+}

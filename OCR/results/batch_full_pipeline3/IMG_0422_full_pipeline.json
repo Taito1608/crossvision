@@ -1,0 +1,874 @@
+{
+  "image": "IMG_0422.jpg",
+  "image_size": [
+    2268,
+    4032
+  ],
+  "num_detections": 16,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 16
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 4.085616588592529,
+          "cx": 1589,
+          "cy": 2782
+        },
+        {
+          "idx": 1,
+          "angle": 1.5911402702331543,
+          "cx": 1202,
+          "cy": 2758
+        },
+        {
+          "idx": 2,
+          "angle": 3.094058036804199,
+          "cx": 400,
+          "cy": 2705
+        },
+        {
+          "idx": 3,
+          "angle": 90.0,
+          "cx": 1155,
+          "cy": 2486
+        },
+        {
+          "idx": 4,
+          "angle": 7.125016689300537,
+          "cx": 2137,
+          "cy": 1895
+        },
+        {
+          "idx": 5,
+          "angle": 8.13010311126709,
+          "cx": 1634,
+          "cy": 1849
+        },
+        {
+          "idx": 6,
+          "angle": 8.443191528320312,
+          "cx": 1148,
+          "cy": 1786
+        },
+        {
+          "idx": 7,
+          "angle": 7.125016689300537,
+          "cx": 348,
+          "cy": 1639
+        },
+        {
+          "idx": 8,
+          "angle": 7.305759906768799,
+          "cx": 924,
+          "cy": 1542
+        },
+        {
+          "idx": 9,
+          "angle": 15.945395469665527,
+          "cx": 2099,
+          "cy": 1461
+        },
+        {
+          "idx": 10,
+          "angle": 9.963804244995117,
+          "cx": 1452,
+          "cy": 1412
+        },
+        {
+          "idx": 11,
+          "angle": 9.462322235107422,
+          "cx": 1108,
+          "cy": 1356
+        },
+        {
+          "idx": 12,
+          "angle": 14.03624439239502,
+          "cx": 948,
+          "cy": 1327
+        },
+        {
+          "idx": 13,
+          "angle": 14.03624439239502,
+          "cx": 912,
+          "cy": 1147
+        },
+        {
+          "idx": 14,
+          "angle": 14.03624439239502,
+          "cx": 1131,
+          "cy": 899
+        },
+        {
+          "idx": 15,
+          "angle": 11.768290519714355,
+          "cx": 667,
+          "cy": 801
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 4.09,
+          "det_score": 0.0003,
+          "box_points": [
+            [
+              1445,
+              2824
+            ],
+            [
+              1452,
+              2721
+            ],
+            [
+              1735,
+              2741
+            ],
+            [
+              1727,
+              2844
+            ]
+          ],
+          "recognized_text": "b?3",
+          "text_filtered": "b3",
+          "confidence": 0.0127,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1329,
+              2672
+            ],
+            [
+              1851,
+              2672
+            ],
+            [
+              1851,
+              2893
+            ],
+            [
+              1329,
+              2893
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 1.59,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              1025,
+              2813
+            ],
+            [
+              1028,
+              2694
+            ],
+            [
+              1380,
+              2703
+            ],
+            [
+              1376,
+              2822
+            ]
+          ],
+          "recognized_text": "B|Sb3",
+          "text_filtered": "BSb3",
+          "confidence": 0.0248,
+          "product_codes": [
+            "BSB3"
+          ],
+          "expanded_box": [
+            [
+              883,
+              2643
+            ],
+            [
+              1522,
+              2643
+            ],
+            [
+              1522,
+              2873
+            ],
+            [
+              883,
+              2873
+            ]
+          ]
+        },
+        {
+          "box_index": 2,
+          "angle_degree": 3.09,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              74,
+              2761
+            ],
+            [
+              83,
+              2616
+            ],
+            [
+              726,
+              2649
+            ],
+            [
+              718,
+              2794
+            ]
+          ],
+          "recognized_text": "MXa",
+          "text_filtered": "MXa",
+          "confidence": 0.021,
+          "product_codes": [
+            "MXA"
+          ],
+          "expanded_box": [
+            [
+              0,
+              2545
+            ],
+            [
+              986,
+              2545
+            ],
+            [
+              986,
+              2865
+            ],
+            [
+              0,
+              2865
+            ]
+          ]
+        },
+        {
+          "box_index": 3,
+          "angle_degree": 90.0,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1045,
+              2444
+            ],
+            [
+              1266,
+              2444
+            ],
+            [
+              1266,
+              2528
+            ],
+            [
+              1045,
+              2528
+            ]
+          ],
+          "recognized_text": "XXa1",
+          "text_filtered": "XXa1",
+          "confidence": 0.0213,
+          "product_codes": [
+            "XXA1"
+          ],
+          "expanded_box": [
+            [
+              957,
+              2411
+            ],
+            [
+              1354,
+              2411
+            ],
+            [
+              1354,
+              2561
+            ],
+            [
+              957,
+              2561
+            ]
+          ]
+        },
+        {
+          "box_index": 4,
+          "angle_degree": 7.13,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              2036,
+              1946
+            ],
+            [
+              2053,
+              1823
+            ],
+            [
+              2239,
+              1845
+            ],
+            [
+              2223,
+              1968
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1955,
+              1765
+            ],
+            [
+              2267,
+              1765
+            ],
+            [
+              2267,
+              2026
+            ],
+            [
+              1955,
+              2026
+            ]
+          ]
+        },
+        {
+          "box_index": 5,
+          "angle_degree": 8.13,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              1557,
+              1883
+            ],
+            [
+              1569,
+              1797
+            ],
+            [
+              1711,
+              1817
+            ],
+            [
+              1699,
+              1902
+            ]
+          ],
+          "recognized_text": "7A",
+          "text_filtered": "7A",
+          "confidence": 0.0189,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1496,
+              1755
+            ],
+            [
+              1772,
+              1755
+            ],
+            [
+              1772,
+              1944
+            ],
+            [
+              1496,
+              1944
+            ]
+          ]
+        },
+        {
+          "box_index": 6,
+          "angle_degree": 8.44,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              809,
+              1778
+            ],
+            [
+              821,
+              1700
+            ],
+            [
+              1487,
+              1794
+            ],
+            [
+              1475,
+              1872
+            ]
+          ],
+          "recognized_text": "T?BISb3ON-7A",
+          "text_filtered": "TBISb3ON-7A",
+          "confidence": 0.0216,
+          "product_codes": [
+            "TBISB3ON-7A"
+          ],
+          "expanded_box": [
+            [
+              538,
+              1632
+            ],
+            [
+              1758,
+              1632
+            ],
+            [
+              1758,
+              1940
+            ],
+            [
+              538,
+              1940
+            ]
+          ]
+        },
+        {
+          "box_index": 7,
+          "angle_degree": 7.13,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              94,
+              1662
+            ],
+            [
+              107,
+              1558
+            ],
+            [
+              603,
+              1617
+            ],
+            [
+              589,
+              1721
+            ]
+          ],
+          "recognized_text": "NXa",
+          "text_filtered": "NXa",
+          "confidence": 0.0177,
+          "product_codes": [
+            "NXA"
+          ],
+          "expanded_box": [
+            [
+              0,
+              1493
+            ],
+            [
+              806,
+              1493
+            ],
+            [
+              806,
+              1786
+            ],
+            [
+              0,
+              1786
+            ]
+          ]
+        },
+        {
+          "box_index": 8,
+          "angle_degree": 7.31,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              751,
+              1556
+            ],
+            [
+              760,
+              1487
+            ],
+            [
+              1099,
+              1528
+            ],
+            [
+              1089,
+              1597
+            ]
+          ],
+          "recognized_text": "AXa",
+          "text_filtered": "AXa",
+          "confidence": 0.0234,
+          "product_codes": [
+            "AXA"
+          ],
+          "expanded_box": [
+            [
+              612,
+              1443
+            ],
+            [
+              1238,
+              1443
+            ],
+            [
+              1238,
+              1641
+            ],
+            [
+              612,
+              1641
+            ]
+          ]
+        },
+        {
+          "box_index": 9,
+          "angle_degree": 15.95,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              1993,
+              1471
+            ],
+            [
+              2014,
+              1400
+            ],
+            [
+              2207,
+              1452
+            ],
+            [
+              2185,
+              1523
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1908,
+              1351
+            ],
+            [
+              2267,
+              1351
+            ],
+            [
+              2267,
+              1572
+            ],
+            [
+              1908,
+              1572
+            ]
+          ]
+        },
+        {
+          "box_index": 10,
+          "angle_degree": 9.96,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              1221,
+              1406
+            ],
+            [
+              1233,
+              1343
+            ],
+            [
+              1683,
+              1418
+            ],
+            [
+              1671,
+              1481
+            ]
+          ],
+          "recognized_text": "Sb?3oN-4",
+          "text_filtered": "Sb3oN-4",
+          "confidence": 0.0212,
+          "product_codes": [
+            "SB3ON-4"
+          ],
+          "expanded_box": [
+            [
+              1037,
+              1288
+            ],
+            [
+              1867,
+              1288
+            ],
+            [
+              1867,
+              1536
+            ],
+            [
+              1037,
+              1536
+            ]
+          ]
+        },
+        {
+          "box_index": 11,
+          "angle_degree": 9.46,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1017,
+              1378
+            ],
+            [
+              1030,
+              1308
+            ],
+            [
+              1199,
+              1335
+            ],
+            [
+              1186,
+              1404
+            ]
+          ],
+          "recognized_text": "3Sb",
+          "text_filtered": "3Sb",
+          "confidence": 0.0159,
+          "product_codes": [
+            "3SB"
+          ],
+          "expanded_box": [
+            [
+              945,
+              1270
+            ],
+            [
+              1271,
+              1270
+            ],
+            [
+              1271,
+              1442
+            ],
+            [
+              945,
+              1442
+            ]
+          ]
+        },
+        {
+          "box_index": 12,
+          "angle_degree": 14.04,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              917,
+              1359
+            ],
+            [
+              936,
+              1285
+            ],
+            [
+              980,
+              1296
+            ],
+            [
+              960,
+              1370
+            ]
+          ],
+          "recognized_text": "B",
+          "text_filtered": "B",
+          "confidence": 0.0153,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              892,
+              1251
+            ],
+            [
+              1005,
+              1251
+            ],
+            [
+              1005,
+              1404
+            ],
+            [
+              892,
+              1404
+            ]
+          ]
+        },
+        {
+          "box_index": 13,
+          "angle_degree": 14.04,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              885,
+              1152
+            ],
+            [
+              890,
+              1132
+            ],
+            [
+              940,
+              1143
+            ],
+            [
+              935,
+              1164
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              863,
+              1120
+            ],
+            [
+              962,
+              1120
+            ],
+            [
+              962,
+              1176
+            ],
+            [
+              863,
+              1176
+            ]
+          ]
+        },
+        {
+          "box_index": 14,
+          "angle_degree": 14.04,
+          "det_score": 0.0003,
+          "box_points": [
+            [
+              1051,
+              908
+            ],
+            [
+              1065,
+              856
+            ],
+            [
+              1212,
+              891
+            ],
+            [
+              1198,
+              943
+            ]
+          ],
+          "recognized_text": "TA",
+          "text_filtered": "TA",
+          "confidence": 0.0186,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              987,
+              822
+            ],
+            [
+              1276,
+              822
+            ],
+            [
+              1276,
+              977
+            ],
+            [
+              987,
+              977
+            ]
+          ]
+        },
+        {
+          "box_index": 15,
+          "angle_degree": 11.77,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              403,
+              777
+            ],
+            [
+              415,
+              724
+            ],
+            [
+              932,
+              827
+            ],
+            [
+              920,
+              879
+            ]
+          ],
+          "recognized_text": "W?BIseoN",
+          "text_filtered": "WBIseoN",
+          "confidence": 0.0134,
+          "product_codes": [
+            "WBISEON"
+          ],
+          "expanded_box": [
+            [
+              192,
+              662
+            ],
+            [
+              1143,
+              662
+            ],
+            [
+              1143,
+              941
+            ],
+            [
+              192,
+              941
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": [
+    "BSB3",
+    "MXA",
+    "XXA1",
+    "TBISB3ON-7A",
+    "NXA",
+    "AXA",
+    "SB3ON-4",
+    "3SB",
+    "WBISEON"
+  ]
+}

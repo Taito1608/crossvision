@@ -1,0 +1,42 @@
+{
+  "image": "IMG_1536.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 1,
+  "all_product_codes": [
+    "CNO"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 7.13,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1602,
+          3464
+        ],
+        [
+          1622,
+          3213
+        ],
+        [
+          1690,
+          3217
+        ],
+        [
+          1671,
+          3469
+        ]
+      ],
+      "recognized_text": "CNO",
+      "text_filtered": "CNO",
+      "confidence": 0.0241,
+      "product_codes": [
+        "CNO"
+      ]
+    }
+  ]
+}

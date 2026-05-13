@@ -1,0 +1,72 @@
+{
+  "image": "M4sb29-2.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 2,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 89.10482788085938,
+      "box_points": [
+        [
+          491,
+          879
+        ],
+        [
+          1737,
+          859
+        ],
+        [
+          1739,
+          963
+        ],
+        [
+          492,
+          983
+        ]
+      ],
+      "expanded_box": [
+        242,
+        835,
+        1988,
+        1007
+      ],
+      "recognized_text": "M4sb29-2",
+      "product_codes": [
+        "M4SB29-2"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          428,
+          650
+        ],
+        [
+          537,
+          650
+        ],
+        [
+          537,
+          700
+        ],
+        [
+          428,
+          700
+        ]
+      ],
+      "expanded_box": [
+        407,
+        640,
+        558,
+        710
+      ],
+      "recognized_text": "A",
+      "product_codes": []
+    }
+  ]
+}

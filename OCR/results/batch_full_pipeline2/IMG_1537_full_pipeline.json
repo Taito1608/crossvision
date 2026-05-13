@@ -1,0 +1,69 @@
+{
+  "image": "IMG_1537.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 2,
+  "all_product_codes": [
+    "LC-NO9SAL"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 78.61,
+      "det_score": 0.0003,
+      "box_points": [
+        [
+          595,
+          2367
+        ],
+        [
+          674,
+          2351
+        ],
+        [
+          950,
+          3476
+        ],
+        [
+          872,
+          3491
+        ]
+      ],
+      "recognized_text": "LC-NO9SAL",
+      "text_filtered": "LC-NO9SAL",
+      "confidence": 0.0155,
+      "product_codes": [
+        "LC-NO9SAL"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 87.27,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          133,
+          1180
+        ],
+        [
+          517,
+          1170
+        ],
+        [
+          547,
+          2156
+        ],
+        [
+          163,
+          2166
+        ]
+      ],
+      "recognized_text": "B?S",
+      "text_filtered": "BS",
+      "confidence": 0.0091,
+      "product_codes": []
+    }
+  ]
+}

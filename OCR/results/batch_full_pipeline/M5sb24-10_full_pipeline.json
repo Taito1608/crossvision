@@ -1,0 +1,104 @@
+{
+  "image": "M5sb24-10.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 3,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 88.67462921142578,
+      "box_points": [
+        [
+          414,
+          845
+        ],
+        [
+          1590,
+          817
+        ],
+        [
+          1592,
+          913
+        ],
+        [
+          416,
+          941
+        ]
+      ],
+      "expanded_box": [
+        179,
+        793,
+        1827,
+        965
+      ],
+      "recognized_text": "M5Sb2410",
+      "product_codes": [
+        "M5SB2410"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          29,
+          682
+        ],
+        [
+          121,
+          682
+        ],
+        [
+          121,
+          859
+        ],
+        [
+          29,
+          859
+        ]
+      ],
+      "expanded_box": [
+        11,
+        647,
+        139,
+        894
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 89.0091323852539,
+      "box_points": [
+        [
+          395,
+          582
+        ],
+        [
+          1979,
+          554
+        ],
+        [
+          1981,
+          651
+        ],
+        [
+          397,
+          680
+        ]
+      ],
+      "expanded_box": [
+        78,
+        529,
+        2048,
+        705
+      ],
+      "recognized_text": "YUMASURON",
+      "product_codes": [
+        "YUMASURON"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,515 @@
+{
+  "total_images": 15,
+  "images_with_labels": 15,
+  "total_time_seconds": 37.54,
+  "average_exact_match_rate": 0.0,
+  "average_partial_match_rate": 0.1611,
+  "results": [
+    {
+      "image": "015_B15b30N-41__B15b30N-7A_45deg_NW_yellow.JPG",
+      "status": "OK",
+      "num_detections": 9,
+      "product_codes": [
+        "A0T",
+        "OXV",
+        "1XV",
+        "EENOC9S19TU",
+        "HVL-NOC9SIQI",
+        "LNO9SIAT",
+        "1H-NOS9SIM"
+      ],
+      "correct_codes": [
+        "BISb30N-7A",
+        "BISb30N-4I",
+        "BISb30N-7A",
+        "BISb30N-53"
+      ],
+      "time_seconds": 2.95,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-7A",
+          "BISb30N-4I",
+          "BISb30N-7A",
+          "BISb30N-53"
+        ],
+        "extra": [
+          "A0T",
+          "OXV",
+          "1XV",
+          "EENOC9S19TU",
+          "HVL-NOC9SIQI",
+          "LNO9SIAT",
+          "1H-NOS9SIM"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG20250416153020.jpg",
+      "status": "OK",
+      "num_detections": 7,
+      "product_codes": [
+        "7-N0E9",
+        "YOEASTA",
+        "AXAL",
+        "B3ON-7",
+        "BISB3"
+      ],
+      "correct_codes": [
+        "BISb30N-23",
+        "BISb30N-7"
+      ],
+      "time_seconds": 3.11,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recognized": "BISB3",
+            "correct": "BISb30N-23"
+          }
+        ],
+        "misses": [
+          "BISb30N-7"
+        ],
+        "extra": [
+          "7-N0E9",
+          "YOEASTA",
+          "AXAL",
+          "B3ON-7"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.5
+      }
+    },
+    {
+      "image": "IMG20250416160821.jpg",
+      "status": "OK",
+      "num_detections": 8,
+      "product_codes": [
+        "BSB",
+        "IBXY",
+        "BI-NOE4S1I",
+        "00-NOE9",
+        "NNCDOU"
+      ],
+      "correct_codes": [
+        "BISb30N-19",
+        "BISb30N-20"
+      ],
+      "time_seconds": 2.64,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-19",
+          "BISb30N-20"
+        ],
+        "extra": [
+          "BSB",
+          "IBXY",
+          "BI-NOE4S1I",
+          "00-NOE9",
+          "NNCDOU"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_0422.jpg",
+      "status": "OK",
+      "num_detections": 16,
+      "product_codes": [
+        "BSB",
+        "MXA",
+        "VBISB30N-TA",
+        "AXAL",
+        "SB3ON-41",
+        "SB3ON"
+      ],
+      "correct_codes": [
+        "BISb30N-7A",
+        "BISb30N-4I",
+        "BISb30N-7A"
+      ],
+      "time_seconds": 2.51,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recognized": "VBISB30N-TA",
+            "correct": "BISb30N-7A"
+          }
+        ],
+        "misses": [
+          "BISb30N-4I",
+          "BISb30N-7A"
+        ],
+        "extra": [
+          "BSB",
+          "MXA",
+          "AXAL",
+          "SB3ON-41",
+          "SB3ON"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.3333
+      }
+    },
+    {
+      "image": "IMG_0771.jpg",
+      "status": "OK",
+      "num_detections": 5,
+      "product_codes": [
+        "LENOL9CID",
+        "I-NOLAR",
+        "D1S640N-23"
+      ],
+      "correct_codes": [
+        "BISb40N-23",
+        "BISb40N-15",
+        "BISb40N-27"
+      ],
+      "time_seconds": 2.48,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recognized": "D1S640N-23",
+            "correct": "BISb40N-23"
+          }
+        ],
+        "misses": [
+          "BISb40N-15",
+          "BISb40N-27"
+        ],
+        "extra": [
+          "LENOL9CID",
+          "I-NOLAR"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.3333
+      }
+    },
+    {
+      "image": "IMG_0787.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "B1SB3ON-16",
+        "AXAL"
+      ],
+      "correct_codes": [
+        "BISb30N-16"
+      ],
+      "time_seconds": 2.03,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recognized": "B1SB3ON-16",
+            "correct": "BISb30N-16"
+          }
+        ],
+        "misses": [],
+        "extra": [
+          "AXAL"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 1.0
+      }
+    },
+    {
+      "image": "IMG_1536.jpg",
+      "status": "OK",
+      "num_detections": 1,
+      "product_codes": [
+        "CNO"
+      ],
+      "correct_codes": [
+        "BISb40N-23",
+        "BISb40N-15"
+      ],
+      "time_seconds": 2.18,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb40N-23",
+          "BISb40N-15"
+        ],
+        "extra": [
+          "CNO"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_1537.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "LC-NO9SAL"
+      ],
+      "correct_codes": [
+        "BISb40N-27",
+        "BISb40N-8",
+        "BISb40N-26",
+        "BISb40N-9"
+      ],
+      "time_seconds": 2.15,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb40N-27",
+          "BISb40N-8",
+          "BISb40N-26",
+          "BISb40N-9"
+        ],
+        "extra": [
+          "LC-NO9SAL"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_1548.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [],
+      "correct_codes": [
+        "BISb40N-46"
+      ],
+      "time_seconds": 1.99,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb40N-46"
+        ],
+        "extra": [],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "IMG_1571.jpg",
+      "status": "OK",
+      "num_detections": 4,
+      "product_codes": [
+        "VEFNOE9SI8",
+        "I-NSI"
+      ],
+      "correct_codes": [
+        "BISb30N-13A",
+        "BISb30N-13"
+      ],
+      "time_seconds": 2.37,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-13A",
+          "BISb30N-13"
+        ],
+        "extra": [
+          "VEFNOE9SI8",
+          "I-NSI"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "M4sb29-2.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "774707"
+      ],
+      "correct_codes": [
+        "M4sb29-2"
+      ],
+      "time_seconds": 1.97,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "M4sb29-2"
+        ],
+        "extra": [
+          "774707"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "M5sb24-10.jpg",
+      "status": "OK",
+      "num_detections": 3,
+      "product_codes": [
+        "AOI",
+        "Z9SSWSO",
+        "NMLMAVVAN"
+      ],
+      "correct_codes": [
+        "M5sb24-10"
+      ],
+      "time_seconds": 2.02,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "M5sb24-10"
+        ],
+        "extra": [
+          "AOI",
+          "Z9SSWSO",
+          "NMLMAVVAN"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "N5G15-X1Y1.jpg",
+      "status": "OK",
+      "num_detections": 2,
+      "product_codes": [
+        "AIX-SDGN",
+        "ITV"
+      ],
+      "correct_codes": [
+        "N5G15-X1Y1"
+      ],
+      "time_seconds": 2.02,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "N5G15-X1Y1"
+        ],
+        "extra": [
+          "AIX-SDGN",
+          "ITV"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    },
+    {
+      "image": "multi_001_sunny_yellow.JPG",
+      "status": "OK",
+      "num_detections": 22,
+      "product_codes": [
+        "9CNOE9S",
+        "BISB",
+        "YCL-NOE9S",
+        "O7-NOE9S1J",
+        "B3ON-34",
+        "TXV",
+        "AYAL",
+        "B1-NOE9S1EI",
+        "1BXY",
+        "BISB3",
+        "7BX7",
+        "NOCQ",
+        "ASA",
+        "V7OX",
+        "9S-NOE9S",
+        "YALD",
+        "SB3ON-36"
+      ],
+      "correct_codes": [
+        "BISb30N-36",
+        "BISb30N-40",
+        "BISb30N-19",
+        "BISb30N-20",
+        "BISb30N-56",
+        "BISb30N-34",
+        "BISb30N-12",
+        "BISb30N-26"
+      ],
+      "time_seconds": 4.57,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [
+          {
+            "recognized": "BISB",
+            "correct": "BISb30N-36"
+          },
+          {
+            "recognized": "BISB3",
+            "correct": "BISb30N-40"
+          }
+        ],
+        "misses": [
+          "BISb30N-19",
+          "BISb30N-20",
+          "BISb30N-56",
+          "BISb30N-34",
+          "BISb30N-12",
+          "BISb30N-26"
+        ],
+        "extra": [
+          "9CNOE9S",
+          "YCL-NOE9S",
+          "O7-NOE9S1J",
+          "B3ON-34",
+          "TXV",
+          "AYAL",
+          "B1-NOE9S1EI",
+          "1BXY",
+          "7BX7",
+          "NOCQ",
+          "ASA",
+          "V7OX",
+          "9S-NOE9S",
+          "YALD",
+          "SB3ON-36"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.25
+      }
+    },
+    {
+      "image": "multi_008_yellow_green.JPG",
+      "status": "OK",
+      "num_detections": 1,
+      "product_codes": [
+        "E-N"
+      ],
+      "correct_codes": [
+        "BISb30N-7A",
+        "BISb30N-41",
+        "BISb30N-7A",
+        "BISb30N-53",
+        "BISb30N-37A"
+      ],
+      "time_seconds": 2.55,
+      "match": {
+        "exact_matches": [],
+        "partial_matches": [],
+        "misses": [
+          "BISb30N-7A",
+          "BISb30N-41",
+          "BISb30N-7A",
+          "BISb30N-53",
+          "BISb30N-37A"
+        ],
+        "extra": [
+          "E-N"
+        ],
+        "exact_rate": 0.0,
+        "partial_rate": 0.0
+      }
+    }
+  ]
+}

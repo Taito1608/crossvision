@@ -1,0 +1,276 @@
+{
+  "image": "015_B15b30N-41__B15b30N-7A_45deg_NW_yellow.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 9,
+  "all_product_codes": [
+    "A0T",
+    "OXV",
+    "1XV",
+    "EENOC9S19TU",
+    "HVL-NOC9SIQI",
+    "LNO9SIAT",
+    "1H-NOS9SIM"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 40.91,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          2272,
+          3689
+        ],
+        [
+          3037,
+          2847
+        ],
+        [
+          3149,
+          2942
+        ],
+        [
+          2385,
+          3784
+        ]
+      ],
+      "recognized_text": "A0T",
+      "text_filtered": "A0T",
+      "confidence": 0.0125,
+      "product_codes": [
+        "A0T"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 45.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          2695,
+          2902
+        ],
+        [
+          3026,
+          2579
+        ],
+        [
+          3081,
+          2633
+        ],
+        [
+          2750,
+          2955
+        ]
+      ],
+      "recognized_text": "oXV",
+      "text_filtered": "oXV",
+      "confidence": 0.0145,
+      "product_codes": [
+        "OXV"
+      ]
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 55.01,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1038,
+          2956
+        ],
+        [
+          1788,
+          2412
+        ],
+        [
+          1863,
+          2516
+        ],
+        [
+          1113,
+          3061
+        ]
+      ],
+      "recognized_text": "1XV",
+      "text_filtered": "1XV",
+      "confidence": 0.017,
+      "product_codes": [
+        "1XV"
+      ]
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 45.69,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          2732,
+          3228
+        ],
+        [
+          3813,
+          2193
+        ],
+        [
+          3907,
+          2287
+        ],
+        [
+          2826,
+          3322
+        ]
+      ],
+      "recognized_text": "E?ENoc9S19?TU",
+      "text_filtered": "EENoc9S19TU",
+      "confidence": 0.0143,
+      "product_codes": [
+        "EENOC9S19TU"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 56.31,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1603,
+          2376
+        ],
+        [
+          1922,
+          2149
+        ],
+        [
+          1959,
+          2203
+        ],
+        [
+          1639,
+          2430
+        ]
+      ],
+      "recognized_text": "bX",
+      "text_filtered": "bX",
+      "confidence": 0.0143,
+      "product_codes": []
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 56.43,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1629,
+          2618
+        ],
+        [
+          2822,
+          1817
+        ],
+        [
+          2875,
+          1896
+        ],
+        [
+          1683,
+          2697
+        ]
+      ],
+      "recognized_text": "H?VL-NOC9SIQ?I",
+      "text_filtered": "HVL-NOC9SIQI",
+      "confidence": 0.0167,
+      "product_codes": [
+        "HVL-NOC9SIQI"
+      ]
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 63.79,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          256,
+          2123
+        ],
+        [
+          1184,
+          1651
+        ],
+        [
+          1213,
+          1709
+        ],
+        [
+          285,
+          2182
+        ]
+      ],
+      "recognized_text": "L?NO9SIA?T",
+      "text_filtered": "LNO9SIAT",
+      "confidence": 0.0162,
+      "product_codes": [
+        "LNO9SIAT"
+      ]
+    },
+    {
+      "box_index": 7,
+      "angle_degree": 59.53,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1312,
+          2238
+        ],
+        [
+          2350,
+          1613
+        ],
+        [
+          2393,
+          1683
+        ],
+        [
+          1354,
+          2308
+        ]
+      ],
+      "recognized_text": "1h-Nos9SI?m",
+      "text_filtered": "1h-Nos9SIm",
+      "confidence": 0.0163,
+      "product_codes": [
+        "1H-NOS9SIM"
+      ]
+    },
+    {
+      "box_index": 8,
+      "angle_degree": 53.13,
+      "det_score": 0.0003,
+      "box_points": [
+        [
+          1133,
+          1750
+        ],
+        [
+          1284,
+          1632
+        ],
+        [
+          1305,
+          1660
+        ],
+        [
+          1155,
+          1778
+        ]
+      ],
+      "recognized_text": "V",
+      "text_filtered": "V",
+      "confidence": 0.0111,
+      "product_codes": []
+    }
+  ]
+}

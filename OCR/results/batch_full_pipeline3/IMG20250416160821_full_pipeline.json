@@ -1,0 +1,438 @@
+{
+  "image": "IMG20250416160821.jpg",
+  "image_size": [
+    3000,
+    4000
+  ],
+  "num_detections": 8,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 8
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 90.0,
+          "cx": 2000,
+          "cy": 3889
+        },
+        {
+          "idx": 1,
+          "angle": 90.0,
+          "cx": 2771,
+          "cy": 3818
+        },
+        {
+          "idx": 2,
+          "angle": 90.0,
+          "cx": 2422,
+          "cy": 3661
+        },
+        {
+          "idx": 3,
+          "angle": 5.659482002258301,
+          "cx": 618,
+          "cy": 3130
+        },
+        {
+          "idx": 4,
+          "angle": 4.113504886627197,
+          "cx": 1274,
+          "cy": 2646
+        },
+        {
+          "idx": 5,
+          "angle": 81.6070785522461,
+          "cx": 2005,
+          "cy": 1553
+        },
+        {
+          "idx": 6,
+          "angle": 86.35686492919922,
+          "cx": 2578,
+          "cy": 1370
+        },
+        {
+          "idx": 7,
+          "angle": 7.125016689300537,
+          "cx": 130,
+          "cy": 1167
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 90.0,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1900,
+              3824
+            ],
+            [
+              2100,
+              3824
+            ],
+            [
+              2100,
+              3954
+            ],
+            [
+              1900,
+              3954
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1820,
+              3772
+            ],
+            [
+              2180,
+              3772
+            ],
+            [
+              2180,
+              3999
+            ],
+            [
+              1820,
+              3999
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 90.0,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              2735,
+              3762
+            ],
+            [
+              2808,
+              3762
+            ],
+            [
+              2808,
+              3874
+            ],
+            [
+              2735,
+              3874
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              2706,
+              3718
+            ],
+            [
+              2837,
+              3718
+            ],
+            [
+              2837,
+              3918
+            ],
+            [
+              2706,
+              3918
+            ]
+          ]
+        },
+        {
+          "box_index": 2,
+          "angle_degree": 90.0,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              2330,
+              3424
+            ],
+            [
+              2514,
+              3424
+            ],
+            [
+              2514,
+              3899
+            ],
+            [
+              2330,
+              3899
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              2257,
+              3234
+            ],
+            [
+              2587,
+              3234
+            ],
+            [
+              2587,
+              3999
+            ],
+            [
+              2257,
+              3999
+            ]
+          ]
+        },
+        {
+          "box_index": 3,
+          "angle_degree": 5.66,
+          "det_score": 0.9993,
+          "box_points": [
+            [
+              449,
+              3536
+            ],
+            [
+              533,
+              2701
+            ],
+            [
+              789,
+              2725
+            ],
+            [
+              704,
+              3560
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              313,
+              2358
+            ],
+            [
+              925,
+              2358
+            ],
+            [
+              925,
+              3903
+            ],
+            [
+              313,
+              3903
+            ]
+          ]
+        },
+        {
+          "box_index": 4,
+          "angle_degree": 4.11,
+          "det_score": 0.0335,
+          "box_points": [
+            [
+              1090,
+              3620
+            ],
+            [
+              1235,
+              1657
+            ],
+            [
+              1458,
+              1673
+            ],
+            [
+              1313,
+              3636
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              943,
+              866
+            ],
+            [
+              1605,
+              866
+            ],
+            [
+              1605,
+              3999
+            ],
+            [
+              943,
+              3999
+            ]
+          ]
+        },
+        {
+          "box_index": 5,
+          "angle_degree": 81.61,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1894,
+              1354
+            ],
+            [
+              2053,
+              1331
+            ],
+            [
+              2116,
+              1752
+            ],
+            [
+              1958,
+              1775
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1806,
+              1154
+            ],
+            [
+              2204,
+              1154
+            ],
+            [
+              2204,
+              1952
+            ],
+            [
+              1806,
+              1952
+            ]
+          ]
+        },
+        {
+          "box_index": 6,
+          "angle_degree": 86.36,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              2418,
+              663
+            ],
+            [
+              2646,
+              649
+            ],
+            [
+              2739,
+              2077
+            ],
+            [
+              2510,
+              2091
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              2290,
+              73
+            ],
+            [
+              2867,
+              73
+            ],
+            [
+              2867,
+              2667
+            ],
+            [
+              2290,
+              2667
+            ]
+          ]
+        },
+        {
+          "box_index": 7,
+          "angle_degree": 7.13,
+          "det_score": 0.0003,
+          "box_points": [
+            [
+              0,
+              1682
+            ],
+            [
+              94,
+              629
+            ],
+            [
+              282,
+              652
+            ],
+            [
+              147,
+              1705
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              0,
+              199
+            ],
+            [
+              394,
+              199
+            ],
+            [
+              394,
+              2135
+            ],
+            [
+              0,
+              2135
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": []
+}

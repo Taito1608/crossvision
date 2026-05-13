@@ -1,0 +1,462 @@
+{
+  "image": "IMG_0422.jpg",
+  "image_size": [
+    2268,
+    4032
+  ],
+  "num_detections": 16,
+  "all_product_codes": [
+    "BSB",
+    "MXA",
+    "VBISB30N-TA",
+    "AXAL",
+    "SB3ON-41",
+    "SB3ON"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 4.09,
+      "det_score": 0.0003,
+      "box_points": [
+        [
+          1358,
+          2860
+        ],
+        [
+          1365,
+          2684
+        ],
+        [
+          1822,
+          2704
+        ],
+        [
+          1814,
+          2880
+        ]
+      ],
+      "recognized_text": "3",
+      "text_filtered": "3",
+      "confidence": 0.0184,
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 1.59,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          918,
+          2851
+        ],
+        [
+          921,
+          2655
+        ],
+        [
+          1486,
+          2664
+        ],
+        [
+          1482,
+          2860
+        ]
+      ],
+      "recognized_text": "B(Sb",
+      "text_filtered": "BSb",
+      "confidence": 0.0243,
+      "product_codes": [
+        "BSB"
+      ]
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 3.09,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          0,
+          2814
+        ],
+        [
+          0,
+          2562
+        ],
+        [
+          921,
+          2595
+        ],
+        [
+          913,
+          2847
+        ]
+      ],
+      "recognized_text": "MXa",
+      "text_filtered": "MXa",
+      "confidence": 0.0206,
+      "product_codes": [
+        "MXA"
+      ]
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          978,
+          2418
+        ],
+        [
+          1332,
+          2418
+        ],
+        [
+          1332,
+          2553
+        ],
+        [
+          978,
+          2553
+        ]
+      ],
+      "recognized_text": "(bX",
+      "text_filtered": "bX",
+      "confidence": 0.0156,
+      "product_codes": []
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 7.13,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1975,
+          1989
+        ],
+        [
+          1992,
+          1779
+        ],
+        [
+          2267,
+          1801
+        ],
+        [
+          2267,
+          2011
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 8.13,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1510,
+          1914
+        ],
+        [
+          1522,
+          1765
+        ],
+        [
+          1757,
+          1785
+        ],
+        [
+          1745,
+          1933
+        ]
+      ],
+      "recognized_text": "1A",
+      "text_filtered": "1A",
+      "confidence": 0.0162,
+      "product_codes": []
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 8.44,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          605,
+          1726
+        ],
+        [
+          617,
+          1648
+        ],
+        [
+          1690,
+          1845
+        ],
+        [
+          1678,
+          1923
+        ]
+      ],
+      "recognized_text": "VBISb30N-TA",
+      "text_filtered": "VBISb30N-TA",
+      "confidence": 0.0234,
+      "product_codes": [
+        "VBISB30N-TA"
+      ]
+    },
+    {
+      "box_index": 7,
+      "angle_degree": 7.13,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          0,
+          1710
+        ],
+        [
+          0,
+          1509
+        ],
+        [
+          755,
+          1568
+        ],
+        [
+          741,
+          1769
+        ]
+      ],
+      "recognized_text": "xa",
+      "text_filtered": "xa",
+      "confidence": 0.022,
+      "product_codes": []
+    },
+    {
+      "box_index": 8,
+      "angle_degree": 7.31,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          646,
+          1589
+        ],
+        [
+          655,
+          1454
+        ],
+        [
+          1203,
+          1495
+        ],
+        [
+          1193,
+          1630
+        ]
+      ],
+      "recognized_text": "AXaL",
+      "text_filtered": "AXaL",
+      "confidence": 0.0259,
+      "product_codes": [
+        "AXAL"
+      ]
+    },
+    {
+      "box_index": 9,
+      "angle_degree": 15.95,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1928,
+          1507
+        ],
+        [
+          1949,
+          1363
+        ],
+        [
+          2267,
+          1415
+        ],
+        [
+          2249,
+          1559
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 10,
+      "angle_degree": 9.96,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1082,
+          1364
+        ],
+        [
+          1094,
+          1301
+        ],
+        [
+          1821,
+          1459
+        ],
+        [
+          1809,
+          1522
+        ]
+      ],
+      "recognized_text": "sb3oN-41",
+      "text_filtered": "sb3oN-41",
+      "confidence": 0.0235,
+      "product_codes": [
+        "SB3ON-41"
+      ]
+    },
+    {
+      "box_index": 11,
+      "angle_degree": 9.46,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          962,
+          1406
+        ],
+        [
+          975,
+          1279
+        ],
+        [
+          1253,
+          1306
+        ],
+        [
+          1240,
+          1432
+        ]
+      ],
+      "recognized_text": "sb",
+      "text_filtered": "sb",
+      "confidence": 0.0173,
+      "product_codes": []
+    },
+    {
+      "box_index": 12,
+      "angle_degree": 14.04,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          898,
+          1384
+        ],
+        [
+          917,
+          1259
+        ],
+        [
+          998,
+          1270
+        ],
+        [
+          978,
+          1395
+        ]
+      ],
+      "recognized_text": "R",
+      "text_filtered": "R",
+      "confidence": 0.0129,
+      "product_codes": []
+    },
+    {
+      "box_index": 13,
+      "angle_degree": 14.04,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          868,
+          1161
+        ],
+        [
+          873,
+          1122
+        ],
+        [
+          956,
+          1133
+        ],
+        [
+          951,
+          1173
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 14,
+      "angle_degree": 14.04,
+      "det_score": 0.0003,
+      "box_points": [
+        [
+          1002,
+          934
+        ],
+        [
+          1016,
+          829
+        ],
+        [
+          1260,
+          864
+        ],
+        [
+          1246,
+          969
+        ]
+      ],
+      "recognized_text": "A",
+      "text_filtered": "A",
+      "confidence": 0.0241,
+      "product_codes": []
+    },
+    {
+      "box_index": 15,
+      "angle_degree": 11.77,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          244,
+          730
+        ],
+        [
+          256,
+          677
+        ],
+        [
+          1090,
+          873
+        ],
+        [
+          1078,
+          925
+        ]
+      ],
+      "recognized_text": "B/Sb3ON",
+      "text_filtered": "B/Sb3ON",
+      "confidence": 0.0244,
+      "product_codes": [
+        "SB3ON"
+      ]
+    }
+  ]
+}

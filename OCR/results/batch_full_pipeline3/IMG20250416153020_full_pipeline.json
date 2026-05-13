@@ -1,0 +1,406 @@
+{
+  "image": "IMG20250416153020.jpg",
+  "image_size": [
+    4624,
+    3468
+  ],
+  "num_detections": 7,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 7
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 10.251198768615723,
+          "cx": 3293,
+          "cy": 3021
+        },
+        {
+          "idx": 1,
+          "angle": 9.462321281433105,
+          "cx": 1962,
+          "cy": 2730
+        },
+        {
+          "idx": 2,
+          "angle": 4.5377726554870605,
+          "cx": 424,
+          "cy": 1755
+        },
+        {
+          "idx": 3,
+          "angle": 90.0,
+          "cx": 2802,
+          "cy": 950
+        },
+        {
+          "idx": 4,
+          "angle": 87.35746002197266,
+          "cx": 2152,
+          "cy": 617
+        },
+        {
+          "idx": 5,
+          "angle": 85.44258117675781,
+          "cx": 3967,
+          "cy": 637
+        },
+        {
+          "idx": 6,
+          "angle": 87.51044464111328,
+          "cx": 2888,
+          "cy": 582
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 10.25,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              2972,
+              3046
+            ],
+            [
+              3001,
+              2883
+            ],
+            [
+              3615,
+              2996
+            ],
+            [
+              3586,
+              3159
+            ]
+          ],
+          "recognized_text": "TAV",
+          "text_filtered": "TAV",
+          "confidence": 0.0145,
+          "product_codes": [
+            "TAV"
+          ],
+          "expanded_box": [
+            [
+              2715,
+              2773
+            ],
+            [
+              3872,
+              2773
+            ],
+            [
+              3872,
+              3269
+            ],
+            [
+              2715,
+              3269
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 9.46,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1389,
+              2704
+            ],
+            [
+              1412,
+              2565
+            ],
+            [
+              2535,
+              2757
+            ],
+            [
+              2512,
+              2895
+            ]
+          ],
+          "recognized_text": "N",
+          "text_filtered": "N",
+          "confidence": 0.015,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              931,
+              2433
+            ],
+            [
+              2993,
+              2433
+            ],
+            [
+              2993,
+              3027
+            ],
+            [
+              931,
+              3027
+            ]
+          ]
+        },
+        {
+          "box_index": 2,
+          "angle_degree": 4.54,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              203,
+              1783
+            ],
+            [
+              210,
+              1693
+            ],
+            [
+              646,
+              1728
+            ],
+            [
+              639,
+              1818
+            ]
+          ],
+          "recognized_text": "YEASIA",
+          "text_filtered": "YEASIA",
+          "confidence": 0.0154,
+          "product_codes": [
+            "YEASIA"
+          ],
+          "expanded_box": [
+            [
+              26,
+              1643
+            ],
+            [
+              823,
+              1643
+            ],
+            [
+              823,
+              1868
+            ],
+            [
+              26,
+              1868
+            ]
+          ]
+        },
+        {
+          "box_index": 3,
+          "angle_degree": 90.0,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              2557,
+              881
+            ],
+            [
+              3048,
+              881
+            ],
+            [
+              3048,
+              1019
+            ],
+            [
+              2557,
+              1019
+            ]
+          ],
+          "recognized_text": "1oX?V",
+          "text_filtered": "1oXV",
+          "confidence": 0.0143,
+          "product_codes": [
+            "1OXV"
+          ],
+          "expanded_box": [
+            [
+              2361,
+              826
+            ],
+            [
+              3244,
+              826
+            ],
+            [
+              3244,
+              1074
+            ],
+            [
+              2361,
+              1074
+            ]
+          ]
+        },
+        {
+          "box_index": 4,
+          "angle_degree": 87.36,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1787,
+              580
+            ],
+            [
+              2512,
+              545
+            ],
+            [
+              2517,
+              656
+            ],
+            [
+              1792,
+              690
+            ]
+          ],
+          "recognized_text": "L-NOE9S",
+          "text_filtered": "L-NOE9S",
+          "confidence": 0.0248,
+          "product_codes": [
+            "L-NOE9S"
+          ],
+          "expanded_box": [
+            [
+              1495,
+              487
+            ],
+            [
+              2809,
+              487
+            ],
+            [
+              2809,
+              748
+            ],
+            [
+              1495,
+              748
+            ]
+          ]
+        },
+        {
+          "box_index": 5,
+          "angle_degree": 85.44,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              3527,
+              574
+            ],
+            [
+              4393,
+              503
+            ],
+            [
+              4409,
+              701
+            ],
+            [
+              3542,
+              772
+            ]
+          ],
+          "recognized_text": "aXV",
+          "text_filtered": "aXV",
+          "confidence": 0.018,
+          "product_codes": [
+            "AXV"
+          ],
+          "expanded_box": [
+            [
+              3175,
+              396
+            ],
+            [
+              4623,
+              396
+            ],
+            [
+              4623,
+              879
+            ],
+            [
+              3175,
+              879
+            ]
+          ]
+        },
+        {
+          "box_index": 6,
+          "angle_degree": 87.51,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              2636,
+              532
+            ],
+            [
+              3135,
+              510
+            ],
+            [
+              3140,
+              633
+            ],
+            [
+              2641,
+              655
+            ]
+          ],
+          "recognized_text": "E9SI8",
+          "text_filtered": "E9SI8",
+          "confidence": 0.0196,
+          "product_codes": [
+            "E9SI8"
+          ],
+          "expanded_box": [
+            [
+              2435,
+              452
+            ],
+            [
+              3341,
+              452
+            ],
+            [
+              3341,
+              713
+            ],
+            [
+              2435,
+              713
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": [
+    "TAV",
+    "YEASIA",
+    "1OXV",
+    "L-NOE9S",
+    "AXV",
+    "E9SI8"
+  ]
+}

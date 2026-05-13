@@ -1,0 +1,101 @@
+{
+  "image": "M5sb24-10.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 3,
+  "all_product_codes": [
+    "AOI",
+    "Z9SSWSO",
+    "NMLMAVVAN"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 88.67,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          60,
+          807
+        ],
+        [
+          1943,
+          779
+        ],
+        [
+          1945,
+          950
+        ],
+        [
+          62,
+          978
+        ]
+      ],
+      "recognized_text": "a*OI+Z9SSW?So",
+      "text_filtered": "aOI+Z9SSWSo",
+      "confidence": 0.0161,
+      "product_codes": [
+        "AOI",
+        "Z9SSWSO"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1,
+          628
+        ],
+        [
+          148,
+          628
+        ],
+        [
+          148,
+          912
+        ],
+        [
+          1,
+          912
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 89.01,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          0,
+          544
+        ],
+        [
+          2047,
+          516
+        ],
+        [
+          2047,
+          688
+        ],
+        [
+          0,
+          717
+        ]
+      ],
+      "recognized_text": "NMLMAVVAN",
+      "text_filtered": "NMLMAVVAN",
+      "confidence": 0.0141,
+      "product_codes": [
+        "NMLMAVVAN"
+      ]
+    }
+  ]
+}

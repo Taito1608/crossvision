@@ -1,0 +1,72 @@
+{
+  "image": "N5G15-X1Y1.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 2,
+  "all_product_codes": [
+    "AIX-SDGN",
+    "ITV"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 83.81,
+      "det_score": 0.0,
+      "box_points": [
+        [
+          0,
+          1371
+        ],
+        [
+          2047,
+          1000
+        ],
+        [
+          2047,
+          1143
+        ],
+        [
+          0,
+          1514
+        ]
+      ],
+      "recognized_text": "AIX-SDGN",
+      "text_filtered": "AIX-SDGN",
+      "confidence": 0.0181,
+      "product_codes": [
+        "AIX-SDGN"
+      ]
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 86.04,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          0,
+          303
+        ],
+        [
+          2047,
+          190
+        ],
+        [
+          2047,
+          490
+        ],
+        [
+          0,
+          603
+        ]
+      ],
+      "recognized_text": "ITV",
+      "text_filtered": "ITV",
+      "confidence": 0.0182,
+      "product_codes": [
+        "ITV"
+      ]
+    }
+  ]
+}

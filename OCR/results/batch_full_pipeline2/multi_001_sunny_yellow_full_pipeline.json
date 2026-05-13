@@ -1,0 +1,657 @@
+{
+  "image": "multi_001_sunny_yellow.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 22,
+  "all_product_codes": [
+    "9CNOE9S",
+    "BISB",
+    "YCL-NOE9S",
+    "O7-NOE9S1J",
+    "B3ON-34",
+    "TXV",
+    "AYAL",
+    "B1-NOE9S1EI",
+    "1BXY",
+    "BISB3",
+    "7BX7",
+    "NOCQ",
+    "ASA",
+    "V7OX",
+    "9S-NOE9S",
+    "YALD",
+    "SB3ON-36"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 1.36,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          861,
+          5185
+        ],
+        [
+          865,
+          4858
+        ],
+        [
+          2027,
+          4875
+        ],
+        [
+          2022,
+          5202
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 1.33,
+      "det_score": 0.0,
+      "box_points": [
+        [
+          43,
+          4719
+        ],
+        [
+          49,
+          4302
+        ],
+        [
+          2411,
+          4336
+        ],
+        [
+          2405,
+          4753
+        ]
+      ],
+      "recognized_text": "9CNOE9S/",
+      "text_filtered": "9CNOE9S/",
+      "confidence": 0.0183,
+      "product_codes": [
+        "9CNOE9S"
+      ]
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          3269,
+          4351
+        ],
+        [
+          3356,
+          4351
+        ],
+        [
+          3356,
+          4465
+        ],
+        [
+          3269,
+          4465
+        ]
+      ],
+      "recognized_text": "8*",
+      "text_filtered": "8",
+      "confidence": 0.017,
+      "product_codes": []
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          0,
+          4009
+        ],
+        [
+          460,
+          4009
+        ],
+        [
+          460,
+          4141
+        ],
+        [
+          0,
+          4141
+        ]
+      ],
+      "recognized_text": "BISb.",
+      "text_filtered": "BISb.",
+      "confidence": 0.0233,
+      "product_codes": [
+        "BISB"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          339,
+          3754
+        ],
+        [
+          444,
+          3754
+        ],
+        [
+          444,
+          3848
+        ],
+        [
+          339,
+          3848
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 1.65,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          250,
+          3866
+        ],
+        [
+          254,
+          3645
+        ],
+        [
+          1815,
+          3672
+        ],
+        [
+          1811,
+          3894
+        ]
+      ],
+      "recognized_text": "Y?Cl-NoE9s/",
+      "text_filtered": "YCl-NoE9s/",
+      "confidence": 0.0189,
+      "product_codes": [
+        "YCL-NOE9S"
+      ]
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1751,
+          3496
+        ],
+        [
+          4058,
+          3496
+        ],
+        [
+          4058,
+          3791
+        ],
+        [
+          1751,
+          3791
+        ]
+      ],
+      "recognized_text": "O7-NOE9S1J",
+      "text_filtered": "O7-NOE9S1J",
+      "confidence": 0.0154,
+      "product_codes": [
+        "O7-NOE9S1J"
+      ]
+    },
+    {
+      "box_index": 7,
+      "angle_degree": 1.17,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          621,
+          3493
+        ],
+        [
+          623,
+          3302
+        ],
+        [
+          1349,
+          3311
+        ],
+        [
+          1346,
+          3502
+        ]
+      ],
+      "recognized_text": "b?3oN-34",
+      "text_filtered": "b3oN-34",
+      "confidence": 0.0231,
+      "product_codes": [
+        "B3ON-34"
+      ]
+    },
+    {
+      "box_index": 8,
+      "angle_degree": 88.21,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          316,
+          3310
+        ],
+        [
+          748,
+          3302
+        ],
+        [
+          752,
+          3492
+        ],
+        [
+          319,
+          3501
+        ]
+      ],
+      "recognized_text": "Aa",
+      "text_filtered": "Aa",
+      "confidence": 0.0126,
+      "product_codes": []
+    },
+    {
+      "box_index": 9,
+      "angle_degree": 86.19,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          2174,
+          3015
+        ],
+        [
+          3162,
+          2975
+        ],
+        [
+          3174,
+          3279
+        ],
+        [
+          2186,
+          3319
+        ]
+      ],
+      "recognized_text": "TXV",
+      "text_filtered": "TXV",
+      "confidence": 0.0158,
+      "product_codes": [
+        "TXV"
+      ]
+    },
+    {
+      "box_index": 10,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          252,
+          3031
+        ],
+        [
+          750,
+          3031
+        ],
+        [
+          750,
+          3203
+        ],
+        [
+          252,
+          3203
+        ]
+      ],
+      "recognized_text": "AYal",
+      "text_filtered": "AYal",
+      "confidence": 0.0225,
+      "product_codes": [
+        "AYAL"
+      ]
+    },
+    {
+      "box_index": 11,
+      "angle_degree": 89.7,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          685,
+          2531
+        ],
+        [
+          2896,
+          2524
+        ],
+        [
+          2897,
+          2753
+        ],
+        [
+          686,
+          2761
+        ]
+      ],
+      "recognized_text": "b1-NOE9S1EI",
+      "text_filtered": "b1-NOE9S1EI",
+      "confidence": 0.0207,
+      "product_codes": [
+        "B1-NOE9S1EI"
+      ]
+    },
+    {
+      "box_index": 12,
+      "angle_degree": 88.59,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          941,
+          2115
+        ],
+        [
+          1797,
+          2102
+        ],
+        [
+          1801,
+          2379
+        ],
+        [
+          945,
+          2392
+        ]
+      ],
+      "recognized_text": "1bXY",
+      "text_filtered": "1bXY",
+      "confidence": 0.0182,
+      "product_codes": [
+        "1BXY"
+      ]
+    },
+    {
+      "box_index": 13,
+      "angle_degree": 1.02,
+      "det_score": 0.0003,
+      "box_points": [
+        [
+          297,
+          2159
+        ],
+        [
+          299,
+          1970
+        ],
+        [
+          914,
+          1977
+        ],
+        [
+          911,
+          2166
+        ]
+      ],
+      "recognized_text": "BIsb3",
+      "text_filtered": "BIsb3",
+      "confidence": 0.0226,
+      "product_codes": [
+        "BISB3"
+      ]
+    },
+    {
+      "box_index": 14,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          245,
+          1718
+        ],
+        [
+          781,
+          1718
+        ],
+        [
+          781,
+          1880
+        ],
+        [
+          245,
+          1880
+        ]
+      ],
+      "recognized_text": "7bX7",
+      "text_filtered": "7bX7",
+      "confidence": 0.0186,
+      "product_codes": [
+        "7BX7"
+      ]
+    },
+    {
+      "box_index": 15,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          2522,
+          1426
+        ],
+        [
+          3671,
+          1426
+        ],
+        [
+          3671,
+          1684
+        ],
+        [
+          2522,
+          1684
+        ]
+      ],
+      "recognized_text": "0+-NOCq",
+      "text_filtered": "0+-NOCq",
+      "confidence": 0.0182,
+      "product_codes": [
+        "NOCQ"
+      ]
+    },
+    {
+      "box_index": 16,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          2067,
+          1415
+        ],
+        [
+          2720,
+          1415
+        ],
+        [
+          2720,
+          1701
+        ],
+        [
+          2067,
+          1701
+        ]
+      ],
+      "recognized_text": "Asa",
+      "text_filtered": "Asa",
+      "confidence": 0.0115,
+      "product_codes": [
+        "ASA"
+      ]
+    },
+    {
+      "box_index": 17,
+      "angle_degree": 3.81,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          302,
+          1424
+        ],
+        [
+          308,
+          1259
+        ],
+        [
+          1168,
+          1294
+        ],
+        [
+          1162,
+          1459
+        ]
+      ],
+      "recognized_text": "V?7oX",
+      "text_filtered": "V7oX",
+      "confidence": 0.0181,
+      "product_codes": [
+        "V7OX"
+      ]
+    },
+    {
+      "box_index": 18,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          2012,
+          1047
+        ],
+        [
+          2927,
+          1047
+        ],
+        [
+          2927,
+          1295
+        ],
+        [
+          2012,
+          1295
+        ]
+      ],
+      "recognized_text": "T7",
+      "text_filtered": "T7",
+      "confidence": 0.019,
+      "product_codes": []
+    },
+    {
+      "box_index": 19,
+      "angle_degree": 1.48,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          0,
+          1221
+        ],
+        [
+          0,
+          1046
+        ],
+        [
+          1534,
+          1071
+        ],
+        [
+          1531,
+          1245
+        ]
+      ],
+      "recognized_text": "9s-NoE9s/d",
+      "text_filtered": "9s-NoE9s/d",
+      "confidence": 0.0206,
+      "product_codes": [
+        "9S-NOE9S"
+      ]
+    },
+    {
+      "box_index": 20,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1740,
+          557
+        ],
+        [
+          2908,
+          557
+        ],
+        [
+          2908,
+          815
+        ],
+        [
+          1740,
+          815
+        ]
+      ],
+      "recognized_text": "YaLD",
+      "text_filtered": "YaLD",
+      "confidence": 0.0237,
+      "product_codes": [
+        "YALD"
+      ]
+    },
+    {
+      "box_index": 21,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          1210,
+          181
+        ],
+        [
+          3352,
+          181
+        ],
+        [
+          3352,
+          418
+        ],
+        [
+          1210,
+          418
+        ]
+      ],
+      "recognized_text": "B/Sb3oN-36",
+      "text_filtered": "B/Sb3oN-36",
+      "confidence": 0.0263,
+      "product_codes": [
+        "SB3ON-36"
+      ]
+    }
+  ]
+}

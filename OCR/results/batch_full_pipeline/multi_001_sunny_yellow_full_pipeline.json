@@ -1,0 +1,706 @@
+{
+  "image": "multi_001_sunny_yellow.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 22,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 1.3639274835586548,
+      "box_points": [
+        [
+          1080,
+          5121
+        ],
+        [
+          1084,
+          4923
+        ],
+        [
+          1809,
+          4940
+        ],
+        [
+          1804,
+          5138
+        ]
+      ],
+      "expanded_box": [
+        935,
+        4880,
+        1954,
+        5181
+      ],
+      "recognized_text": "N",
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 1.3322197198867798,
+      "box_points": [
+        [
+          487,
+          4635
+        ],
+        [
+          493,
+          4387
+        ],
+        [
+          1967,
+          4421
+        ],
+        [
+          1961,
+          4669
+        ]
+      ],
+      "expanded_box": [
+        191,
+        4331,
+        2263,
+        4725
+      ],
+      "recognized_text": "9GNOE9S/S",
+      "product_codes": [
+        "9GNOE9S"
+      ]
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          3286,
+          4373
+        ],
+        [
+          3340,
+          4373
+        ],
+        [
+          3340,
+          4444
+        ],
+        [
+          3286,
+          4444
+        ]
+      ],
+      "expanded_box": [
+        3276,
+        4359,
+        3350,
+        4458
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          73,
+          4034
+        ],
+        [
+          371,
+          4034
+        ],
+        [
+          371,
+          4117
+        ],
+        [
+          73,
+          4117
+        ]
+      ],
+      "expanded_box": [
+        14,
+        4018,
+        430,
+        4133
+      ],
+      "recognized_text": "BlSb",
+      "product_codes": [
+        "BLSB"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          359,
+          3772
+        ],
+        [
+          425,
+          3772
+        ],
+        [
+          425,
+          3831
+        ],
+        [
+          359,
+          3831
+        ]
+      ],
+      "expanded_box": [
+        346,
+        3761,
+        438,
+        3842
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 1.64834463596344,
+      "box_points": [
+        [
+          544,
+          3820
+        ],
+        [
+          548,
+          3692
+        ],
+        [
+          1522,
+          3719
+        ],
+        [
+          1518,
+          3848
+        ]
+      ],
+      "expanded_box": [
+        349,
+        3661,
+        1717,
+        3879
+      ],
+      "recognized_text": "r?ZINoE9s/a",
+      "product_codes": [
+        "ZINOE9S"
+      ]
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          2184,
+          3552
+        ],
+        [
+          3626,
+          3552
+        ],
+        [
+          3626,
+          3736
+        ],
+        [
+          2184,
+          3736
+        ]
+      ],
+      "expanded_box": [
+        1896,
+        3516,
+        3914,
+        3772
+      ],
+      "recognized_text": "BISb30N?-2O",
+      "product_codes": [
+        "BISB30N"
+      ]
+    },
+    {
+      "box_index": 7,
+      "angle_degree": 1.1691392660140991,
+      "box_points": [
+        [
+          758,
+          3456
+        ],
+        [
+          760,
+          3340
+        ],
+        [
+          1213,
+          3349
+        ],
+        [
+          1210,
+          3465
+        ]
+      ],
+      "expanded_box": [
+        667,
+        3315,
+        1304,
+        3490
+      ],
+      "recognized_text": "30N-34",
+      "product_codes": [
+        "30N-34"
+      ]
+    },
+    {
+      "box_index": 8,
+      "angle_degree": 88.21009063720703,
+      "box_points": [
+        [
+          398,
+          3348
+        ],
+        [
+          667,
+          3340
+        ],
+        [
+          671,
+          3455
+        ],
+        [
+          401,
+          3464
+        ]
+      ],
+      "expanded_box": [
+        344,
+        3316,
+        725,
+        3488
+      ],
+      "recognized_text": "BiSb",
+      "product_codes": [
+        "BISB"
+      ]
+    },
+    {
+      "box_index": 9,
+      "angle_degree": 86.18592071533203,
+      "box_points": [
+        [
+          2362,
+          3080
+        ],
+        [
+          2975,
+          3040
+        ],
+        [
+          2987,
+          3215
+        ],
+        [
+          2374,
+          3255
+        ]
+      ],
+      "expanded_box": [
+        2237,
+        2997,
+        3112,
+        3298
+      ],
+      "recognized_text": "AYc?T",
+      "product_codes": [
+        "AYC"
+      ]
+    },
+    {
+      "box_index": 10,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          346,
+          3064
+        ],
+        [
+          657,
+          3064
+        ],
+        [
+          657,
+          3171
+        ],
+        [
+          346,
+          3171
+        ]
+      ],
+      "expanded_box": [
+        284,
+        3043,
+        719,
+        3192
+      ],
+      "recognized_text": "AYa1",
+      "product_codes": [
+        "AYA1"
+      ]
+    },
+    {
+      "box_index": 11,
+      "angle_degree": 89.69844055175781,
+      "box_points": [
+        [
+          1100,
+          2576
+        ],
+        [
+          2482,
+          2569
+        ],
+        [
+          2483,
+          2709
+        ],
+        [
+          1101,
+          2717
+        ]
+      ],
+      "expanded_box": [
+        824,
+        2540,
+        2759,
+        2746
+      ],
+      "recognized_text": "BiSb3oN-19",
+      "product_codes": [
+        "BISB3ON-19"
+      ]
+    },
+    {
+      "box_index": 12,
+      "angle_degree": 88.58557891845703,
+      "box_points": [
+        [
+          1103,
+          2170
+        ],
+        [
+          1636,
+          2157
+        ],
+        [
+          1640,
+          2325
+        ],
+        [
+          1107,
+          2338
+        ]
+      ],
+      "expanded_box": [
+        996,
+        2121,
+        1747,
+        2374
+      ],
+      "recognized_text": "AXa!",
+      "product_codes": [
+        "AXA"
+      ]
+    },
+    {
+      "box_index": 13,
+      "angle_degree": 1.023030161857605,
+      "box_points": [
+        [
+          413,
+          2123
+        ],
+        [
+          415,
+          2007
+        ],
+        [
+          799,
+          2014
+        ],
+        [
+          796,
+          2130
+        ]
+      ],
+      "expanded_box": [
+        336,
+        1983,
+        876,
+        2154
+      ],
+      "recognized_text": "B/sb3",
+      "product_codes": [
+        "SB3"
+      ]
+    },
+    {
+      "box_index": 14,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          346,
+          1749
+        ],
+        [
+          681,
+          1749
+        ],
+        [
+          681,
+          1850
+        ],
+        [
+          346,
+          1850
+        ]
+      ],
+      "expanded_box": [
+        279,
+        1729,
+        748,
+        1870
+      ],
+      "recognized_text": "L?Xa1",
+      "product_codes": [
+        "XA1"
+      ]
+    },
+    {
+      "box_index": 15,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          2738,
+          1475
+        ],
+        [
+          3456,
+          1475
+        ],
+        [
+          3456,
+          1636
+        ],
+        [
+          2738,
+          1636
+        ]
+      ],
+      "expanded_box": [
+        2595,
+        1443,
+        3599,
+        1668
+      ],
+      "recognized_text": "3QN-4o",
+      "product_codes": [
+        "3QN-4O"
+      ]
+    },
+    {
+      "box_index": 16,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          2190,
+          1469
+        ],
+        [
+          2598,
+          1469
+        ],
+        [
+          2598,
+          1648
+        ],
+        [
+          2190,
+          1648
+        ]
+      ],
+      "expanded_box": [
+        2109,
+        1434,
+        2679,
+        1683
+      ],
+      "recognized_text": "BISb",
+      "product_codes": [
+        "BISB"
+      ]
+    },
+    {
+      "box_index": 17,
+      "angle_degree": 3.814074993133545,
+      "box_points": [
+        [
+          465,
+          1387
+        ],
+        [
+          471,
+          1297
+        ],
+        [
+          1006,
+          1332
+        ],
+        [
+          1000,
+          1422
+        ]
+      ],
+      "expanded_box": [
+        357,
+        1272,
+        1114,
+        1447
+      ],
+      "recognized_text": "V?7oX",
+      "product_codes": [
+        "7OX"
+      ]
+    },
+    {
+      "box_index": 18,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          2184,
+          1094
+        ],
+        [
+          2756,
+          1094
+        ],
+        [
+          2756,
+          1249
+        ],
+        [
+          2184,
+          1249
+        ]
+      ],
+      "expanded_box": [
+        2070,
+        1063,
+        2870,
+        1280
+      ],
+      "recognized_text": "AYaL",
+      "product_codes": [
+        "AYAL"
+      ]
+    },
+    {
+      "box_index": 19,
+      "angle_degree": 1.481457233428955,
+      "box_points": [
+        [
+          266,
+          1184
+        ],
+        [
+          268,
+          1084
+        ],
+        [
+          1242,
+          1109
+        ],
+        [
+          1239,
+          1208
+        ]
+      ],
+      "expanded_box": [
+        71,
+        1060,
+        1437,
+        1232
+      ],
+      "recognized_text": "9s-NoE9s/d",
+      "product_codes": [
+        "9S-NOE9S"
+      ]
+    },
+    {
+      "box_index": 20,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          1959,
+          606
+        ],
+        [
+          2689,
+          606
+        ],
+        [
+          2689,
+          767
+        ],
+        [
+          1959,
+          767
+        ]
+      ],
+      "expanded_box": [
+        1813,
+        574,
+        2835,
+        799
+      ],
+      "recognized_text": "V7",
+      "product_codes": []
+    },
+    {
+      "box_index": 21,
+      "angle_degree": 90.0,
+      "box_points": [
+        [
+          1612,
+          226
+        ],
+        [
+          2951,
+          226
+        ],
+        [
+          2951,
+          374
+        ],
+        [
+          1612,
+          374
+        ]
+      ],
+      "expanded_box": [
+        1345,
+        197,
+        3218,
+        403
+      ],
+      "recognized_text": "9E-NoC9S7a",
+      "product_codes": [
+        "9E-NOC9S7A"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "image": "IMG_1548.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 2,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 2
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 0.0,
+          "cx": 1806,
+          "cy": 2582
+        },
+        {
+          "idx": 1,
+          "angle": 1.7623909711837769,
+          "cx": 1428,
+          "cy": 1427
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 0.0,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              1705,
+              2608
+            ],
+            [
+              1705,
+              2557
+            ],
+            [
+              1907,
+              2557
+            ],
+            [
+              1907,
+              2608
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              1625,
+              2537
+            ],
+            [
+              1987,
+              2537
+            ],
+            [
+              1987,
+              2628
+            ],
+            [
+              1625,
+              2628
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 1.76,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              806,
+              2642
+            ],
+            [
+              883,
+              178
+            ],
+            [
+              2051,
+              213
+            ],
+            [
+              1974,
+              2677
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              308,
+              0
+            ],
+            [
+              2549,
+              0
+            ],
+            [
+              2549,
+              3676
+            ],
+            [
+              308,
+              3676
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": []
+}

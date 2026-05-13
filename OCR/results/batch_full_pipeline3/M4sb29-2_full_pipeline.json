@@ -1,0 +1,136 @@
+{
+  "image": "M4sb29-2.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 2,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 2
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 89.10482788085938,
+          "cx": 1114,
+          "cy": 921
+        },
+        {
+          "idx": 1,
+          "angle": 90.0,
+          "cx": 482,
+          "cy": 675
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 89.1,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              491,
+              879
+            ],
+            [
+              1737,
+              859
+            ],
+            [
+              1739,
+              963
+            ],
+            [
+              492,
+              983
+            ]
+          ],
+          "recognized_text": "M4sb29-2",
+          "text_filtered": "M4sb29-2",
+          "confidence": 0.0258,
+          "product_codes": [
+            "M4SB29-2"
+          ],
+          "expanded_box": [
+            [
+              0,
+              810
+            ],
+            [
+              2047,
+              810
+            ],
+            [
+              2047,
+              1032
+            ],
+            [
+              0,
+              1032
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 90.0,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              428,
+              650
+            ],
+            [
+              537,
+              650
+            ],
+            [
+              537,
+              700
+            ],
+            [
+              428,
+              700
+            ]
+          ],
+          "recognized_text": "A",
+          "text_filtered": "A",
+          "confidence": 0.0162,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              385,
+              630
+            ],
+            [
+              580,
+              630
+            ],
+            [
+              580,
+              720
+            ],
+            [
+              385,
+              720
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": [
+    "M4SB29-2"
+  ]
+}

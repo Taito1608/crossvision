@@ -1,0 +1,40 @@
+{
+  "image": "IMG_1536.jpg",
+  "image_size": [
+    3024,
+    4032
+  ],
+  "num_detections": 1,
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 7.125016689300537,
+      "box_points": [
+        [
+          1619,
+          3416
+        ],
+        [
+          1639,
+          3261
+        ],
+        [
+          1674,
+          3265
+        ],
+        [
+          1655,
+          3421
+        ]
+      ],
+      "expanded_box": [
+        1608,
+        3229,
+        1685,
+        3453
+      ],
+      "recognized_text": "",
+      "product_codes": []
+    }
+  ]
+}

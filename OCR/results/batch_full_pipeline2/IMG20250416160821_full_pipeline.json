@@ -1,0 +1,243 @@
+{
+  "image": "IMG20250416160821.jpg",
+  "image_size": [
+    3000,
+    4000
+  ],
+  "num_detections": 8,
+  "all_product_codes": [
+    "BSB",
+    "IBXY",
+    "BI-NOE4S1I",
+    "00-NOE9",
+    "NNCDOU"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1840,
+          3785
+        ],
+        [
+          2160,
+          3785
+        ],
+        [
+          2160,
+          3993
+        ],
+        [
+          1840,
+          3993
+        ]
+      ],
+      "recognized_text": "*",
+      "text_filtered": "",
+      "confidence": 0.0114,
+      "product_codes": []
+    },
+    {
+      "box_index": 1,
+      "angle_degree": 90.0,
+      "det_score": 0.0002,
+      "box_points": [
+        [
+          2713,
+          3728
+        ],
+        [
+          2829,
+          3728
+        ],
+        [
+          2829,
+          3907
+        ],
+        [
+          2713,
+          3907
+        ]
+      ],
+      "recognized_text": "O",
+      "text_filtered": "O",
+      "confidence": 0.0124,
+      "product_codes": []
+    },
+    {
+      "box_index": 2,
+      "angle_degree": 90.0,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          2274,
+          3281
+        ],
+        [
+          2569,
+          3281
+        ],
+        [
+          2569,
+          3999
+        ],
+        [
+          2274,
+          3999
+        ]
+      ],
+      "recognized_text": "B(sb)",
+      "text_filtered": "Bsb",
+      "confidence": 0.0217,
+      "product_codes": [
+        "BSB"
+      ]
+    },
+    {
+      "box_index": 3,
+      "angle_degree": 5.66,
+      "det_score": 0.9993,
+      "box_points": [
+        [
+          347,
+          3793
+        ],
+        [
+          431,
+          2443
+        ],
+        [
+          891,
+          2467
+        ],
+        [
+          806,
+          3817
+        ]
+      ],
+      "recognized_text": "IbxY",
+      "text_filtered": "IbxY",
+      "confidence": 0.0176,
+      "product_codes": [
+        "IBXY"
+      ]
+    },
+    {
+      "box_index": 4,
+      "angle_degree": 4.11,
+      "det_score": 0.0335,
+      "box_points": [
+        [
+          979,
+          3999
+        ],
+        [
+          1124,
+          1063
+        ],
+        [
+          1568,
+          1079
+        ],
+        [
+          1423,
+          3999
+        ]
+      ],
+      "recognized_text": "bI-NOE4S1I",
+      "text_filtered": "bI-NOE4S1I",
+      "confidence": 0.0203,
+      "product_codes": [
+        "BI-NOE4S1I"
+      ]
+    },
+    {
+      "box_index": 5,
+      "angle_degree": 81.61,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          1827,
+          1220
+        ],
+        [
+          2119,
+          1197
+        ],
+        [
+          2182,
+          1885
+        ],
+        [
+          1891,
+          1908
+        ]
+      ],
+      "recognized_text": "",
+      "text_filtered": "",
+      "confidence": 0.0,
+      "product_codes": []
+    },
+    {
+      "box_index": 6,
+      "angle_degree": 86.36,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          2321,
+          230
+        ],
+        [
+          2742,
+          216
+        ],
+        [
+          2835,
+          2509
+        ],
+        [
+          2413,
+          2523
+        ]
+      ],
+      "recognized_text": "00-NoE9",
+      "text_filtered": "00-NoE9",
+      "confidence": 0.0141,
+      "product_codes": [
+        "00-NOE9"
+      ]
+    },
+    {
+      "box_index": 7,
+      "angle_degree": 7.13,
+      "det_score": 0.0003,
+      "box_points": [
+        [
+          0,
+          2004
+        ],
+        [
+          9,
+          306
+        ],
+        [
+          366,
+          329
+        ],
+        [
+          231,
+          2027
+        ]
+      ],
+      "recognized_text": "Nnc?dou",
+      "text_filtered": "Nncdou",
+      "confidence": 0.0155,
+      "product_codes": [
+        "NNCDOU"
+      ]
+    }
+  ]
+}

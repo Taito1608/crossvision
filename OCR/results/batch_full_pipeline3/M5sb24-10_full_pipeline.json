@@ -1,0 +1,190 @@
+{
+  "image": "M5sb24-10.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 3,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 3
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 88.67462921142578,
+          "cx": 1003,
+          "cy": 879
+        },
+        {
+          "idx": 1,
+          "angle": 90.0,
+          "cx": 75,
+          "cy": 770
+        },
+        {
+          "idx": 2,
+          "angle": 89.0091323852539,
+          "cx": 1188,
+          "cy": 616
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 88.67,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              414,
+              845
+            ],
+            [
+              1590,
+              817
+            ],
+            [
+              1592,
+              913
+            ],
+            [
+              416,
+              941
+            ]
+          ],
+          "recognized_text": "7M5sb2410",
+          "text_filtered": "7M5sb2410",
+          "confidence": 0.0224,
+          "product_codes": [
+            "7M5SB2410"
+          ],
+          "expanded_box": [
+            [
+              0,
+              768
+            ],
+            [
+              2047,
+              768
+            ],
+            [
+              2047,
+              990
+            ],
+            [
+              0,
+              990
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 90.0,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              29,
+              682
+            ],
+            [
+              121,
+              682
+            ],
+            [
+              121,
+              859
+            ],
+            [
+              29,
+              859
+            ]
+          ],
+          "recognized_text": "",
+          "text_filtered": "",
+          "confidence": 0.0,
+          "product_codes": [],
+          "expanded_box": [
+            [
+              0,
+              612
+            ],
+            [
+              157,
+              612
+            ],
+            [
+              157,
+              929
+            ],
+            [
+              0,
+              929
+            ]
+          ]
+        },
+        {
+          "box_index": 2,
+          "angle_degree": 89.01,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              395,
+              582
+            ],
+            [
+              1979,
+              554
+            ],
+            [
+              1981,
+              651
+            ],
+            [
+              397,
+              680
+            ]
+          ],
+          "recognized_text": "HAAULW",
+          "text_filtered": "HAAULW",
+          "confidence": 0.015,
+          "product_codes": [
+            "HAAULW"
+          ],
+          "expanded_box": [
+            [
+              0,
+              504
+            ],
+            [
+              2047,
+              504
+            ],
+            [
+              2047,
+              730
+            ],
+            [
+              0,
+              730
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": [
+    "7M5SB2410",
+    "HAAULW"
+  ]
+}

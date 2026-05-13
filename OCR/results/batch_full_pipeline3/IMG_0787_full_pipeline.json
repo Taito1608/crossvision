@@ -1,0 +1,139 @@
+{
+  "image": "IMG_0787.jpg",
+  "image_size": [
+    4032,
+    3024
+  ],
+  "num_detections": 2,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 2
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 2.2398927211761475,
+          "cx": 1961,
+          "cy": 1327
+        },
+        {
+          "idx": 1,
+          "angle": 1.6307562589645386,
+          "cx": 2882,
+          "cy": 744
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 2.24,
+          "det_score": 0.0001,
+          "box_points": [
+            [
+              291,
+              1368
+            ],
+            [
+              299,
+              1153
+            ],
+            [
+              3632,
+              1286
+            ],
+            [
+              3623,
+              1502
+            ]
+          ],
+          "recognized_text": "BIS13ON-16",
+          "text_filtered": "BIS13ON-16",
+          "confidence": 0.0208,
+          "product_codes": [
+            "BIS13ON-16"
+          ],
+          "expanded_box": [
+            [
+              0,
+              1014
+            ],
+            [
+              4031,
+              1014
+            ],
+            [
+              4031,
+              1641
+            ],
+            [
+              0,
+              1641
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 1.63,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              2138,
+              803
+            ],
+            [
+              2143,
+              642
+            ],
+            [
+              3627,
+              685
+            ],
+            [
+              3623,
+              847
+            ]
+          ],
+          "recognized_text": "AXal",
+          "text_filtered": "AXal",
+          "confidence": 0.0201,
+          "product_codes": [
+            "AXAL"
+          ],
+          "expanded_box": [
+            [
+              1543,
+              560
+            ],
+            [
+              4031,
+              560
+            ],
+            [
+              4031,
+              929
+            ],
+            [
+              1543,
+              929
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": [
+    "BIS13ON-16",
+    "AXAL"
+  ]
+}

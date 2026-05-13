@@ -1,0 +1,42 @@
+{
+  "image": "multi_008_yellow_green.JPG",
+  "image_size": [
+    4284,
+    5712
+  ],
+  "num_detections": 1,
+  "all_product_codes": [
+    "E-N"
+  ],
+  "detections": [
+    {
+      "box_index": 0,
+      "angle_degree": 14.04,
+      "det_score": 0.0001,
+      "box_points": [
+        [
+          3473,
+          2625
+        ],
+        [
+          3499,
+          2456
+        ],
+        [
+          3577,
+          2466
+        ],
+        [
+          3550,
+          2635
+        ]
+      ],
+      "recognized_text": "E-N",
+      "text_filtered": "E-N",
+      "confidence": 0.0168,
+      "product_codes": [
+        "E-N"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "image": "N5G15-X1Y1.jpg",
+  "image_size": [
+    2048,
+    1536
+  ],
+  "num_detections": 2,
+  "detection_model": "det.onnx",
+  "recognition_model": "en_PP-OCRv3_rec.onnx",
+  "stages": {
+    "s1_d": {
+      "model": "det.onnx",
+      "desc": "テキスト領域検出",
+      "num": 2
+    },
+    "s2_c": {
+      "model": "minAreaRect",
+      "desc": "角度抽出",
+      "info": [
+        {
+          "idx": 0,
+          "angle": 83.81376647949219,
+          "cx": 1165,
+          "cy": 1257
+        },
+        {
+          "idx": 1,
+          "angle": 86.04244995117188,
+          "cx": 1137,
+          "cy": 397
+        }
+      ]
+    },
+    "s3_r": {
+      "model": "en_PP-OCRv3_rec.onnx",
+      "desc": "axis-aligned crop+20%pad",
+      "dets": [
+        {
+          "box_index": 0,
+          "angle_degree": 83.81,
+          "det_score": 0.0,
+          "box_points": [
+            [
+              357,
+              1275
+            ],
+            [
+              1958,
+              1097
+            ],
+            [
+              1973,
+              1240
+            ],
+            [
+              372,
+              1418
+            ]
+          ],
+          "recognized_text": "N5G5-XY",
+          "text_filtered": "N5G5-XY",
+          "confidence": 0.0191,
+          "product_codes": [
+            "N5G5-XY"
+          ],
+          "expanded_box": [
+            [
+              0,
+              969
+            ],
+            [
+              2047,
+              969
+            ],
+            [
+              2047,
+              1535
+            ],
+            [
+              0,
+              1535
+            ]
+          ]
+        },
+        {
+          "box_index": 1,
+          "angle_degree": 86.04,
+          "det_score": 0.0002,
+          "box_points": [
+            [
+              336,
+              381
+            ],
+            [
+              1928,
+              268
+            ],
+            [
+              1938,
+              413
+            ],
+            [
+              346,
+              526
+            ]
+          ],
+          "recognized_text": "A4W2",
+          "text_filtered": "A4W2",
+          "confidence": 0.0197,
+          "product_codes": [
+            "A4W2"
+          ],
+          "expanded_box": [
+            [
+              0,
+              165
+            ],
+            [
+              2047,
+              165
+            ],
+            [
+              2047,
+              629
+            ],
+            [
+              0,
+              629
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "all_product_codes": [
+    "N5G5-XY",
+    "A4W2"
+  ]
+}
