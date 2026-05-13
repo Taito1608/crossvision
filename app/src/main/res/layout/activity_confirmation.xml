@@ -1,24 +1,24 @@
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="#D8D8D8">
+    android:background="#D8D8D8"
+    android:padding="16dp">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <!-- ① 写真エリア（撮影画像一覧 - スクロール可能） -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="250dp"
+        android:background="#CFCFCF">
 
-        <!-- ① 写真エリア -->
-        <ImageView
-            android:id="@+id/confirmation_image"
+        <LinearLayout
+            android:id="@+id/confirmation_images_container"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:scaleType="centerInside"
-            android:background="#CFCFCF"
-            android:contentDescription="撮影画像プレビュー" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp" />
+    </ScrollView>
 
         <!-- ② 検索エリア -->
         <LinearLayout
@@ -148,6 +148,4 @@
                 android:text="確定" />
         </LinearLayout>
 
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

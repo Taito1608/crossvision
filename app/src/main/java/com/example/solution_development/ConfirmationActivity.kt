@@ -14,6 +14,7 @@ import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -35,7 +36,7 @@ class ConfirmationActivity : AppCompatActivity() {
     private data class StatusOption(val code: String, val label: String)
     private data class ScannedItem(var code: String, var status: String)
 
-    private lateinit var confirmationImage: ImageView
+    private lateinit var confirmationImagesContainer: LinearLayout
     private lateinit var statusGroup: RadioGroup
     private lateinit var confirmButton: Button
     private lateinit var continueButton: Button
@@ -69,7 +70,7 @@ class ConfirmationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_confirmation)
 
         // ===== View取得 =====
-        confirmationImage = findViewById(R.id.confirmation_image)
+        confirmationImagesContainer = findViewById(R.id.confirmation_images_container)
         statusGroup = findViewById(R.id.status_group)
         confirmButton = findViewById(R.id.confirm_button)
         continueButton = findViewById(R.id.continue_button)
@@ -80,11 +81,7 @@ class ConfirmationActivity : AppCompatActivity() {
         val construction = intent.getStringExtra("construction").orEmpty().ifBlank { "unknown" }
         val scannedList = intent.getStringArrayListExtra("scannedList") ?: arrayListOf()
 
-        val latestCaptured = CapturedImageStore.getImages().firstOrNull()
-        if (latestCaptured != null) {
-            val bmp = BitmapFactory.decodeByteArray(latestCaptured, 0, latestCaptured.size)
-            confirmationImage.setImageBitmap(bmp)
-        }
+        renderCapturedImages()
 
         // ===== スキャン結果をListViewに表示 =====
         scannedItems.clear()
@@ -174,6 +171,45 @@ class ConfirmationActivity : AppCompatActivity() {
         continueButton.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
+        }
+    }
+
+    private fun renderCapturedImages() {
+        confirmationImagesContainer.removeAllViews()
+
+        val images = CapturedImageStore.getImages()
+        if (images.isEmpty()) {
+            val emptyView = TextView(this).apply {
+                text = "撮影画像がありません"
+                textSize = 16f
+                setTextColor(android.graphics.Color.DKGRAY)
+                setPadding(12, 24, 12, 24)
+            }
+            confirmationImagesContainer.addView(emptyView)
+            return
+        }
+
+        val density = resources.displayMetrics.density
+        val imageHeight = (180 * density).toInt()
+        val marginBottom = (8 * density).toInt()
+
+        for (bytes in images) {
+            val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: continue
+
+            val imageView = ImageView(this).apply {
+                setImageBitmap(bmp)
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setBackgroundColor(android.graphics.Color.parseColor("#DDDDDD"))
+                adjustViewBounds = true
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    imageHeight
+                ).apply {
+                    bottomMargin = marginBottom
+                }
+            }
+
+            confirmationImagesContainer.addView(imageView)
         }
     }
 
