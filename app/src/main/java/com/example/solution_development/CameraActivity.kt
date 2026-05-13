@@ -1,23 +1,32 @@
 package com.example.solution_development
 
 import android.Manifest
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.content.pm.PackageManager
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.ImageFormat
+import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.util.AttributeSet
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.*
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -30,16 +39,9 @@ import androidx.camera.view.PreviewView
 import com.example.solution_development.ocr.OnnxOcrEngine
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
+import java.util.concurrent.Executors
 import java.util.regex.Pattern
-
-// ============================================================
-// [ML Kit code - preserved for reference]
-// import com.google.mlkit.vision.text.TextRecognition
-// import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-// import com.google.mlkit.vision.common.InputImage
-//
-// private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-// ============================================================
 
 class CameraActivity : AppCompatActivity() {
 
@@ -49,18 +51,20 @@ class CameraActivity : AppCompatActivity() {
 
     // TODO ===== UI =====
     private lateinit var previewView: PreviewView
+    private lateinit var overlay: ScanOverlayView
     private lateinit var btnSelectImage: Button
 
     // TODO ===== CameraX =====
     private lateinit var imageCapture: ImageCapture
     private lateinit var imageAnalysis: androidx.camera.core.ImageAnalysis
 
-    // TODO ===== OCR (ONNX PaddleOCR v3) =====
+    // TODO ===== OCR (ONNX PaddleOCR) =====
     private lateinit var engine: OnnxOcrEngine
 
     // TODO ===== ??? =====
     private var isCaptured = false
     private val scannedList = mutableListOf<String>()
+    private val cameraExecutor = Executors.newSingleThreadExecutor()
 
     // 鉄鋼製品の使用可能文字のみを抽出する正規表現
     // 許可: 0-9, A-Z, a-z, +, -, ., /, _, スペース
@@ -71,88 +75,71 @@ class CameraActivity : AppCompatActivity() {
 
     // TODO ===== AI =====
     private val pickImageLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                Toast.makeText(this, "画像選択完了", Toast.LENGTH_SHORT).show()
-                sendToAI(uri)
-            }
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { processGalleryImage(it) }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "スキャン画面"
+        try {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.title = "スキャン画面"
 
-        previewView = findViewById(R.id.previewView)
+            // ONNX PaddleOCR の初期化
+            engine = OnnxOcrEngine(this)
 
-        val btnComplete = findViewById<Button>(R.id.btnComplete)
-        btnSelectImage = findViewById(R.id.btnSelectImage)
+            previewView = findViewById(R.id.previewView)
+            overlay = findViewById(R.id.overlay)
+            val btnComplete = findViewById<Button>(R.id.btnComplete)
+            btnSelectImage = findViewById(R.id.btnSelectImage)
 
-        btnComplete.setOnClickListener {
-            val intent = Intent(this, ConfirmationActivity::class.java)
+            btnComplete.setOnClickListener {
+                val intent = Intent(this, ConfirmationActivity::class.java)
+                
+//                 val process = this.intent.getStringExtra("process")
+//                 val construction = this.intent.getStringExtra("construction")
 
-            // ダミーデータ：スキャン結果を追加
-            if (scannedList.isEmpty()) {
-                scannedList.add("123456")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
-                scannedList.add("789012")
-                scannedList.add("345678")
+//                 // ダミーデータ：スキャン結果を追加
+//                 if (scannedList.isEmpty()) {
+//                     scannedList.add("123456")
+//                     scannedList.add("789012")
+//                     scannedList.add("345678")
+//                 }
+
+//                 confirmationIntent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+//                 confirmationIntent.putExtra("process", process)
+//                 confirmationIntent.putExtra("construction", construction)
+
+                intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
+
+                startActivity(intent)
             }
 
-            intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
-
-            startActivity(intent)
-        }
-
-        btnSelectImage.setOnClickListener {
-            pickImageLauncher.launch("image/*")
-        }
-
-        // ============================================================
-        // [ML Kit shutter button code - preserved for reference]
-        // btnShutter.setOnClickListener{
-        //     val photoFile = File(cacheDir, "ocr_temp.jpg")
-        //     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-        //     imageCapture.takePicture(
-        //         outputOptions,
-        //         ContextCompat.getMainExecutor(this),
-        //         object : ImageCapture.OnImageSavedCallback {
-        //             override fun onImageSaved(outputFileResults: ImageCapture.outputFileResults){
-        //                 val savedUri = Uri.fromFile(photoFile)
-        //                 Toast.makeText(this@CameraActivity, "スキャン成功", Toast.LENGTH_SHORT).show()
-        //                 runOCR(savedUri)
-        //             }
-        //             override fun onError(exception: ImageCaptureException){
-        //                 Toast.makeText(this@CameraActivity,"スキャン成功: ${exception.message}", Toast.LENGTH_SHORT).show()
-        //             }
-        //         }
-        //     )
-        // }
-        // ============================================================
-
-        // Initialize ONNX OCR Engine
-        engine = OnnxOcrEngine(this)
-        engine.setModelPreset(OnnxOcrEngine.ModelPreset.PP_OCR_V3_RAPIDOCR)
-
-        // Load model in background thread
-        Thread {
-            val success = engine.loadModel()
-            Log.d(TAG, "ONNX model load result: $success")
-            runOnUiThread {
-                if (success) {
-                    Log.d(TAG, "ONNX model loaded successfully")
-                } else {
-                    Log.e(TAG, "Failed to load ONNX model")
-                    Toast.makeText(this, "モデルの読み込みに失敗しました", Toast.LENGTH_LONG).show()
-                }
+            btnSelectImage.setOnClickListener {
+                pickImageLauncher.launch("image/*")
             }
+
+            if(ContextCompat.checkSelfPermission(
+                this,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ){
+                startCamera()
+            }else{
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    1001
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("CameraActivity", "onCreate error", e)
+            Toast.makeText(this, "初期化中にエラーが発生しました", Toast.LENGTH_LONG).show()
+        }
+
+        // ONNX engine is initialized in onCreate above
         }.start()
 
         if(ContextCompat.checkSelfPermission(
@@ -175,8 +162,6 @@ class CameraActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray,
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if(requestCode == 1001){
             if(grantResults.isNotEmpty() &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -189,64 +174,62 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun startCamera(){
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        try {
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
+            cameraProviderFuture.addListener({
+                try {
+                    val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder().build().also{
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
+                    val preview = Preview.Builder().build().also{
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
 
-            imageAnalysis = androidx.camera.core.ImageAnalysis.Builder()
-                .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
+                    imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
 
+                    imageCapture = ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .build()
+
+                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(
+                        this,
+                        cameraSelector,
+                        preview,
+                        imageAnalysis,
+                        imageCapture
+                    )
+
+                    // Viewのレイアウトが完了した後に Analyzer を開始
+                    overlay.post {
+                        startAnalyzer()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Camera binding error", e)
+                    Toast.makeText(this@CameraActivity, "カメラバインドエラー: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }, ContextCompat.getMainExecutor(this))
+        } catch (e: Exception) {
+            Log.e(TAG, "startCamera error", e)
+            Toast.makeText(this, "カメラ初期化エラー", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun startAnalyzer() {
+        try {
             imageAnalysis.setAnalyzer(
-                ContextCompat.getMainExecutor(this)
-            ) { imageProxy: ImageProxy ->
+                cameraExecutor
+            ) { imageProxy ->
 
-                if (isProcessing) {
+                if (isProcessing || isCaptured) {
                     imageProxy.close()
                     return@setAnalyzer
                 }
                 isProcessing = true
 
-                // ============================================================
-                // [ML Kit OCR code - preserved for reference]
-                // val mediaImage = imageProxy.image
-                // if (mediaImage != null) {
-                //     val image = InputImage.fromMediaImage(
-                //         mediaImage,
-                //         imageProxy.imageInfo.rotationDegrees
-                //     )
-                //     recognizer.process(image)
-                //         .addOnSuccessListener { visionText ->
-                //             val text = visionText.text
-                //             val numbers = text.replace(Regex("[^0-9]"), "")
-                //             if (numbers.length >= 6) {
-                //                 if (!scannedList.contains(numbers)) {
-                //                     scannedList.add(numbers)
-                //                 }
-                //                 if (!isCaptured) {
-                //                     isCaptured = true
-                //                     captureImage()
-                //                     Handler(Looper.getMainLooper()).postDelayed({
-                //                         isCaptured = false
-                //                     }, 2000)
-                //                 }
-                //             }
-                //         }
-                //         .addOnCompleteListener {
-                //             isProcessing = false
-                //             imageProxy.close()
-                //         }
-                // } else {
-                //     imageProxy.close()
-                // }
-                // ============================================================
-
-                // ONNX PaddleOCR v3 inference
+                // ONNX PaddleOCR inference
                 val mediaImage = imageProxy.image
                 if (mediaImage != null) {
                     try {
@@ -294,26 +277,26 @@ class CameraActivity : AppCompatActivity() {
                     imageProxy.close()
                 }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "startAnalyzer error", e)
+        }
+    }
 
-            imageCapture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build()
+    private fun triggerCapture() {
+        if (isCaptured) return
+        isCaptured = true
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+        //imageAnalysis.clearAnalyzer()
 
-            try{
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    imageAnalysis,
-                    imageCapture
-                )
-            }catch (e: Exception){
-                e.printStackTrace()
-            }
-        }, ContextCompat.getMainExecutor(this))
+        Handler(Looper.getMainLooper()).postDelayed({
+            captureImage()
+        }, 400)
+
+        //Handler(Looper.getMainLooper()).postDelayed({
+        //    isCaptured = false
+//
+        //    startAnalyzer()
+        //}, 2500)
     }
 
     /**
@@ -355,33 +338,142 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun captureImage() {
-        val file = File(
-            getExternalFilesDir(null),
-            "scan_${System.currentTimeMillis()}.jpg"
-        )
+        val filename = "scan_${System.currentTimeMillis()}.jpg"
 
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
+            //put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+            contentResolver,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        ).build()
+
+        //val uri = contentResolver.insert(
+        //    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        //    values
+        //) ?: run {
+        //    Toast.makeText(this, "URI作成失敗", Toast.LENGTH_SHORT).show()
+        //    return
+        //}
+
+        //if (uri == null) {
+        //    Toast.makeText(this, "保存失敗", Toast.LENGTH_SHORT).show()
+        //    return
+        //}
+
+
 
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val uri = Uri.fromFile(file)
-                    Toast.makeText(this@CameraActivity, "スキャン完了", Toast.LENGTH_SHORT).show()
+                    //val uri = Uri.fromFile(file)
 
-                    sendToAI(uri)
+                    val savedUri = outputFileResults.savedUri
+
+                    Log.d("SAVE", "保存成功: $savedUri")
+
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "保存成功",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    savedUri?.let {
+                        sendToAI(it)
+                    }
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     exception.printStackTrace()
+
+                    Log.e("CAMERA_ERROR", "保存失敗: ${exception.message}")
+                    Toast.makeText(this@CameraActivity, "保存エラー", Toast.LENGTH_LONG).show()
                 }
             }
         )
     }
 
+    fun ImageProxy.toBitmap(): Bitmap {
+        val yBuffer = planes[0].buffer
+        val uBuffer = planes[1].buffer
+        val vBuffer = planes[2].buffer
+
+        val ySize = yBuffer.remaining()
+        val uSize = uBuffer.remaining()
+        val vSize = vBuffer.remaining()
+
+        val nv21 = ByteArray(ySize + uSize + vSize)
+
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
+        val imageBytes = out.toByteArray()
+
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
+
+    private fun processGalleryImage(uri: Uri) {
+        try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+
+            Thread {
+                try {
+                    val codes = engine.extractProductCode(bitmap)
+                    if (codes.isNotEmpty()) {
+                        runOnUiThread {
+                            for (code in codes) {
+                                if (!scannedList.contains(code)) {
+                                    scannedList.add(code)
+                                }
+                            }
+                            Toast.makeText(this, "検出完了", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Gallery OCR error", e)
+                }
+            }.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     private fun sendToAI(uri: Uri) {
         println("AI送信: $uri")
+    }
+
+    private fun checkPermissions() {
+        val permissions = mutableListOf(
+            Manifest.permission.CAMERA
+        )
+
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+        }
+
+        val denied = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (denied.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                denied.toTypedArray(),
+                100
+            )
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

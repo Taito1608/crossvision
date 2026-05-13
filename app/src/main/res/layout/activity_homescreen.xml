@@ -59,10 +59,12 @@
                 android:layout_height="48dp"
                 android:layout_marginRight="12dp"/>
 
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/etConstructionText"
-                android:hint="工事名を入力"
-                android:textSize="16dp"
+                android:hint="工事名を検索"
+                android:textSize="16sp"
+                android:completionThreshold="1"
+                android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_bg"
@@ -85,10 +87,12 @@
                 android:layout_height="48dp"
                 android:layout_marginRight="12dp"/>
 
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/etProcessText"
-                android:hint="工程名を入力"
-                android:textSize="16dp"
+                android:hint="工程名を検索"
+                android:textSize="16sp"
+                android:completionThreshold="1"
+                android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_bg"
