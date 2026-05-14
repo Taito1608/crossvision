@@ -313,24 +313,33 @@
 
         </LinearLayout>
 
-        <!-- Log output -->
+        <!-- In-app Log output (for CC to read via screenshot or copy) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logcat Tags:"
+            android:text="📋 App Log (Logcat: -s VerificationActivity:* OnnxOcrEngine:*)"
             android:textStyle="bold"
             android:textSize="12sp"
             android:layout_marginTop="12dp" />
 
-        <TextView
+        <ScrollView
+            android:id="@+id/scrollLog"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="VerificationActivity:*,OnnxOcrEngine:*"
-            android:textSize="11sp"
-            android:typeface="monospace"
-            android:background="#333333"
-            android:textColor="#00FF00"
-            android:padding="4dp" />
+            android:layout_height="300dp"
+            android:background="#1A1A1A"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(waiting...)"
+                android:textSize="10sp"
+                android:typeface="monospace"
+                android:textColor="#00FF00"
+                android:fontFamily="monospace" />
+
+        </ScrollView>
 
     </LinearLayout>
 

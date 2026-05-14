@@ -53,19 +53,23 @@ class OnnxOcrEngine(private val context: Context) {
         private const val REC_INPUT_HEIGHT = 48
         private const val REC_INPUT_CHANNELS = 3
 
-        // Detection model input spec (PP-OCRv5 det)
+        // Detection model input spec
         private const val DET_INPUT_NAME = "x"
-        // det_v5.onnx accepts dynamic [batch, 3, H, W]; use 640 for accuracy or 480 for speed
-        private const val DET_INPUT_SIZE = 640
+        // det.onnx: ImageNet normalization, aspect-ratio resize, max side = 960, pad to multiple of 32
+        private const val DET_MAX_SIDE = 960
 
-        // PaddleOCR normalization
+        // Recognition model normalization (PaddleOCR)
         private const val PADDLE_MEAN = 127.5f
         private const val PADDLE_STD = 127.5f
 
+        // Detection model normalization (ImageNet) — det.onnx was trained with this
+        private val DET_MEAN = floatArrayOf(0.485f, 0.456f, 0.406f)
+        private val DET_STD = floatArrayOf(0.229f, 0.224f, 0.225f)
+
         // Detection post-processing parameters
         private const val DET_DB_THRESH = 0.3f
-        private const val DET_DB_UNCLIP_RATIO = 2.0f
-        private const val DET_MIN_AREA = 3f
+        private const val DET_PAD_EXPAND = 30  // pixels to expand detected box
+        private const val DET_MIN_COMPONENT_SIZE = 5
 
         // Product code extraction pattern
         private val PRODUCT_CODE_PATTERN = Pattern.compile("[A-Z0-9]{3,}-?[0-9]*")
@@ -181,9 +185,9 @@ class OnnxOcrEngine(private val context: Context) {
                 throw Exception("Model '${currentPreset.modelFile}' not found or load failed.", e)
             }
 
-            // Load detection model (det_v5.onnx)
+            // Load detection model (det.onnx — same model that worked in soya-ocr)
             try {
-                val detPath = "onnx/det_v5.onnx"
+                val detPath = "onnx/det.onnx"
                 context.assets.open(detPath).close()  // verify asset exists
                 val detModelPath = copyAssetToInternalStorage(detPath)
                 Log.i(TAG, "Det model path: $detModelPath")
@@ -288,41 +292,60 @@ class OnnxOcrEngine(private val context: Context) {
 
     /**
      * Convert bitmap to detection model input tensor.
-     * Resize to DET_INPUT_SIZE x DET_INPUT_SIZE, normalize, NCHW.
+     * Matches soya-ocr preprocessing: aspect-ratio resize, max side = DET_MAX_SIDE,
+     * pad to multiple of 32, ImageNet normalization.
      */
     private fun bitmapToDetTensor(bitmap: Bitmap): OnnxTensor {
-        val resized = Bitmap.createScaledBitmap(bitmap, DET_INPUT_SIZE, DET_INPUT_SIZE, true)
-        val totalSize = 3 * DET_INPUT_SIZE * DET_INPUT_SIZE
-        val floatArray = FloatArray(totalSize)
-        val planeSize = DET_INPUT_SIZE * DET_INPUT_SIZE
+        val srcH = bitmap.height
+        val srcW = bitmap.width
 
-        for (y in 0 until DET_INPUT_SIZE) {
-            for (x in 0 until DET_INPUT_SIZE) {
-                val pixel = resized.getPixel(x, y)
-                val r = ((pixel shr 16) and 0xFF).toFloat()
-                val g = ((pixel shr 8) and 0xFF).toFloat()
-                val b = (pixel and 0xFF).toFloat()
-                val base = y * DET_INPUT_SIZE + x
-                floatArray[base] = (r - PADDLE_MEAN) / PADDLE_STD
-                floatArray[planeSize + base] = (g - PADDLE_MEAN) / PADDLE_STD
-                floatArray[2 * planeSize + base] = (b - PADDLE_MEAN) / PADDLE_STD
+        // Resize: aspect ratio preserved, max side = DET_MAX_SIDE, round up to multiple of 32
+        val scale = minOf(DET_MAX_SIDE.toFloat() / srcH, DET_MAX_SIDE.toFloat() / srcW)
+        val newH = ((srcH * scale).toInt() + 31) / 32 * 32
+        val newW = ((srcW * scale).toInt() + 31) / 32 * 32
+
+        Log.i(TAG, "Det resize: ${srcW}x${srcH} → ${newW}x$newH (scale=$scale)")
+
+        val resized = Bitmap.createScaledBitmap(bitmap, newW, newH, true)
+        val pixels = IntArray(newW * newH)
+        resized.getPixels(pixels, 0, newW, 0, 0, newW, newH)
+
+        // Build NCHW float array with ImageNet normalization
+        val totalSize = 3 * newH * newW
+        val floatArray = FloatArray(totalSize)
+        val planeSize = newH * newW
+        for (y in 0 until newH) {
+            for (x in 0 until newW) {
+                val pixel = pixels[y * newW + x]
+                val r = ((pixel shr 16) and 0xFF).toFloat() / 255f
+                val g = ((pixel shr 8) and 0xFF).toFloat() / 255f
+                val b = (pixel and 0xFF).toFloat() / 255f
+                val base = y * newW + x
+                floatArray[base] = (r - DET_MEAN[0]) / DET_STD[0]
+                floatArray[planeSize + base] = (g - DET_MEAN[1]) / DET_STD[1]
+                floatArray[2 * planeSize + base] = (b - DET_MEAN[2]) / DET_STD[2]
             }
         }
 
+        // Log input stats for debugging
+        var minF = Float.MAX_VALUE; var maxF = Float.MIN_VALUE; var sumF = 0f
+        for (v in floatArray) { if (v < minF) minF = v; if (v > maxF) maxF = v; sumF += v }
+        Log.i(TAG, "Det input stats: min=$minF, max=$maxF, avg=${sumF / floatArray.size}")
+
         val floatBuffer = ByteBuffer
-            .allocateDirect(floatArray.size * 4)
+            .allocateDirect(totalSize * 4)
             .order(ByteOrder.nativeOrder())
             .asFloatBuffer()
             .put(floatArray)
         floatBuffer.rewind()
 
-        val shape = longArrayOf(1L, 3L, DET_INPUT_SIZE.toLong(), DET_INPUT_SIZE.toLong())
+        val shape = longArrayOf(1L, 3L, newH.toLong(), newW.toLong())
         return OnnxTensor.createTensor(ortEnvironment, floatBuffer, shape)
     }
 
     /**
      * Post-process DBNet probability map → list of bounding boxes.
-     * Simple approach: threshold → connected component → bounding rect → scale to original.
+     * Matches soya-ocr: threshold → connected component (flood fill) → bounding rect → scale to original.
      */
     private fun postProcessDet(
         probMap: FloatArray,
@@ -331,90 +354,69 @@ class OnnxOcrEngine(private val context: Context) {
         origW: Int,
         origH: Int
     ): List<TextRegion> {
-        // 1. Threshold the probability map
-        val binary = BooleanArray(detH * detW)
-        for (i in probMap.indices) {
-            binary[i] = probMap[i] >= DET_DB_THRESH
-        }
+        Log.i(TAG, "Det post-process: ${detW}x$detH → ${origW}x$origH, thresh=$DET_DB_THRESH")
 
-        // 2. Connected component labeling (flood fill)
-        val labels = IntArray(detH * detW) { -1 }
-        var currentLabel = 0
-        val componentPixels = mutableMapOf<Int, MutableList<Pair<Int, Int>>>()
+        // 1. Threshold the probability map
+        val binary = Array(detH) { BooleanArray(detW) }
+        var aboveThresh = 0
+        for (y in 0 until detH) {
+            for (x in 0 until detW) {
+                val v = probMap[y * detW + x]
+                if (v > DET_DB_THRESH) {
+                    binary[y][x] = true
+                    aboveThresh++
+                }
+            }
+        }
+        Log.i(TAG, "Det binary: $aboveThresh / ${detH * detW} pixels above threshold")
+
+        // 2. Connected component finder (flood fill)
+        val visited = Array(detH) { BooleanArray(detW) }
+        val boxes = mutableListOf<TextRegion>()
+        val scaleX = origW.toFloat() / detW
+        val scaleY = origH.toFloat() / detH
 
         for (y in 0 until detH) {
             for (x in 0 until detW) {
-                val idx = y * detW + x
-                if (binary[idx] && labels[idx] == -1) {
-                    // BFS flood fill
+                if (binary[y][x] && !visited[y][x]) {
                     val queue = ArrayDeque<Pair<Int, Int>>()
                     queue.add(Pair(x, y))
-                    labels[idx] = currentLabel
-                    val pixels = mutableListOf<Pair<Int, Int>>()
-                    componentPixels[currentLabel] = pixels
-
+                    visited[y][x] = true
+                    var minX = x; var maxX = x; var minY = y; var maxY = y
+                    var count = 0
                     while (queue.isNotEmpty()) {
                         val (cx, cy) = queue.removeFirst()
-                        pixels.add(Pair(cx, cy))
+                        count++
+                        if (cx < minX) minX = cx; if (cx > maxX) maxX = cx
+                        if (cy < minY) minY = cy; if (cy > maxY) maxY = cy
                         for (dy in -1..1) {
                             for (dx in -1..1) {
-                                val nx = cx + dx
-                                val ny = cy + dy
-                                if (nx in 0 until detW && ny in 0 until detH) {
-                                    val nIdx = ny * detW + nx
-                                    if (binary[nIdx] && labels[nIdx] == -1) {
-                                        labels[nIdx] = currentLabel
-                                        queue.add(Pair(nx, ny))
-                                    }
+                                val nx = cx + dx; val ny = cy + dy
+                                if (nx in 0 until detW && ny in 0 until detH && binary[ny][nx] && !visited[ny][nx]) {
+                                    visited[ny][nx] = true
+                                    queue.add(Pair(nx, ny))
                                 }
                             }
                         }
                     }
-                    currentLabel++
+                    if (count >= DET_MIN_COMPONENT_SIZE) {
+                        val x1 = (minX * scaleX).toInt() - DET_PAD_EXPAND
+                        val y1 = (minY * scaleY).toInt() - DET_PAD_EXPAND
+                        val x2 = (maxX * scaleX).toInt() + DET_PAD_EXPAND
+                        val y2 = (maxY * scaleY).toInt() + DET_PAD_EXPAND
+                        val safeX1 = x1.coerceIn(0, origW - 1)
+                        val safeY1 = y1.coerceIn(0, origH - 1)
+                        val safeX2 = x2.coerceIn(0, origW - 1)
+                        val safeY2 = y2.coerceIn(0, origH - 1)
+                        if (safeX2 > safeX1 && safeY2 > safeY1) {
+                            boxes.add(TextRegion(Rect(safeX1, safeY1, safeX2, safeY2), 1.0f))
+                        }
+                    }
                 }
             }
         }
 
-        Log.d(TAG, "Det post-process: $currentLabel components found")
-
-        // 3. Convert components to bounding boxes, filter by area, scale to original image
-        val regions = mutableListOf<TextRegion>()
-        val scaleX = origW.toFloat() / detW
-        val scaleY = origH.toFloat() / detH
-
-        for ((_, pixels) in componentPixels) {
-            if (pixels.size < DET_MIN_AREA) continue
-
-            var minX = Int.MAX_VALUE
-            var minY = Int.MAX_VALUE
-            var maxX = Int.MIN_VALUE
-            var maxY = Int.MIN_VALUE
-            for ((px, py) in pixels) {
-                minX = min(minX, px)
-                minY = min(minY, py)
-                maxX = max(maxX, px)
-                maxY = max(maxY, py)
-            }
-
-            // Unclip: expand box by ratio
-            val boxW = maxX - minX
-            val boxH = maxY - minY
-            val area = boxW * boxH
-            if (area < DET_MIN_AREA) continue
-
-            val perimeter = 2f * (boxW + boxH)
-            val unclipDist = (area * DET_DB_UNCLIP_RATIO / perimeter).roundToInt()
-
-            val expandedMinX = max(0, minX - unclipDist)
-            val expandedMinY = max(0, minY - unclipDist)
-            val expandedMaxX = min(detW - 1, maxX + unclipDist)
-            val expandedMaxY = min(detH - 1, maxY + unclipDist)
-
-            // Scale to original image coordinates
-            val origMinX = (expandedMinX * scaleX).roundToInt()
-            val origMinY = (expandedMinY * scaleY).roundToInt()
-            val origMaxX = (expandedMaxX * scaleX).roundToInt()
-            val origMaxY = (expandedMaxY * scaleY).roundToInt()
+        Log.i(TAG, "Det post-process: ${boxes.size} regions after filtering (minSize=$DET_MIN_COMPONENT_SIZE)")
 
             // Compute average confidence for this region
             var sumConf = 0f
@@ -426,8 +428,8 @@ class OnnxOcrEngine(private val context: Context) {
             regions.add(TextRegion(Rect(origMinX, origMinY, origMaxX, origMaxY), avgConf))
         }
 
-        Log.d(TAG, "Det post-process: ${regions.size} regions after filtering")
-        return regions
+        Log.i(TAG, "Det post-process: ${boxes.size} regions after filtering")
+        return boxes
     }
 
     // ─── Recognition: rec model ────────────────────────────────
