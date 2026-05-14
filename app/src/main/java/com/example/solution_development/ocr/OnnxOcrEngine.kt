@@ -8,7 +8,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.Log
-import java.io.ByteArrayOutputStream
+import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.regex.Pattern
@@ -124,17 +124,30 @@ class OnnxOcrEngine(private val context: Context) {
 
     // ─── Asset Loading ─────────────────────────────────────────
 
-    private fun loadModelFromAssets(modelPath: String): ByteArray {
-        context.assets.open(modelPath).use { inputStream ->
-            ByteArrayOutputStream().use { outputStream ->
-                val buffer = ByteArray(4 * 1024)
+    /**
+     * Copy an asset file to internal storage and return the absolute path.
+     * This avoids loading the entire model into the Java heap, which is
+     * critical for large models (>50MB) on emulators with limited heap.
+     */
+    private fun copyAssetToInternalStorage(assetPath: String): String {
+        val outFile = File(context.filesDir, assetPath.substringAfterLast("/"))
+        if (outFile.exists() && outFile.length() > 0) {
+            Log.d(TAG, "Model already cached: ${outFile.absolutePath} (${outFile.length()} bytes)")
+            return outFile.absolutePath
+        }
+        Log.i(TAG, "Copying asset $assetPath → ${outFile.absolutePath}")
+        context.assets.open(assetPath).use { input ->
+            outFile.parentFile?.mkdirs()
+            outFile.outputStream().use { output ->
+                val buffer = ByteArray(64 * 1024)
                 var bytesRead: Int
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream.write(buffer, 0, bytesRead)
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    output.write(buffer, 0, bytesRead)
                 }
-                return outputStream.toByteArray()
             }
         }
+        Log.i(TAG, "Model cached: ${outFile.absolutePath} (${outFile.length()} bytes)")
+        return outFile.absolutePath
     }
 
     // ─── Model Loading ─────────────────────────────────────────
@@ -150,37 +163,36 @@ class OnnxOcrEngine(private val context: Context) {
             ortEnvironment = OrtEnvironment.getEnvironment()
             Log.i(TAG, "OrtEnvironment created")
 
-            // Load recognition model
+            // Load recognition model — copy to internal storage first, then load by path
+            // This avoids OOM from loading the entire model into the Java heap
             try {
-                context.assets.open(currentPreset.modelFile).close()
-                Log.i(TAG, "Rec model file exists: ${currentPreset.modelFile}")
+                val recModelPath = copyAssetToInternalStorage(currentPreset.modelFile)
+                Log.i(TAG, "Rec model path: $recModelPath")
+
+                val recSessionOptions = OrtSession.SessionOptions().apply {
+                    setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+                    setIntraOpNumThreads(2)
+                }
+                recSession = ortEnvironment?.createSession(recModelPath, recSessionOptions)
+                isRecLoaded = recSession != null
+                Log.i(TAG, "Rec session created: $isRecLoaded, inputs=${recSession?.inputNames}, outputs=${recSession?.outputNames}")
             } catch (e: Exception) {
-                Log.e(TAG, "Rec model NOT found: ${currentPreset.modelFile}", e)
-                throw Exception("Model '${currentPreset.modelFile}' not found in assets.")
+                Log.e(TAG, "Rec model load failed: ${currentPreset.modelFile}", e)
+                throw Exception("Model '${currentPreset.modelFile}' not found or load failed.", e)
             }
-
-            val recModelBytes = loadModelFromAssets(currentPreset.modelFile)
-            Log.i(TAG, "Rec model loaded, size: ${recModelBytes.size} bytes")
-
-            val recSessionOptions = OrtSession.SessionOptions().apply {
-                setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
-                setIntraOpNumThreads(2)
-            }
-            recSession = ortEnvironment?.createSession(recModelBytes, recSessionOptions)
-            isRecLoaded = recSession != null
-            Log.i(TAG, "Rec session created: $isRecLoaded, inputs=${recSession?.inputNames}, outputs=${recSession?.outputNames}")
 
             // Load detection model (det_v5.onnx)
             try {
                 val detPath = "onnx/det_v5.onnx"
-                context.assets.open(detPath).close()
-                val detModelBytes = loadModelFromAssets(detPath)
-                Log.i(TAG, "Det model loaded, size: ${detModelBytes.size} bytes")
+                context.assets.open(detPath).close()  // verify asset exists
+                val detModelPath = copyAssetToInternalStorage(detPath)
+                Log.i(TAG, "Det model path: $detModelPath")
+
                 val detSessionOptions = OrtSession.SessionOptions().apply {
                     setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
                     setIntraOpNumThreads(2)
                 }
-                detSession = ortEnvironment?.createSession(detModelBytes, detSessionOptions)
+                detSession = ortEnvironment?.createSession(detModelPath, detSessionOptions)
                 isDetLoaded = detSession != null
                 Log.i(TAG, "Det session created: $isDetLoaded, inputs=${detSession?.inputNames}, outputs=${detSession?.outputNames}")
             } catch (e: Exception) {

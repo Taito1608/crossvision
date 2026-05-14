@@ -42,6 +42,9 @@ android {
         buildConfig = true
         compose = true
     }
+    aaptOptions {
+        noCompress("onnx")
+    }
 }
 
 dependencies {
