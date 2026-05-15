@@ -41,6 +41,12 @@ class OnnxOcrEngine(private val context: Context) {
             dictFile = "onnx/custom_dict.txt",
             outputName = "softmax_2.tmp_0",
             numClasses = 438
+        ),
+        PP_OCR_V3_EN(
+            modelFile = "onnx/en_PP-OCRv3_rec.onnx",
+            dictFile = "onnx/en_PP-OCRv3_dict.txt",
+            outputName = "fetch_name_0",
+            numClasses = 97
         )
     }
 
@@ -99,6 +105,9 @@ class OnnxOcrEngine(private val context: Context) {
         val rect: Rect,
         val confidence: Float
     )
+
+    fun isRecLoaded(): Boolean = isRecLoaded
+    fun isDetLoaded(): Boolean = isDetLoaded
 
     fun setModelPreset(preset: ModelPreset) {
         release()
@@ -193,18 +202,24 @@ class OnnxOcrEngine(private val context: Context) {
                 Log.i(TAG, "Det model path: $detModelPath")
 
                 val detSessionOptions = OrtSession.SessionOptions().apply {
-                    setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
-                    setIntraOpNumThreads(2)
+                    // Use BASIC_OPT for large models to avoid native crash on emulator
+                    setOptimizationLevel(OrtSession.SessionOptions.OptLevel.BASIC_OPT)
+                    setIntraOpNumThreads(1)
                 }
+                Log.i(TAG, "Det: creating session...")
                 detSession = ortEnvironment?.createSession(detModelPath, detSessionOptions)
+                Log.i(TAG, "Det: session create returned")
                 isDetLoaded = detSession != null
                 Log.i(TAG, "Det session created: $isDetLoaded, inputs=${detSession?.inputNames}, outputs=${detSession?.outputNames}")
-            } catch (e: Exception) {
-                Log.w(TAG, "Det model not found, detection disabled: ${e.message}")
+            } catch (e: Throwable) {
+                Log.e(TAG, "Det model load failed (non-fatal): ${e.javaClass.simpleName}: ${e.message}", e)
                 isDetLoaded = false
             }
 
             Log.i(TAG, "Model loading complete: rec=$isRecLoaded, det=$isDetLoaded")
+            if (!isDetLoaded) {
+                Log.w(TAG, "Detection model NOT loaded — stages 1-5 will show empty results")
+            }
             isRecLoaded
         } catch (e: OrtException) {
             Log.e(TAG, "OrtException in loadModel", e)

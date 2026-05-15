@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="PP-OCRv5 検証ツール"
+            android:text="PP-OCRv3 検証ツール"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
@@ -103,133 +103,7 @@
 
         </LinearLayout>
 
-        <!-- Stage 1: Detection -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#E8F0FE"
-            android:padding="8dp"
-            android:layout_marginBottom="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Stage 1: Detection (det.onnx)"
-                    android:textStyle="bold"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btnStage1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▶ Run"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvStage1Result"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="(not run)"
-                android:textSize="11sp"
-                android:typeface="monospace" />
-
-        </LinearLayout>
-
-        <!-- Stage 2: Post-process -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#E8F0FE"
-            android:padding="8dp"
-            android:layout_marginBottom="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Stage 2: Post-process (BBox)"
-                    android:textStyle="bold"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btnStage2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▶ Run"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvStage2Result"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="(not run)"
-                android:textSize="11sp"
-                android:typeface="monospace" />
-
-        </LinearLayout>
-
-        <!-- Stage 3: Crop -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFF8E1"
-            android:padding="8dp"
-            android:layout_marginBottom="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Stage 3: Crop"
-                    android:textStyle="bold"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btnStage3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▶ Run"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvStage3Result"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="(not run)"
-                android:textSize="11sp"
-                android:typeface="monospace" />
-
-        </LinearLayout>
-
-        <!-- Stage 4: Recognition -->
+        <!-- Recognition -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -247,22 +121,22 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Stage 4: Recognition (rec.onnx)"
+                    android:text="Recognition (en_PP-OCRv3_rec.onnx)"
                     android:textStyle="bold"
                     android:textSize="14sp" />
 
                 <Button
-                    android:id="@+id/btnStage4"
+                    android:id="@+id/btnRecognize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="▶ Run"
+                    android:text="▶ Recognize"
                     android:textSize="12sp"
                     android:padding="4dp" />
 
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvStage4Result"
+                android:id="@+id/tvRecognitionResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="(not run)"
@@ -271,49 +145,7 @@
 
         </LinearLayout>
 
-        <!-- Stage 5: Full Pipeline -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FCE4EC"
-            android:padding="8dp"
-            android:layout_marginBottom="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Stage 5: Full Pipeline (det→rec)"
-                    android:textStyle="bold"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btnStage5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▶ Run All"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvStage5Result"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="(not run)"
-                android:textSize="11sp"
-                android:typeface="monospace" />
-
-        </LinearLayout>
-
-        <!-- In-app Log output (for CC to read via screenshot or copy) -->
+        <!-- In-app Log output -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
