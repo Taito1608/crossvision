@@ -417,18 +417,6 @@ class OnnxOcrEngine(private val context: Context) {
         }
 
         Log.i(TAG, "Det post-process: ${boxes.size} regions after filtering (minSize=$DET_MIN_COMPONENT_SIZE)")
-
-            // Compute average confidence for this region
-            var sumConf = 0f
-            for ((px, py) in pixels) {
-                sumConf += probMap[py * detW + px]
-            }
-            val avgConf = sumConf / pixels.size
-
-            regions.add(TextRegion(Rect(origMinX, origMinY, origMaxX, origMaxY), avgConf))
-        }
-
-        Log.i(TAG, "Det post-process: ${boxes.size} regions after filtering")
         return boxes
     }
 
@@ -672,6 +660,7 @@ class OnnxOcrEngine(private val context: Context) {
         }
     }
 
+    @Suppress("DEPRECATION")
     protected fun finalize() {
         release()
     }
