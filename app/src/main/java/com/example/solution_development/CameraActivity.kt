@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.os.Looper
 import android.view.MenuItem
+import android.view.KeyEvent
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -45,6 +46,8 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.google.mlkit.vision.common.InputImage
 import java.io.ByteArrayOutputStream
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 
 class CameraActivity : AppCompatActivity() {
@@ -88,6 +91,17 @@ class CameraActivity : AppCompatActivity() {
 
             previewView = findViewById(R.id.previewView)
             overlay = findViewById(R.id.overlay)
+
+            // Ensure PreviewView can receive key events
+            previewView.isFocusable = true
+            previewView.isFocusableInTouchMode = true
+            previewView.requestFocus()
+            // also ensure decor view has focus
+            window?.decorView?.apply {
+                isFocusable = true
+                isFocusableInTouchMode = true
+                requestFocus()
+            }
 
             val btnComplete = findViewById<Button>(R.id.btnComplete)
             val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
@@ -324,11 +338,16 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun triggerCapture() {
-        if (isCaptured) return
+        Log.d("CameraActivity", "triggerCapture called isCaptured=$isCaptured")
+        if (isCaptured) {
+            Log.d("CameraActivity", "triggerCapture aborted: already captured")
+            return
+        }
         isCaptured = true
 
         //imageAnalysis.clearAnalyzer()
 
+        Log.d("CameraActivity", "scheduling captureImage in 400ms")
         Handler(Looper.getMainLooper()).postDelayed({
             captureImage()
         }, 400)
@@ -341,6 +360,7 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun captureImage() {
+        Log.d("CameraActivity", "captureImage called: imageCapture initialized=${::imageCapture.isInitialized}")
         val filename = "scan_${System.currentTimeMillis()}.jpg"
 
         val contentValues = ContentValues().apply {
@@ -371,11 +391,13 @@ class CameraActivity : AppCompatActivity() {
 
 
 
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+        try {
+            imageCapture.takePicture(
+                outputOptions,
+                ContextCompat.getMainExecutor(this),
+                object : ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        Log.d("CameraActivity", "onImageSaved callback invoked: $outputFileResults")
                     //val uri = Uri.fromFile(file)
 
                     val savedUri = outputFileResults.savedUri
@@ -388,19 +410,79 @@ class CameraActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    savedUri?.let {
-                        sendToAI(it)
+                    savedUri?.let { uri ->
+                        var uriForAI: Uri = uri
+                        // load bitmap and crop to overlay rect
+                        try {
+                            val input = contentResolver.openInputStream(uri)
+                            val fullBitmap = BitmapFactory.decodeStream(input)
+                            input?.close()
+
+                            if (fullBitmap != null) {
+                                val rect = overlay.getScanRect()
+
+                                val pvW = previewView.width
+                                val pvH = previewView.height
+
+                                if (pvW > 0 && pvH > 0) {
+                                    val mapped = mapOverlayToBitmapRect(
+                                        overlayRect = rect,
+                                        bitmapWidth = fullBitmap.width,
+                                        bitmapHeight = fullBitmap.height,
+                                        viewWidth = pvW,
+                                        viewHeight = pvH
+                                    )
+
+                                    val cropped = Bitmap.createBitmap(
+                                        fullBitmap,
+                                        mapped.left,
+                                        mapped.top,
+                                        mapped.width(),
+                                        mapped.height()
+                                    )
+
+                                    val baos = ByteArrayOutputStream()
+                                    cropped.compress(Bitmap.CompressFormat.JPEG, 85, baos)
+                                    val bytes = baos.toByteArray()
+                                    baos.close()
+
+                                    CapturedImageStore.addImage(bytes)
+
+                                    // Save cropped result and remove original full-size shot.
+                                    val croppedUri = saveBitmapToMediaStore(cropped)
+                                    if (croppedUri != null) {
+                                        uriForAI = croppedUri
+                                        contentResolver.delete(uri, null, null)
+                                        Log.d("CameraActivity", "saved cropped image uri=$croppedUri and deleted original=$uri")
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("CameraActivity", "crop saved image error", e)
+                        }
+
+                        sendToAI(uriForAI)
+                    }
+
+                    // Unlock capture after one successful shot so volume key can trigger again.
+                    isCaptured = false
+                    Log.d("CameraActivity", "capture flow completed: isCaptured reset to false")
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        exception.printStackTrace()
+
+                        Log.e("CameraActivity", "onImageSaved onError: ${exception.message}", exception)
+                        Log.e("CAMERA_ERROR", "保存失敗: ${exception.message}")
+                        Toast.makeText(this@CameraActivity, "保存エラー", Toast.LENGTH_LONG).show()
+                        isCaptured = false
                     }
                 }
-
-                override fun onError(exception: ImageCaptureException) {
-                    exception.printStackTrace()
-
-                    Log.e("CAMERA_ERROR", "保存失敗: ${exception.message}")
-                    Toast.makeText(this@CameraActivity, "保存エラー", Toast.LENGTH_LONG).show()
-                }
-            }
-        )
+            )
+        } catch (e: Exception) {
+            Log.e("CameraActivity", "takePicture threw", e)
+            isCaptured = false
+        }
     }
 
     fun ImageProxy.toBitmap(): Bitmap {
@@ -459,6 +541,57 @@ class CameraActivity : AppCompatActivity() {
         println("AI送信: $uri")
     }
 
+    private fun mapOverlayToBitmapRect(
+        overlayRect: Rect,
+        bitmapWidth: Int,
+        bitmapHeight: Int,
+        viewWidth: Int,
+        viewHeight: Int
+    ): Rect {
+        // PreviewView defaults to center-crop style scaling; map overlay coordinates accordingly.
+        val scale = max(
+            viewWidth.toFloat() / bitmapWidth.toFloat(),
+            viewHeight.toFloat() / bitmapHeight.toFloat()
+        )
+        val displayedWidth = bitmapWidth * scale
+        val displayedHeight = bitmapHeight * scale
+        val dx = (viewWidth - displayedWidth) / 2f
+        val dy = (viewHeight - displayedHeight) / 2f
+
+        val left = ((overlayRect.left - dx) / scale).roundToInt().coerceIn(0, bitmapWidth - 1)
+        val top = ((overlayRect.top - dy) / scale).roundToInt().coerceIn(0, bitmapHeight - 1)
+        val right = ((overlayRect.right - dx) / scale).roundToInt().coerceIn(left + 1, bitmapWidth)
+        val bottom = ((overlayRect.bottom - dy) / scale).roundToInt().coerceIn(top + 1, bitmapHeight)
+
+        return Rect(left, top, right, bottom)
+    }
+
+    private fun saveBitmapToMediaStore(bitmap: Bitmap): Uri? {
+        val croppedName = "scan_crop_${System.currentTimeMillis()}.jpg"
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, croppedName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?: return null
+
+        return try {
+            contentResolver.openOutputStream(uri)?.use { output ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)
+            } ?: run {
+                contentResolver.delete(uri, null, null)
+                return null
+            }
+            uri
+        } catch (e: Exception) {
+            Log.e("CameraActivity", "saveBitmapToMediaStore error", e)
+            contentResolver.delete(uri, null, null)
+            null
+        }
+    }
+
     private fun checkPermissions() {
         val permissions = mutableListOf(
             Manifest.permission.CAMERA
@@ -487,5 +620,55 @@ class CameraActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
+        Log.d("CameraActivity", "onKeyDown keyCode=$keyCode event=$event")
+        // keep existing onKeyDown as fallback
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
+                Log.d("CameraActivity", "onKeyDown triggerCapture for key=$keyCode")
+                triggerCapture()
+                true
+            }
+            else -> super.onKeyDown(keyCode, event)
+        }
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        // Capture volume keys here to ensure we get them before system handles volume UI
+        // handle both down and up; prefer ACTION_UP to avoid repeated triggers while holding
+        Log.d("CameraActivity", "dispatchKeyEvent action=${event.action} keyCode=${event.keyCode}")
+        if (event.action == KeyEvent.ACTION_UP) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
+                    Log.d("CameraActivity", "dispatchKeyEvent ACTION_UP triggerCapture key=${event.keyCode}")
+                    triggerCapture()
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        Log.d("CameraActivity", "onKeyUp keyCode=$keyCode event=$event")
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
+                Log.d("CameraActivity", "onKeyUp triggerCapture for key=$keyCode")
+                // ensure capture on key up as well
+                triggerCapture()
+                true
+            }
+            else -> super.onKeyUp(keyCode, event)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // re-request focus when activity resumes
+        previewView.requestFocus()
+        window?.decorView?.requestFocus()
+        Log.d("CameraActivity", "onResume requested focus on preview and decorView")
     }
 }

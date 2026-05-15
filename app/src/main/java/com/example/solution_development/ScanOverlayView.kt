@@ -6,6 +6,9 @@ import android.util.AttributeSet
 import android.view.View
 
 class ScanOverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+    private val frameWidthRatio = 0.80f
+    private val frameHeightRatio = 0.16f
+
     private val framePaint = Paint().apply {
         color = Color.GREEN
         strokeWidth = 6f
@@ -20,8 +23,8 @@ class ScanOverlayView(context: Context, attrs: AttributeSet?) : View(context, at
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val frameWidth = width * 0.8f
-        val frameHeight = this.height * 0.2f
+        val frameWidth = width * frameWidthRatio
+        val frameHeight = this.height * frameHeightRatio
 
         val left = (this.width - frameWidth) / 2
         val top = (this.height - frameHeight) / 2
