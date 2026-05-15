@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity(){
     private lateinit var tvShowPass: TextView
     private lateinit var btnLogin: Button
 
-
     private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?){
@@ -62,8 +61,7 @@ class MainActivity : AppCompatActivity(){
                 Toast.makeText(this, "APIトークンが設定されていません。", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-
-
+            
 
             Log.d("MainActivity", "Starting product code fetch; token length=${token.length}")
 
