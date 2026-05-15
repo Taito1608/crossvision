@@ -32,6 +32,9 @@ class MainActivity : AppCompatActivity(){
         tvShowPass = findViewById(R.id.tvShowPass)
         btnLogin = findViewById(R.id.btnLogin)
 
+        val correctId = "user"
+        val correctPass = "pass"
+
         tvShowPass.setOnClickListener{
             isPasswordVisible = !isPasswordVisible
 
@@ -46,14 +49,19 @@ class MainActivity : AppCompatActivity(){
         }
 
         btnLogin.setOnClickListener{
+            if (etId.text.toString() == correctId && etPass.text.toString() == correctPass){
+                Toast.makeText(this, "ログイン成功", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "IDまたはパスワードが違います。", Toast.LENGTH_SHORT).show()
+            }
             val token = BuildConfig.CROSSVISION_API_TOKEN ?: ""
             if (token.isEmpty()){
                 Toast.makeText(this, "APIトークンが設定されていません。", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            
 
             Log.d("MainActivity", "Starting product code fetch; token length=${token.length}")
 
