@@ -41,10 +41,8 @@ import androidx.graphics.*
 import android.graphics.Rect
 import java.io.File
 import java.io.InputStream
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import com.google.mlkit.vision.common.InputImage
 import java.io.ByteArrayOutputStream
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -52,33 +50,34 @@ import kotlin.math.roundToInt
 
 class CameraActivity : AppCompatActivity() {
 
-    // TODO ===== UI =====
+    // ===== UI =====
     private lateinit var previewView: PreviewView
     private lateinit var overlay: ScanOverlayView
-    //private lateinit var btnComplete: Button
     private lateinit var btnSelectImage: Button
 
-    // TODO ===== CameraX =====
+    // ===== CameraX =====
     private lateinit var imageCapture: ImageCapture
     private lateinit var imageAnalysis: ImageAnalysis
 
-    // TODO ===== OCR =====
-    private lateinit var recognizer: com.google.mlkit.vision.text.TextRecognizer
+    // ===== OCR =====
+    private lateinit var engine: OnnxOcrEngine
+    private var engineReady = false
 
-    // TODO ===== ??? =====
+    // ===== State =====
     private var isCaptured = false
     private val scannedList = mutableListOf<String>()
     private val cameraExecutor = Executors.newSingleThreadExecutor()
 
-    // TODO ===== AI =====
+    // ===== Gallery =====
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let { processGalleryImage(it) }
         }
 
+    // ===== Processing =====
     private var isProcessing = false
 
-    override fun onCreate(savedInstanceState: Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
@@ -86,17 +85,14 @@ class CameraActivity : AppCompatActivity() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = "スキャン画面"
 
-            // ML Kit の初期化
-            recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-
             previewView = findViewById(R.id.previewView)
             overlay = findViewById(R.id.overlay)
+            btnSelectImage = findViewById(R.id.btnSelectImage)
 
             // Ensure PreviewView can receive key events
             previewView.isFocusable = true
             previewView.isFocusableInTouchMode = true
             previewView.requestFocus()
-            // also ensure decor view has focus
             window?.decorView?.apply {
                 isFocusable = true
                 isFocusableInTouchMode = true
@@ -104,27 +100,10 @@ class CameraActivity : AppCompatActivity() {
             }
 
             val btnComplete = findViewById<Button>(R.id.btnComplete)
-            val btnSelectImage = findViewById<Button>(R.id.btnSelectImage)
 
             btnComplete.setOnClickListener {
                 val intent = Intent(this, ConfirmationActivity::class.java)
-                
-//                 val process = this.intent.getStringExtra("process")
-//                 val construction = this.intent.getStringExtra("construction")
-
-//                 // ダミーデータ：スキャン結果を追加
-//                 if (scannedList.isEmpty()) {
-//                     scannedList.add("123456")
-//                     scannedList.add("789012")
-//                     scannedList.add("345678")
-//                 }
-
-//                 confirmationIntent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
-//                 confirmationIntent.putExtra("process", process)
-//                 confirmationIntent.putExtra("construction", construction)
-
                 intent.putStringArrayListExtra("scannedList", ArrayList(scannedList))
-
                 startActivity(intent)
             }
 
@@ -132,13 +111,17 @@ class CameraActivity : AppCompatActivity() {
                 pickImageLauncher.launch("image/*")
             }
 
-            if(ContextCompat.checkSelfPermission(
-                this,
+            // ONNXエンジン初期化
+            engine = OnnxOcrEngine(applicationContext)
+            engineReady = engine.loadModel()
+
+            if (ContextCompat.checkSelfPermission(
+                    this,
                     Manifest.permission.CAMERA
                 ) == PackageManager.PERMISSION_GRANTED
-            ){
+            ) {
                 startCamera()
-            }else{
+            } else {
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.CAMERA),
@@ -149,47 +132,6 @@ class CameraActivity : AppCompatActivity() {
             Log.e("CameraActivity", "onCreate error", e)
             Toast.makeText(this, "初期化中にエラーが発生しました", Toast.LENGTH_LONG).show()
         }
-
-        //btnShutter.setOnClickListener{
-        //    val photoFile = File(cacheDir, "ocr_temp.jpg")
-
-        //    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-        //    imageCapture.takePicture(
-        //        outputOptions,
-        //        ContextCompat.getMainExecutor(this),
-        //        object : ImageCapture.OnImageSavedCallback {
-        //            override fun onImageSaved(outputFileResults: ImageCapture.outputFileResults){
-
-        //                val savedUri = Uri.fromFile(photoFile)
-        //                Toast.makeText(this@CameraActivity, "スキャン成功", Toast.LENGTH_SHORT).show()
-
-        //                // send to OCR(filepass)
-        //                runOCR(savedUri)
-
-        //                //finish()
-        //            }
-
-        //            override fun onError(exception: ImageCaptureException){
-        //                Toast.makeText(this@CameraActivity,"スキャン成功: ${exception.message}", Toast.LENGTH_SHORT).show()
-        //            }
-        //        }
-        //    )
-        //}
-
-        if(ContextCompat.checkSelfPermission(
-            this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ){
-            startCamera()
-        }else{
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                1001
-            )
-        }
     }
 
     override fun onRequestPermissionsResult(
@@ -197,18 +139,19 @@ class CameraActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray,
     ) {
-        if(requestCode == 1001){
-            if(grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 1001) {
+            if (grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
                 startCamera()
-            }else{
-                Toast.makeText(this, "カメラ権限が必要です",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "カメラ権限が必要です", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
     }
 
-    private fun startCamera(){
+    private fun startCamera() {
         try {
             val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -216,11 +159,13 @@ class CameraActivity : AppCompatActivity() {
                 try {
                     val cameraProvider = cameraProviderFuture.get()
 
-                    val preview = Preview.Builder().build().also{
+                    val preview = Preview.Builder().build().also {
                         it.setSurfaceProvider(previewView.surfaceProvider)
                     }
 
-                    imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
+                    imageAnalysis = ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
 
                     imageCapture = ImageCapture.Builder()
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
@@ -237,7 +182,6 @@ class CameraActivity : AppCompatActivity() {
                         imageCapture
                     )
 
-                    // Viewのレイアウトが完了した後に Analyzer を開始
                     overlay.post {
                         startAnalyzer()
                     }
@@ -252,85 +196,79 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    /** ImageAnalyzer — ONNX OCRエンジンで認識 */
     private fun startAnalyzer() {
+        if (!engineReady) {
+            Log.w("CameraActivity", "エンジン未初期化、スキャンスキップ")
+            return
+        }
+
         try {
             imageAnalysis.setAnalyzer(
                 ContextCompat.getMainExecutor(this)
             ) { imageProxy ->
 
-            if (isProcessing || isCaptured) {
-                imageProxy.close()
-                return@setAnalyzer
-            }
-
-            isProcessing = true
-
-            val mediaImage = imageProxy.image
-
-            if (mediaImage != null) {
-                val bitmap = imageProxy.toBitmap()
-                val rect = overlay.getScanRect()
-
-                // Rect が有効かどうか確認
-                if (rect.width() <= 0 || rect.height() <= 0) {
+                if (isProcessing || isCaptured) {
                     imageProxy.close()
-                    isProcessing = false
                     return@setAnalyzer
                 }
 
-                // Bitmap の範囲内でクロップ領域を計算
-                val cropLeft = rect.left.coerceIn(0, bitmap.width)
-                val cropTop = rect.top.coerceIn(0, bitmap.height)
-                val cropWidth = (rect.right - rect.left).coerceAtLeast(1).coerceAtMost(bitmap.width - cropLeft)
-                val cropHeight = (rect.bottom - rect.top).coerceAtLeast(1).coerceAtMost(bitmap.height - cropTop)
+                isProcessing = true
 
-                // Crop サイズが有効かチェック
-                if (cropWidth <= 0 || cropHeight <= 0) {
-                    imageProxy.close()
-                    isProcessing = false
-                    return@setAnalyzer
-                }
+                val mediaImage = imageProxy.image
 
-                val cropped = Bitmap.createBitmap(
-                    bitmap,
-                    cropLeft,
-                    cropTop,
-                    cropWidth,
-                    cropHeight
-                )
+                if (mediaImage != null) {
+                    val bitmap = imageProxy.toBitmap()
+                    val rect = overlay.getScanRect()
 
-                val image = InputImage.fromMediaImage(
-                    mediaImage,
-                    imageProxy.imageInfo.rotationDegrees
-                )
+                    if (rect.width() <= 0 || rect.height() <= 0) {
+                        imageProxy.close()
+                        isProcessing = false
+                        return@setAnalyzer
+                    }
 
-                try {
-                    recognizer.process(image)
-                        .addOnSuccessListener { visionText ->
-                            val text = visionText.text
+                    val cropLeft = rect.left.coerceIn(0, bitmap.width)
+                    val cropTop = rect.top.coerceIn(0, bitmap.height)
+                    val cropWidth = (rect.right - rect.left).coerceAtLeast(1).coerceAtMost(bitmap.width - cropLeft)
+                    val cropHeight = (rect.bottom - rect.top).coerceAtLeast(1).coerceAtMost(bitmap.height - cropTop)
+
+                    if (cropWidth <= 0 || cropHeight <= 0) {
+                        imageProxy.close()
+                        isProcessing = false
+                        return@setAnalyzer
+                    }
+
+                    val cropped = Bitmap.createBitmap(
+                        bitmap,
+                        cropLeft,
+                        cropTop,
+                        cropWidth,
+                        cropHeight
+                    )
+
+                    try {
+                        // ONNX OCR実行
+                        val results = engine.extractProductCode(cropped)
+
+                        if (results.isNotEmpty()) {
+                            val text = results[0]
+                            // 数値のみ抽出（既存の挙動を維持）
                             val numbers = text.replace(Regex("[^0-9]"), "")
 
                             if (numbers.length >= 6) {
                                 if (!scannedList.contains(numbers)) {
                                     scannedList.add(numbers)
                                 }
-
                                 triggerCapture()
                             }
                         }
-                        .addOnCompleteListener {
-                            isProcessing = false
-                            imageProxy.close()
-                        }
-                } catch (e: Exception) {
-                    Log.e("CameraActivity", "OCR processing error", e)
-                    isProcessing = false
-                    imageProxy.close()
+                    } finally {
+                        cropped.recycle()
+                    }
                 }
-            } else {
+
                 imageProxy.close()
                 isProcessing = false
-            }
             }
         } catch (e: Exception) {
             Log.e("CameraActivity", "startAnalyzer error", e)
@@ -345,29 +283,20 @@ class CameraActivity : AppCompatActivity() {
         }
         isCaptured = true
 
-        //imageAnalysis.clearAnalyzer()
-
         Log.d("CameraActivity", "scheduling captureImage in 400ms")
         Handler(Looper.getMainLooper()).postDelayed({
             captureImage()
         }, 400)
-
-        //Handler(Looper.getMainLooper()).postDelayed({
-        //    isCaptured = false
-//
-        //    startAnalyzer()
-        //}, 2500)
     }
 
     private fun captureImage() {
-        Log.d("CameraActivity", "captureImage called: imageCapture initialized=${::imageCapture.isInitialized}")
+        Log.d("CameraActivity", "captureImage called: initialized=${::imageCapture.isInitialized}")
         val filename = "scan_${System.currentTimeMillis()}.jpg"
 
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
-            //put(MediaStore.Images.Media.IS_PENDING, 1)
         }
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(
@@ -376,102 +305,78 @@ class CameraActivity : AppCompatActivity() {
             contentValues
         ).build()
 
-        //val uri = contentResolver.insert(
-        //    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        //    values
-        //) ?: run {
-        //    Toast.makeText(this, "URI作成失敗", Toast.LENGTH_SHORT).show()
-        //    return
-        //}
-
-        //if (uri == null) {
-        //    Toast.makeText(this, "保存失敗", Toast.LENGTH_SHORT).show()
-        //    return
-        //}
-
-
-
         try {
             imageCapture.takePicture(
                 outputOptions,
                 ContextCompat.getMainExecutor(this),
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                        Log.d("CameraActivity", "onImageSaved callback invoked: $outputFileResults")
-                    //val uri = Uri.fromFile(file)
+                        val savedUri = outputFileResults.savedUri
+                        Log.d("SAVE", "保存成功: $savedUri")
 
-                    val savedUri = outputFileResults.savedUri
+                        Toast.makeText(
+                            this@CameraActivity,
+                            "保存成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                    Log.d("SAVE", "保存成功: $savedUri")
+                        savedUri?.let { uri ->
+                            var uriForAI: Uri = uri
+                            try {
+                                val input = contentResolver.openInputStream(uri)
+                                val fullBitmap = BitmapFactory.decodeStream(input)
+                                input?.close()
 
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "保存成功",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                                if (fullBitmap != null) {
+                                    val rect = overlay.getScanRect()
+                                    val pvW = previewView.width
+                                    val pvH = previewView.height
 
-                    savedUri?.let { uri ->
-                        var uriForAI: Uri = uri
-                        // load bitmap and crop to overlay rect
-                        try {
-                            val input = contentResolver.openInputStream(uri)
-                            val fullBitmap = BitmapFactory.decodeStream(input)
-                            input?.close()
+                                    if (pvW > 0 && pvH > 0) {
+                                        val mapped = mapOverlayToBitmapRect(
+                                            overlayRect = rect,
+                                            bitmapWidth = fullBitmap.width,
+                                            bitmapHeight = fullBitmap.height,
+                                            viewWidth = pvW,
+                                            viewHeight = pvH
+                                        )
 
-                            if (fullBitmap != null) {
-                                val rect = overlay.getScanRect()
+                                        val cropped = Bitmap.createBitmap(
+                                            fullBitmap,
+                                            mapped.left,
+                                            mapped.top,
+                                            mapped.width(),
+                                            mapped.height()
+                                        )
 
-                                val pvW = previewView.width
-                                val pvH = previewView.height
+                                        val baos = ByteArrayOutputStream()
+                                        cropped.compress(Bitmap.CompressFormat.JPEG, 85, baos)
+                                        val bytes = baos.toByteArray()
+                                        baos.close()
 
-                                if (pvW > 0 && pvH > 0) {
-                                    val mapped = mapOverlayToBitmapRect(
-                                        overlayRect = rect,
-                                        bitmapWidth = fullBitmap.width,
-                                        bitmapHeight = fullBitmap.height,
-                                        viewWidth = pvW,
-                                        viewHeight = pvH
-                                    )
+                                        CapturedImageStore.addImage(bytes)
 
-                                    val cropped = Bitmap.createBitmap(
-                                        fullBitmap,
-                                        mapped.left,
-                                        mapped.top,
-                                        mapped.width(),
-                                        mapped.height()
-                                    )
-
-                                    val baos = ByteArrayOutputStream()
-                                    cropped.compress(Bitmap.CompressFormat.JPEG, 85, baos)
-                                    val bytes = baos.toByteArray()
-                                    baos.close()
-
-                                    CapturedImageStore.addImage(bytes)
-
-                                    // Save cropped result and remove original full-size shot.
-                                    val croppedUri = saveBitmapToMediaStore(cropped)
-                                    if (croppedUri != null) {
-                                        uriForAI = croppedUri
-                                        contentResolver.delete(uri, null, null)
-                                        Log.d("CameraActivity", "saved cropped image uri=$croppedUri and deleted original=$uri")
+                                        val croppedUri = saveBitmapToMediaStore(cropped)
+                                        if (croppedUri != null) {
+                                            uriForAI = croppedUri
+                                            contentResolver.delete(uri, null, null)
+                                            Log.d("CameraActivity", "saved cropped and deleted original=$uri")
+                                        }
                                     }
                                 }
+                            } catch (e: Exception) {
+                                Log.e("CameraActivity", "crop saved image error", e)
                             }
-                        } catch (e: Exception) {
-                            Log.e("CameraActivity", "crop saved image error", e)
+
+                            sendToAI(uriForAI)
                         }
 
-                        sendToAI(uriForAI)
-                    }
-
-                    // Unlock capture after one successful shot so volume key can trigger again.
-                    isCaptured = false
-                    Log.d("CameraActivity", "capture flow completed: isCaptured reset to false")
+                        isCaptured = false
+                        Log.d("CameraActivity", "capture flow completed: isCaptured reset to false")
                     }
 
                     override fun onError(exception: ImageCaptureException) {
                         exception.printStackTrace()
-
                         Log.e("CameraActivity", "onImageSaved onError: ${exception.message}", exception)
                         Log.e("CAMERA_ERROR", "保存失敗: ${exception.message}")
                         Toast.makeText(this@CameraActivity, "保存エラー", Toast.LENGTH_LONG).show()
@@ -485,6 +390,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    /** ImageProxy → Bitmap 変換 */
     fun ImageProxy.toBitmap(): Bitmap {
         val yBuffer = planes[0].buffer
         val uBuffer = planes[1].buffer
@@ -509,29 +415,23 @@ class CameraActivity : AppCompatActivity() {
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
 
-    //private fun fakeScanCheck(): Boolean {
-    //    // now random but OCR insert later
-    //    return (0..50).random() == 0
-    //}
-
+    /** ギャラリー画像処理 — ONNX OCR */
     private fun processGalleryImage(uri: Uri) {
         try {
             val inputStream: InputStream? = contentResolver.openInputStream(uri)
             val bitmap = BitmapFactory.decodeStream(inputStream)
 
-            val image = InputImage.fromBitmap(bitmap, 0)
-
-            recognizer.process(image)
-                .addOnSuccessListener { visionText ->
-                    val text = visionText.text
+            if (bitmap != null && engineReady) {
+                val results = engine.extractProductCode(bitmap)
+                if (results.isNotEmpty()) {
+                    val text = results[0]
                     val numbers = text.replace(Regex("[^0-9]"), "")
-
                     if (numbers.isNotEmpty()) {
                         scannedList.add(numbers)
                     }
-
-                    Toast.makeText(this, "検出完了", Toast.LENGTH_SHORT).show()
                 }
+                Toast.makeText(this, "検出完了", Toast.LENGTH_SHORT).show()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -548,7 +448,6 @@ class CameraActivity : AppCompatActivity() {
         viewWidth: Int,
         viewHeight: Int
     ): Rect {
-        // PreviewView defaults to center-crop style scaling; map overlay coordinates accordingly.
         val scale = max(
             viewWidth.toFloat() / bitmapWidth.toFloat(),
             viewHeight.toFloat() / bitmapHeight.toFloat()
@@ -622,9 +521,8 @@ class CameraActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         Log.d("CameraActivity", "onKeyDown keyCode=$keyCode event=$event")
-        // keep existing onKeyDown as fallback
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
                 Log.d("CameraActivity", "onKeyDown triggerCapture for key=$keyCode")
@@ -636,8 +534,6 @@ class CameraActivity : AppCompatActivity() {
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        // Capture volume keys here to ensure we get them before system handles volume UI
-        // handle both down and up; prefer ACTION_UP to avoid repeated triggers while holding
         Log.d("CameraActivity", "dispatchKeyEvent action=${event.action} keyCode=${event.keyCode}")
         if (event.action == KeyEvent.ACTION_UP) {
             when (event.keyCode) {
@@ -656,7 +552,6 @@ class CameraActivity : AppCompatActivity() {
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
                 Log.d("CameraActivity", "onKeyUp triggerCapture for key=$keyCode")
-                // ensure capture on key up as well
                 triggerCapture()
                 true
             }
@@ -666,9 +561,13 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // re-request focus when activity resumes
         previewView.requestFocus()
         window?.decorView?.requestFocus()
         Log.d("CameraActivity", "onResume requested focus on preview and decorView")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        engine.release()
     }
 }
