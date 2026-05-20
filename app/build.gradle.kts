@@ -42,6 +42,7 @@ android {
         buildConfig = true
         compose = true
     }
+    ndkVersion = "26.1.10909125"
 }
 
 dependencies {
@@ -62,7 +63,6 @@ dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.0")
     // ONNX Runtime for PaddleOCR
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.20.0")
-    ndkVersion = "26.1.10909125"
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
